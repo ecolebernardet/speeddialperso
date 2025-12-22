@@ -3,299 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Générateur d'Équipes Équilibrées</title>
+    <title>Générateur d'Équipes Optimisées</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        
-        :root {
-            --primary: #ff637e;
-            --bg: #000000;
-            --text: #ffffff;
-            --card-bg: #1a1a1a;
-            --blue-light: #40c4ff;
-            --pink: #ff80ab;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            min-height: 100vh;
-        }
-
-        h1 { font-size: 1.2rem; text-transform: uppercase; font-weight: 900; margin: 15px 0; letter-spacing: -0.05em; }
-
-        .section-title { 
-            font-size: 10px; color: #555; margin: 15px 0 10px 0; 
-            text-transform: uppercase; font-weight: 900; letter-spacing: 2px;
-            width: 100%; text-align: center;
-        }
-
-        .bg-m { background: #dbeafe; color: #1e3a8a; } 
+        :root { --primary: #ff637e; --bg: #000000; --text: #ffffff; --card-bg: #1a1a1a; --blue-light: #40c4ff; --pink: #ff80ab; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; min-height: 100vh; }
+        .section-title { font-size: 10px; color: #555; margin: 15px 0; font-weight: 900; letter-spacing: 1px; text-align: center; text-transform: uppercase; }
+        .student-item { padding: 8px 2px; border-radius: 50px; font-size: 0.55rem; font-weight: 800; text-align: center; cursor: pointer; border: 1px solid transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.2s; }
         .bg-f { background: #fce7f3; color: #831843; } 
-        
-        .level-section { width: 100%; max-width: 500px; margin: 0 auto 15px auto; }
-        
-        .student-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 5px;
-            width: 100%;
-        }
-
-        .student-item {
-            padding: 8px 2px;
-            border-radius: 10px;
-            font-size: 0.55rem;
-            font-weight: 800;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        .absent {
-            background: #2a2a2a !important;
-            color: #777777 !important;
-            text-decoration: line-through;
-            opacity: 0.5;
-            border-color: #333;
-        }
-
-        .selector-grid { display: flex; justify-content: center; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
-        .num-btn { 
-            background: #222; color: #fff; border: 1px solid #444; 
-            width: 34px; height: 34px; border-radius: 50%; 
-            cursor: pointer; font-weight: 800; font-size: 0.8rem;
-        }
+        .bg-m { background: #dbeafe; color: #1e3a8a; } 
+        .absent { background: #2a2a2a !important; color: #777777 !important; text-decoration: line-through; opacity: 0.7; transform: scale(0.9); }
+        .num-btn { background: #222; color: #fff; border: 1px solid #444; width: 34px; height: 34px; border-radius: 50%; font-weight: 800; cursor: pointer; }
         .num-btn.active { background: var(--primary); border-color: #fff; transform: scale(1.1); }
-
-        .generate-btn { 
-            width: 90%; max-width: 300px; background: var(--primary); color: white; 
-            border: none; padding: 14px; font-size: 10px; font-weight: 900; 
-            border-radius: 50px; cursor: pointer; text-transform: uppercase;
-            margin: 10px 0 20px 0;
-        }
-
-        .grid-teams { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            width: 100%; 
-            max-width: 500px; 
-            margin: 0 auto;
-        }
-        .team-card { border-radius: 1.5rem; padding: 12px; background: var(--card-bg); border: 1px solid #222; margin-bottom: 5px; }
-        .team-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 5px; }
-        .team-title { font-weight: 900; color: #fff; font-size: 0.65rem; text-transform: uppercase; }
-        .team-stats { font-size: 0.55rem; color: #666; font-weight: 700; }
-        
-        .student-row { margin-bottom: 4px; display: flex; align-items: center; font-size: 0.7rem; font-weight: 700; }
-        
-        /* TAGS DE NIVEAU COULEUR */
-        .tag { font-size: 0.5rem; font-weight: 900; margin-right: 6px; padding: 2px 4px; border-radius: 4px; color: #000; }
-        .tag-ce2 { background: #fbbf24; } /* Jaune */
-        .tag-cm2 { background: #4ade80; } /* Vert */
-        .tag-default { background: #333; color: #aaa; }
-
+        .generate-btn { width: 100%; max-width: 300px; background: var(--primary); color: white; padding: 14px; font-size: 10px; font-weight: 900; border-radius: 50px; text-transform: uppercase; margin: 20px 0; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 99, 126, 0.3); }
+        .grid-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; margin: 0 auto; }
+        .team-card { border-radius: 1.2rem; padding: 12px; background: var(--card-bg); border: 1px solid #333; }
+        .team-header { border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 4px; }
+        .team-title { font-weight: 900; font-size: 0.65rem; color: #fff; text-transform: uppercase; }
+        .team-stats { font-size: 0.5rem; color: #aaa; display: block; }
+        .tag { font-size: 0.45rem; font-weight: 900; margin-right: 5px; padding: 2px 4px; border-radius: 3px; color: #000; }
+        .tag-ce2 { background: #fbbf24; } 
+        .tag-cm2 { background: #4ade80; }
         .name-f { color: var(--pink); } 
-        .name-g { color: var(--blue-light); } 
-
-        .bottom-nav { 
-            display: flex; gap: 12px; width: 100%; max-width: 400px; margin-top: 30px; padding-bottom: 60px; 
-        }
-        .btn-nav { font-weight: 800; padding: 16px; border-radius: 50px; font-size: 10px; text-align: center; border: none; cursor: pointer; flex: 1;}
-        
-        button:active { transform: scale(0.95); }
+        .name-g { color: var(--blue-light); }
+        .bottom-nav { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-top: 20px; padding-bottom: 40px; }
+        .btn-nav { font-weight: 800; padding: 12px; border-radius: 50px; font-size: 10px; text-align: center; cursor: pointer; flex: 1; text-transform: uppercase; border: none; }
     </style>
 </head>
-<body>
+<body class="flex flex-col items-center">
 
-    <h1>Équipes</h1>
-    
-    <p class="section-title">Présents ou absents ?</p>
-    <div id="attendance-container" class="w-full max-w-2xl flex flex-col items-center"></div>
+    <p class="section-title">Appel (Cliquez sur les absents)</p>
+    <div id="attendance-container" class="w-full max-w-2xl grid grid-cols-5 gap-1 px-2"></div>
 
     <p class="section-title">Nombre d'équipes</p>
-    <div class="selector-grid">
-        <button class="num-btn" onclick="selectNum(2)">2</button>
-        <button class="num-btn" onclick="selectNum(3)">3</button>
-        <button class="num-btn" onclick="selectNum(4)">4</button>
-        <button class="num-btn active" onclick="selectNum(5)">5</button>
-        <button class="num-btn" onclick="selectNum(6)">6</button>
-        <button class="num-btn" onclick="selectNum(7)">7</button>
-        <button class="num-btn" onclick="selectNum(8)">8</button>
-    </div>
+    <div class="flex gap-2 mb-4" id="selector"></div>
 
-    <button class="generate-btn" onclick="generateTeams()">Générer les groupes</button>
+    <button class="generate-btn" onclick="generateAndBalance()">Générer l'équilibre optimal</button>
 
     <div id="results" class="grid-teams"></div>
 
     <div class="bottom-nav">
-        <button onclick="resetAll()" class="btn-nav bg-red-500 text-red-100">RàZ équipes</button>
+        <button onclick="resetTeams()" class="btn-nav bg-red-500 text-rose-100">Effacer Équipes</button>
         <button onclick="window.location.href='index.html'" class="btn-nav bg-[#71bd7b] text-green-950">Accueil</button>
     </div>
 
 <script>
-    let selectedNumTeams = 5;
+    let selectedNumTeams = 4;
     let ALL_STUDENTS = JSON.parse(localStorage.getItem('maListeEleves')) || [];
-    let absents = new Set(); 
+    
+    // --- MODIFICATION ICI : Chargement des absents depuis la mémoire ---
+    let savedAbsents = JSON.parse(localStorage.getItem('absentsList')) || [];
+    let absents = new Set(savedAbsents);
 
-    function formatDisplayName(fullName) {
-        const parts = fullName.trim().split(" ");
-        if (parts.length === 0) return fullName;
-        const firstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase();
-        const lastName = parts.slice(1).join(" ").toUpperCase();
-        return (firstName + " " + lastName).trim();
+    function init() {
+        const sel = document.getElementById('selector');
+        sel.innerHTML = '';
+        for(let i=2; i<=8; i++) {
+            sel.innerHTML += `<button class="num-btn ${i===selectedNumTeams?'active':''}" id="btn-${i}" onclick="selectNum(${i})">${i}</button>`;
+        }
+        renderAttendance();
+        const saved = localStorage.getItem('savedTeams');
+        if (saved) renderTeams(JSON.parse(saved));
+    }
+
+    function selectNum(n) {
+        selectedNumTeams = n;
+        document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+n).classList.add('active');
     }
 
     function renderAttendance() {
         const container = document.getElementById('attendance-container');
         container.innerHTML = '';
-        const groupes = {};
-        ALL_STUDENTS.forEach(el => {
-            const niv = el.niveau.toUpperCase();
-            if (!groupes[niv]) groupes[niv] = [];
-            groupes[niv].push(el);
-        });
-        Object.keys(groupes).sort().forEach(niv => {
-            const section = document.createElement('div');
-            section.className = "level-section";
-            section.innerHTML = `<div class="text-center text-[9px] font-black text-zinc-600 mb-2 uppercase tracking-widest">${niv}</div>`;
-            const grid = document.createElement('div');
-            grid.className = "student-grid";
-            groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(el => {
-                const isAbsent = absents.has(el.id);
-                const item = document.createElement('div');
-                item.className = `student-item bg-${el.sexe} ${isAbsent ? 'absent' : ''}`;
-                item.innerText = el.identite.split(" ")[0].charAt(0).toUpperCase() + el.identite.split(" ")[0].slice(1).toLowerCase();
-                item.onclick = () => toggleAbsent(el.id);
-                grid.appendChild(item);
-            });
-            section.appendChild(grid);
-            container.appendChild(section);
+        ALL_STUDENTS.sort((a,b) => a.identite.localeCompare(b.identite)).forEach(s => {
+            const isAbs = absents.has(s.id);
+            const div = document.createElement('div');
+            div.className = `student-item bg-${s.sexe.toLowerCase()} ${isAbs ? 'absent' : ''}`;
+            div.innerText = s.identite.split(" ")[0];
+            div.onclick = () => toggleAbs(s.id);
+            container.appendChild(div);
         });
     }
 
-    function toggleAbsent(id) {
-        if (absents.has(id)) absents.delete(id);
-        else absents.add(id);
+    function toggleAbs(id) {
+        if(absents.has(id)) {
+            absents.delete(id);
+        } else {
+            absents.add(id);
+        }
+        // --- MODIFICATION ICI : Sauvegarde immédiate des absents ---
+        localStorage.setItem('absentsList', JSON.stringify(Array.from(absents)));
         renderAttendance();
     }
 
-    function selectNum(n) {
-        selectedNumTeams = n;
-        document.querySelectorAll('.num-btn').forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.innerText) === n);
-        });
-    }
-
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    function generateTeams() {
-        const presents = ALL_STUDENTS.filter(s => !absents.has(s.id));
-        if (presents.length === 0) return alert("Tous les élèves sont absents !");
+    function generateAndBalance() {
+        let presents = ALL_STUDENTS.filter(s => !absents.has(s.id));
+        if (presents.length < selectedNumTeams) return alert("Effectif insuffisant pour ce nombre d'équipes.");
 
         let teams = Array.from({ length: selectedNumTeams }, () => []);
 
-        // Équilibrage : On sépare les élèves par sexe et niveau
         const groups = {
-            f_ce2: [], g_ce2: [],
-            f_cm2: [], g_cm2: [],
-            autres: []
+            f_ce2: presents.filter(s => s.sexe.toLowerCase()==='f' && s.niveau.toUpperCase().includes('CE2')).sort(() => Math.random() - 0.5),
+            m_ce2: presents.filter(s => s.sexe.toLowerCase()!=='f' && s.niveau.toUpperCase().includes('CE2')).sort(() => Math.random() - 0.5),
+            f_cm2: presents.filter(s => s.sexe.toLowerCase()==='f' && s.niveau.toUpperCase().includes('CM2')).sort(() => Math.random() - 0.5),
+            m_cm2: presents.filter(s => s.sexe.toLowerCase()!=='f' && s.niveau.toUpperCase().includes('CM2')).sort(() => Math.random() - 0.5)
         };
 
-        presents.forEach(el => {
-            const niv = el.niveau.toUpperCase();
-            const sexe = el.sexe.toLowerCase();
-            if (niv.includes('CE2')) {
-                sexe === 'f' ? groups.f_ce2.push(el) : groups.g_ce2.push(el);
-            } else if (niv.includes('CM2')) {
-                sexe === 'f' ? groups.f_cm2.push(el) : groups.g_cm2.push(el);
-            } else {
-                groups.autres.push(el);
+        let teamIdx = 0;
+        [groups.f_ce2, groups.m_ce2, groups.f_cm2, groups.m_cm2].forEach(sub => {
+            sub.forEach(student => {
+                teams[teamIdx].push(student);
+                teamIdx = (teamIdx + 1) % selectedNumTeams;
+            });
+        });
+
+        let improved = true;
+        while(improved) {
+            improved = false;
+            let counts = teams.map(t => t.filter(s => s.sexe.toLowerCase()==='f').length);
+            let maxF = Math.max(...counts);
+            let minF = Math.min(...counts);
+
+            if (maxF - minF > 1) {
+                let highIdx = counts.indexOf(maxF);
+                let lowIdx = counts.indexOf(minF);
+
+                for (let level of ['CE2', 'CM2']) {
+                    let girlIdx = teams[highIdx].findIndex(s => s.sexe.toLowerCase()==='f' && s.niveau.includes(level));
+                    let boyIdx = teams[lowIdx].findIndex(s => s.sexe.toLowerCase()!=='f' && s.niveau.includes(level));
+
+                    if (girlIdx !== -1 && boyIdx !== -1) {
+                        let temp = teams[highIdx][girlIdx];
+                        teams[highIdx][girlIdx] = teams[lowIdx][boyIdx];
+                        teams[lowIdx][boyIdx] = temp;
+                        improved = true;
+                        break; 
+                    }
+                }
             }
-        });
-
-        // Mélange et création d'une file d'attente intelligente
-        let pool = [];
-        Object.keys(groups).forEach(key => {
-            pool = pool.concat(shuffle([...groups[key]]));
-        });
-
-        // Distribution alternée
-        pool.forEach((student, index) => {
-            teams[index % selectedNumTeams].push(student);
-        });
+        }
 
         localStorage.setItem('savedTeams', JSON.stringify(teams));
         renderTeams(teams);
     }
 
     function renderTeams(teams) {
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = '';
-
-        teams.forEach((team, index) => {
-            if (team.length === 0) return;
+        const results = document.getElementById('results');
+        results.innerHTML = '';
+        teams.forEach((team, i) => {
             team.sort((a, b) => a.niveau.localeCompare(b.niveau));
-            const countF = team.filter(s => s.sexe.toLowerCase() === 'f').length;
-            const countG = team.filter(s => s.sexe.toLowerCase() !== 'f').length;
-            
-            let card = document.createElement('div');
-            card.className = 'team-card';
-            let studentsHTML = team.map(s => {
-                const niv = s.niveau.toUpperCase();
-                let tagClass = 'tag-default';
-                if (niv.includes('CE2')) tagClass = 'tag-ce2';
-                else if (niv.includes('CM2')) tagClass = 'tag-cm2';
+            const f = team.filter(s => s.sexe.toLowerCase()==='f').length;
+            const m = team.filter(s => s.sexe.toLowerCase()!=='f').length;
+            const ce2 = team.filter(s => s.niveau.toUpperCase().includes('CE2')).length;
+            const cm2 = team.filter(s => s.niveau.toUpperCase().includes('CM2')).length;
 
-                return `
-                <div class="student-row">
-                    <span class="tag ${tagClass}">${niv}</span>
-                    <span class="${s.sexe.toLowerCase() === 'f' ? 'name-f' : 'name-g'}">${formatDisplayName(s.identite)}</span>
+            let html = `<div class="team-card"><div class="team-header"><span class="team-title">Équipe ${i+1}</span><span class="team-stats">${f}F/${m}G • ${ce2}CE/${cm2}CM</span></div>`;
+            team.forEach(s => {
+                const isCE2 = s.niveau.toUpperCase().includes('CE2');
+                html += `<div class="flex items-center mb-1 text-[0.65rem] font-bold">
+                    <span class="tag ${isCE2?'tag-ce2':'tag-cm2'}">${isCE2?'CE2':'CM2'}</span>
+                    <span class="${s.sexe.toLowerCase()==='f'?'name-f':'name-g'}">${s.identite}</span>
                 </div>`;
-            }).join('');
-            
-            card.innerHTML = `
-                <div class="team-header">
-                    <span class="team-title">Équipe ${index + 1}</span>
-                    <span class="team-stats">${countF}F / ${countG}G</span>
-                </div>
-                ${studentsHTML}
-            `;
-            resultsDiv.appendChild(card);
+            });
+            results.innerHTML += html + `</div>`;
         });
     }
 
-    function resetAll() {
+    function resetTeams() {
         if(confirm("Effacer les équipes ?")) {
-            document.getElementById('results').innerHTML = '';
             localStorage.removeItem('savedTeams');
+            document.getElementById('results').innerHTML = '';
         }
     }
 
-    window.onload = () => {
-        renderAttendance();
-        const saved = localStorage.getItem('savedTeams');
-        if (saved) {
-            const teams = JSON.parse(saved);
-            renderTeams(teams);
-        }
-    };
+    window.onload = init;
 </script>
 </body>
 </html>
