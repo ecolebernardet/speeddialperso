@@ -3,55 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Observations Dynamiques</title>
+    <title>Observations - Gestion Fichiers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        :root { --primary: #ff5a98; --bg-dark: #000000; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        :root { --primary: #ff637e; --bg-dark: #000000; --card-bg: #1a1a1a; --blue-light: #40c4ff; --pink: #ff80ab; }
         body { 
             font-family: 'Inter', sans-serif; 
             background: var(--bg-dark); 
-            margin: 0; 
-            padding: 8px; 
-            box-sizing: border-box; 
-            min-height: 100vh;
+            margin: 0; padding: 8px; 
+            min-height: 100vh; color: white;
         }
-        .columns-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 42rem; margin: 0 auto; }
-        
-        .student-list { list-style: none; padding: 0; margin: 0; background: transparent; }
-        
+        .columns-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 80%; margin: 0 auto; }
         .student-item { 
-            padding: 7px 11px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            cursor: pointer; 
-            border-radius: 5rem; 
-            margin-bottom: 3px; 
-            transition: transform 0.1s;
+            padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; border-radius: 50px; margin-bottom: 2px; transition: all 0.2s;
         }
-        .student-item:active { transform: scale(0.96); }
-
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
         .bg-f { background: #fce7f3; color: #831843; } 
+        .is-absent { opacity: 0.3 !important; background: #333 !important; color: #777 !important; text-decoration: line-through; }
+        .student-name { font-weight: 700; font-size: 0.7rem; }
         
-        .student-name { font-weight: 700; font-size: 0.75rem; line-height: 1.2; }
-        
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 350px; }
-        textarea { width: 100%; margin: 15px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.9rem; resize: none; background: #f9f9f9; color: #000; outline: none; }
-        .btns { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-save { background: var(--primary); color: white; }
-        .btn-cancel { background: #eee; color: #555; }
-
-        .bottom-nav { 
-            width: 100%; 
-            max-width: 480px; 
-            margin: 25px auto 0; 
-            padding-bottom: 40px; 
+        /* Modales */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: #1a1a1a; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; border: 1px solid #333; }
+        textarea { 
+            width: 100%; margin: 15px 0; padding: 12px; border-radius: 12px; border: 1px solid #333; 
+            font-size: 0.9rem; resize: none; background: #000; color: #fff; outline: none; 
         }
-        .nav-btn { width: 100%; font-weight: 800; border-radius: 50px; font-size: 9px; padding: 12px 4px; }
+        .btns { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 14px; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 10px; }
+        .btn-save { background: var(--primary); color: white; }
+        .btn-cancel { background: #333; color: #ccc; }
+
+        .bottom-nav { width: 100%; max-width: 500px; margin: 15px auto 0; padding-bottom: 30px; }
+        .nav-btn { font-weight: 900; border-radius: 50px; font-size: 11px; padding: 11px; border: none; }
     </style>
 </head>
 <body>
@@ -60,37 +46,19 @@
 
     <footer class="bottom-nav px-2">
         <div class="grid grid-cols-3 gap-2">
-            <button onclick="openExportModal()" class="nav-btn bg-gray-600 text-white active:scale-95 transition-transform">
-                Export 👆
-            </button>
-            <button onclick="openImportModal()" class="nav-btn bg-gray-600 text-white active:scale-95 transition-transform">
-                Import 👇
-            </button>
-            <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950 active:scale-95 transition-transform">
-                Accueil
-            </button>
+            <button onclick="exportToFile()" class="nav-btn bg-zinc-800 text-white">export .txt 👆</button>
+            <button onclick="importFromFile()" class="nav-btn bg-zinc-800 text-white">import .txt 👇</button>
+            <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950">Accueil</button>
         </div>
     </footer>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-content">
-            <h2 id="modalTitle" style="margin:0; font-size: 1rem; font-weight: 700; color: #111;">Élève</h2>
-            <textarea id="commentInput" rows="10" placeholder="Écrire une observation..."></textarea>
+            <h2 id="modalTitle" style="margin:0; font-size: 1.1rem; font-weight: 800; color: #fff;">Élève</h2>
+            <textarea id="commentInput" rows="8" placeholder="Écrire une observation..."></textarea>
             <div class="btns">
-                <button class="modal-btn btn-cancel" onclick="closeModal('modal')">Annuler</button>
-                <button class="modal-btn btn-save" onclick="saveData()">Valider</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="ioModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="ioTitle" style="margin:0; font-size: 1rem; font-weight: 700; color: #111;">Action</h2>
-            <p class="text-[10px] text-gray-500 mt-2" id="ioDesc"></p>
-            <textarea id="ioTextarea" rows="8"></textarea>
-            <div class="btns">
-                <button class="modal-btn btn-cancel" onclick="closeModal('ioModal')">Fermer</button>
-                <button id="ioActionBtn" class="modal-btn btn-save">Action</button>
+                <button class="modal-btn btn-cancel" onclick="closeModal()">Fermer</button>
+                <button class="modal-btn btn-save" onclick="saveData()">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -98,19 +66,15 @@
     <script>
         let elevesInscrits = JSON.parse(localStorage.getItem('maListeEleves')) || [];
         let savedComments = JSON.parse(localStorage.getItem('studentObservations')) || {};
+        let savedAbsents = JSON.parse(localStorage.getItem('absentsList')) || [];
+        let absents = new Set(savedAbsents);
         let currentStudentId = "";
 
-        // Formatage : Prénom (Initiale Maj) + NOM (Tout en Maj)
         function formatName(str) {
             const parts = str.trim().split(' ');
             if (parts.length === 0) return str;
-            
-            // Prénom : Première lettre Maj, le reste Min
             const firstPart = parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase();
-            
-            // Nom : Tout le reste en Majuscules
             const otherParts = parts.slice(1).join(' ').toUpperCase();
-            
             return (firstPart + ' ' + otherParts).trim();
         }
 
@@ -118,102 +82,95 @@
             const container = document.getElementById('listeContainer');
             container.innerHTML = "";
             if (elevesInscrits.length === 0) {
-                container.innerHTML = `<div class="col-span-2 text-center p-10 border-2 border-dashed border-zinc-800 rounded-3xl mt-10 text-zinc-500 font-bold text-[10px] uppercase">Aucun élève trouvé.</div>`;
+                container.innerHTML = `<div class="col-span-2 text-center p-10 text-zinc-500 text-[10px] font-bold uppercase">Aucun élève chargé.</div>`;
                 return;
             }
+
             const groupes = {};
             elevesInscrits.forEach(el => {
                 const niv = el.niveau.toUpperCase();
                 if (!groupes[niv]) groupes[niv] = [];
                 groupes[niv].push(el);
             });
+
             Object.keys(groupes).sort().forEach(niv => {
                 const col = document.createElement('div');
-                col.className = "column";
-                const colorTitle = (niv === 'CE2') ? 'text-rose-400' : (niv === 'CM2' ? 'text-sky-400' : 'text-emerald-400');
-                col.innerHTML = `<h2 class="${colorTitle} text-[10px] font-bold uppercase tracking-widest text-center mb-2">${niv}</h2>`;
+                const colorTitle = (niv.includes('CE2')) ? 'text-amber-400' : 'text-emerald-400';
+                col.innerHTML = `<h2 class="${colorTitle} text-[10px] font-black uppercase text-center mb-1">${niv}</h2>`;
                 const ul = document.createElement('ul');
                 ul.className = "student-list";
                 
                 groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(el => {
                     const comment = savedComments[el.id] || "";
+                    const isAbs = absents.has(el.id);
                     const li = document.createElement('li');
-                    li.className = `student-item ${el.sexe === 'f' ? 'bg-f' : 'bg-m'}`;
-                    
+                    li.className = `student-item ${el.sexe === 'f' ? 'bg-f' : 'bg-m'} ${isAbs ? 'is-absent' : ''}`;
                     const displayName = formatName(el.identite);
-
-                    li.innerHTML = `
-                        <span class="student-name">${displayName}</span>
-                        <span style="font-size: 0.8rem;">${comment.trim() ? '🔎' : '➔'}</span>
-                    `;
+                    li.innerHTML = `<span class="student-name">${displayName}</span><span>${comment.trim() ? '📝' : '＋'}</span>`;
                     li.onclick = () => openModal(el.id, displayName);
                     ul.appendChild(li);
                 });
-                col.appendChild(ul);
-                container.appendChild(col);
+                col.appendChild(ul); container.appendChild(col);
             });
         }
 
-        function openModal(id, nomFormatted) {
+        function openModal(id, nom) {
             currentStudentId = id;
-            document.getElementById('modalTitle').innerText = nomFormatted;
+            document.getElementById('modalTitle').innerText = nom;
             document.getElementById('commentInput').value = savedComments[id] || "";
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
         function saveData() {
             const val = document.getElementById('commentInput').value;
             if(val.trim() === "") delete savedComments[currentStudentId];
             else savedComments[currentStudentId] = val;
             localStorage.setItem('studentObservations', JSON.stringify(savedComments));
-            closeModal('modal'); 
-            renderList();
+            closeModal(); renderList();
         }
 
-        function openExportModal() {
-            const dataStr = JSON.stringify(savedComments);
-            const area = document.getElementById('ioTextarea');
-            document.getElementById('ioTitle').innerText = "Exporter";
-            document.getElementById('ioDesc').innerText = "Copié dans le presse-papier !";
-            area.value = dataStr;
-            document.getElementById('ioModal').style.display = 'flex';
-            area.select();
-            document.execCommand('copy');
-            document.getElementById('ioActionBtn').innerText = "Copié ! ✅";
+        // --- EXPORT VERS FICHIER .TXT ---
+        function exportToFile() {
+            if (Object.keys(savedComments).length === 0) return alert("Rien à exporter.");
+            
+            const dataStr = JSON.stringify(savedComments, null, 2);
+            const date = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
+            const blob = new Blob([dataStr], { type: 'text/plain' });
+            const link = document.createElement('a');
+            
+            link.href = URL.createObjectURL(blob);
+            link.download = `observations-${date}.txt`;
+            link.click();
+            URL.revokeObjectURL(link.href);
         }
 
-        function openImportModal() {
-            document.getElementById('ioTitle').innerText = "Importer";
-            document.getElementById('ioDesc').innerText = "Collez votre code :";
-            document.getElementById('ioTextarea').value = "";
-            document.getElementById('ioModal').style.display = 'flex';
-            const btn = document.getElementById('ioActionBtn');
-            btn.innerText = "Valider";
-            btn.onclick = () => {
-                try {
-                    const content = document.getElementById('ioTextarea').value;
-                    if(!content) return;
-                    let rawImport = JSON.parse(content);
-                    let processedData = {};
-                    for (let key in rawImport) {
-                        if (isNaN(key)) {
-                            const eleve = elevesInscrits.find(e => e.identite.toUpperCase() === key.toUpperCase());
-                            if (eleve) processedData[eleve.id] = rawImport[key];
-                        } else {
-                            processedData[key] = rawImport[key];
+        // --- IMPORT DEPUIS FICHIER .TXT ---
+        function importFromFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt';
+
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        if (confirm("Remplacer les observations actuelles par celles du fichier ?")) {
+                            savedComments = importedData;
+                            localStorage.setItem('studentObservations', JSON.stringify(savedComments));
+                            renderList();
                         }
-                    }
-                    savedComments = processedData;
-                    localStorage.setItem('studentObservations', JSON.stringify(savedComments));
-                    renderList();
-                    closeModal('ioModal');
-                } catch(e) { alert("Format invalide."); }
+                    } catch (err) { alert("Erreur : Fichier invalide."); }
+                };
+                reader.readAsText(file);
             };
+            input.click();
         }
 
-        renderList();
+        window.onload = renderList;
     </script>
 </body>
 </html>
