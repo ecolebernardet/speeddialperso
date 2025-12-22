@@ -3,118 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tirage au sort - CE2/CM2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Tirage au Sort</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #121212; color: white; }
-        .card { background: #1e1e1e; border: 1px solid #333; border-radius: 1.5rem; }
-        .btn-primary { background: #8b5cf6; transition: all 0.2s; }
-        .btn-primary:active { transform: scale(0.95); background: #7c3aed; }
-        .gender-f { color: #f472b6; } /* Rose pour filles */
-        .gender-g { color: #60a5fa; } /* Bleu pour garçons */
+        :root {
+            --primary: #ff637e;
+            --bg: #000000;
+            --text: #ffffff;
+            --card-bg: #222222;
+            --btn-home: #71bd7b;
+            --home-text: #052e16;
+        }
+
+        /* ANTI-CLIGNOTEMENT RECTANGULAIRE */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 50px;
+            padding: 10px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        #result-container {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 50px;
+            margin: 10px 0;
+            border: 2px solid #333;
+            overflow: hidden;
+        }
+
+        #result-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            padding: 0 5px;
+            text-transform: uppercase;
+        }
+
+        .main-btn {
+            width: 80%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .stats { margin-top: 10px; font-weight: 500; color: #aaa; font-size: 0.7rem; }
+
+        .list-section {
+            width: 100%;
+            max-width: 450px;
+            margin-top: 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 6px;
+            padding: 0;
+            margin-bottom: 15px;
+            list-style: none;
+            width: 100%;
+        }
+
+        .student-item {
+            background: #222;
+            color: #eee;
+            padding: 6px 5px;
+            border-radius: 50px;
+            font-size: 0.75rem; 
+            border: 1px solid #333;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer; /* Indique que c'est cliquable */
+            transition: all 0.2s ease;
+        }
+
+        .drawn {
+            background: #111;
+            color: #444;
+            text-decoration: line-through;
+            border-color: transparent;
+        }
+
+        .reset-link {
+            width: 50%;
+            max-width: 300px;
+            background: #ec003f;
+            color: #fce7f3;
+            border: none;
+            padding: 15px 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            -webkit-appearance: none;
+        }
+
+        .home-btn {
+            width: 50%;
+            max-width: 300px;
+            background: var(--btn-home);
+            color: var(--home-text);
+            border: none;
+            padding: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            margin-bottom: 30px;
+            -webkit-appearance: none;
+        }
+
+        .main-btn:active, .home-btn:active, .reset-link:active, .student-item:active { 
+            transform: scale(0.95); 
+            opacity: 0.9;
+        }
+        
+        .main-btn:disabled { background: #333; box-shadow: none; color: #888; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-6">
+<body>
 
-    <div class="w-full max-w-sm text-center">
-        <header class="mb-8">
-            <h1 class="text-zinc-500 text-xs uppercase tracking-[0.2em] font-bold">Tirage Aléatoire</h1>
-            <div id="status" class="text-[10px] mt-2 text-zinc-600">Chargement de la liste...</div>
-        </header>
-
-        <div class="card p-10 shadow-2xl mb-8">
-            <div id="display-area" class="h-32 flex flex-col items-center justify-center">
-                <div id="result-name" class="text-4xl font-bold mb-2">?</div>
-                <div id="result-info" class="text-xs uppercase tracking-widest text-zinc-500">Prêt</div>
-            </div>
+    <div class="card">
+        <div id="result-container">
+            <div id="result-display">Prêt</div>
         </div>
+        
+        <button id="draw-btn" class="main-btn" onclick="drawName()">TIRER UN PRÉNOM</button>
+        
+        <div class="stats" id="counter">--</div>
+    </div>
 
-        <button onclick="tirerAuSort()" id="btn-tirage" disabled
-                class="btn-primary w-full py-5 rounded-2xl font-bold text-lg shadow-lg shadow-violet-500/20 mb-6 opacity-50 cursor-not-allowed">
-            Lancer le tirage
-        </button>
-
-        <a href="index.html" class="text-zinc-500 text-sm font-medium hover:text-white transition-colors">
-            ← Retour au menu
-        </a>
+    <div class="list-section">
+        <p style="font-size: 0.7rem; color: #666; margin-bottom: 10px;">Tapez sur un nom pour le barrer ou le remettre</p>
+        <ul id="student-list-ui" class="student-grid"></ul>
+        
+        <button class="reset-link" onclick="resetDrawing()">RàZ</button>
+        
+        <button onclick="window.location.href='index.html'" class="home-btn">Accueil</button>
     </div>
 
     <script>
-        let eleves = [];
+        const ALL_NAMES = [
+            "Aliya", "Ariane", "Eden", "Elowan", "Galise", "Jean", "Maëlys", "Matteo", 
+            "Milan", "Noa", "Sirine", "Soline", "Timéo", "Victor", "Zélie",
+            "Célina", "Félix", "Lila", "Madeline", "Marouane", "Maxime", "Mayline", 
+            "Nino", "Nolan", "Roumaïssa"
+        ].sort(); // Optionnel : trier par ordre alphabétique
 
-        // 1. Fonction pour charger la liste depuis le fichier TXT
-        async function chargerEleves() {
-            const statusLabel = document.getElementById('status');
-            const btn = document.getElementById('btn-tirage');
+        let remaining = JSON.parse(localStorage.getItem('remainingStudents')) || [...ALL_NAMES];
 
-            try {
-                const response = await fetch('liste.txt');
-                if (!response.ok) throw new Error('Fichier introuvable');
-                
-                const texte = await response.text();
-                
-                // On transforme le texte en tableau d'objets
-                eleves = texte.trim().split('\n')
-                    .filter(ligne => ligne.includes(',')) // On ignore les lignes mal formées
-                    .map(ligne => {
-                        const [nom, sexe, niveau] = ligne.split(',');
-                        return { 
-                            nom: nom.trim(), 
-                            sexe: sexe.trim().toLowerCase(), 
-                            niveau: niveau.trim().toUpperCase() 
-                        };
-                    });
+        function saveState() {
+            localStorage.setItem('remainingStudents', JSON.stringify(remaining));
+        }
 
-                if (eleves.length > 0) {
-                    statusLabel.innerText = `${eleves.length} élèves chargés`;
-                    statusLabel.className = "text-[10px] mt-2 text-emerald-500";
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                } else {
-                    statusLabel.innerText = "La liste est vide";
-                }
+        // Nouvelle fonction pour basculer l'état d'un élève manuellement
+        function toggleStudent(name) {
+            if (remaining.includes(name)) {
+                // Si présent, on le retire (on le barre)
+                remaining = remaining.filter(n => n !== name);
+            } else {
+                // Si absent, on le rajoute (on le remet en jeu)
+                remaining.push(name);
+            }
+            saveState();
+            updateUI();
+        }
 
-            } catch (error) {
-                statusLabel.innerText = "Erreur : liste.txt introuvable";
-                statusLabel.className = "text-[10px] mt-2 text-rose-500";
-                console.error(error);
+        function updateUI() {
+            const listUI = document.getElementById('student-list-ui');
+            const counter = document.getElementById('counter');
+            const btn = document.getElementById('draw-btn');
+
+            listUI.innerHTML = ''; // On vide la liste
+            
+            ALL_NAMES.forEach(n => {
+                const isDrawn = !remaining.includes(n);
+                const li = document.createElement('li');
+                li.className = `student-item ${isDrawn ? 'drawn' : ''}`;
+                li.innerText = n;
+                // On ajoute l'événement de clic
+                li.onclick = () => toggleStudent(n);
+                listUI.appendChild(li);
+            });
+
+            counter.innerText = `${remaining.length} élève${remaining.length > 1 ? 's' : ''} restant${remaining.length > 1 ? 's' : ''}`;
+
+            if (remaining.length === 0) {
+                btn.disabled = true;
+                btn.innerText = "SESSION TERMINÉE";
+            } else {
+                btn.disabled = false;
+                btn.innerText = "TIRER UN PRÉNOM";
             }
         }
 
-        // 2. Fonction de tirage au sort
-        function tirerAuSort() {
-            if (eleves.length === 0) return;
+        function drawName() {
+            if (remaining.length === 0) return;
 
-            const displayNom = document.getElementById('result-name');
-            const displayInfo = document.getElementById('result-info');
-            
-            // Animation rapide avant le résultat
-            let count = 0;
+            const display = document.getElementById('result-display');
+            const btn = document.getElementById('draw-btn');
+            btn.disabled = true;
+
+            let iterations = 0;
             const interval = setInterval(() => {
-                const randomTemp = eleves[Math.floor(Math.random() * eleves.length)];
-                displayNom.innerText = randomTemp.nom;
-                displayNom.className = "text-4xl font-bold mb-2 text-zinc-600";
-                count++;
-                
-                if (count > 10) {
+                const randomName = remaining[Math.floor(Math.random() * remaining.length)];
+                display.innerText = randomName;
+                iterations++;
+
+                if (iterations > 12) {
                     clearInterval(interval);
+                    const finalIndex = Math.floor(Math.random() * remaining.length);
+                    const winner = remaining.splice(finalIndex, 1)[0];
                     
-                    // Résultat final
-                    const choisi = eleves[Math.floor(Math.random() * eleves.length)];
-                    displayNom.innerText = choisi.nom;
+                    display.innerText = winner;
+                    display.style.color = "#ff637e";
                     
-                    // Couleur selon le sexe
-                    displayNom.className = `text-4xl font-bold mb-2 ${choisi.sexe === 'f' ? 'gender-f' : 'gender-g'}`;
-                    
-                    // Affichage du niveau (CE2 ou CM2)
-                    displayInfo.innerText = choisi.niveau;
+                    saveState();
+                    updateUI();
                 }
-            }, 50);
+            }, 60);
         }
 
-        // Lancer le chargement au démarrage
-        chargerEleves();
+        function resetDrawing() {
+            if(confirm("Réinitialiser le tirage ?")) {
+                remaining = [...ALL_NAMES];
+                localStorage.removeItem('remainingStudents');
+                document.getElementById('result-display').innerText = "Prêt";
+                updateUI();
+            }
+        }
+
+        updateUI();
     </script>
 </body>
 </html>
