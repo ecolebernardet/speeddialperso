@@ -14,7 +14,7 @@
         }
         
         .counter-badge {
-            width: 1.4rem; height: 1.4rem; min-width: 1.4rem;
+            width: 1.2rem; height: 1.2rem; min-width: 1.2rem;
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%; font-weight: 800; font-size: 0.9rem;
             transition: all 0.1s ease; border: 1px solid rgba(0,0,0,0.1);
@@ -35,8 +35,14 @@
         .no-select { -webkit-tap-highlight-color: transparent; user-select: none; }
 
         .student-card {
-            border-radius: 50px;
-            margin-bottom: 4px;
+            padding: 8px 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer; 
+            border-radius: 1rem; 
+            margin-bottom: 5px; 
+            transition: transform 0.1s;
         }
 
         .bg-girl { background-color: #fce7f3; color: #831843; } 
@@ -59,10 +65,9 @@
             border-radius: 50px;
             font-size: 10px;
             text-align: center;
-            text-transform: uppercase;
-            border: none;
+             border: none;
             cursor: pointer;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
     </style>
 </head>
@@ -81,7 +86,7 @@
         </main>
 
         <div class="bottom-nav">
-            <button id="reset-button" class="nav-btn bg-rose-700 text-white shadow-lg active:scale-95 transition-transform">
+            <button id="reset-button" class="nav-btn bg-red-500 text-rose-100 shadow-lg active:scale-95 transition-transform">
                 RàZ
             </button>
 
@@ -135,7 +140,7 @@
             card.className = `student-card flex items-center justify-between p-2 transition-all no-select cursor-pointer ${genderClass}`;
 
             const nameEl = document.createElement('div');
-            nameEl.className = 'font-bold text-[11px] leading-tight pr-1 tracking-tight truncate';
+            nameEl.className = 'font-bold text-[12px] leading-tight pr-1 tracking-tight truncate';
             nameEl.style.color = 'currentColor'; 
             nameEl.innerText = formatNameDisplay(name);
 

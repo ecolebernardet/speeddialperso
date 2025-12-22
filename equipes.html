@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Générateur d'Équipes</title>
+    <title>Générateur d'Équipes Équilibrées</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -13,8 +13,6 @@
             --bg: #000000;
             --text: #ffffff;
             --card-bg: #1a1a1a;
-            --btn-home: #71bd7b;
-            --home-text: #052e16;
             --blue-light: #40c4ff;
             --pink: #ff80ab;
         }
@@ -39,11 +37,10 @@
             width: 100%; text-align: center;
         }
 
-        /* GRILLE D'APPEL */
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
         .bg-f { background: #fce7f3; color: #831843; } 
         
-        .level-section { width: 100%; max-width: 500px; margin: 0 auto 20px auto; }
+        .level-section { width: 100%; max-width: 500px; margin: 0 auto 15px auto; }
         
         .student-grid {
             display: grid;
@@ -56,26 +53,22 @@
             padding: 8px 2px;
             border-radius: 10px;
             font-size: 0.55rem;
-            font-weight: 700;
+            font-weight: 800;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid transparent;
-            text-transform: capitalize;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         .absent {
             background: #2a2a2a !important;
             color: #777777 !important;
             text-decoration: line-through;
-            opacity: 0.7;
+            opacity: 0.5;
             border-color: #333;
         }
 
-        /* CONFIGURATION ÉQUIPES */
         .selector-grid { display: flex; justify-content: center; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
         .num-btn { 
             background: #222; color: #fff; border: 1px solid #444; 
@@ -91,7 +84,6 @@
             margin: 10px 0 20px 0;
         }
 
-        /* RÉSULTATS */
         .grid-teams { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -105,23 +97,21 @@
         .team-title { font-weight: 900; color: #fff; font-size: 0.65rem; text-transform: uppercase; }
         .team-stats { font-size: 0.55rem; color: #666; font-weight: 700; }
         
-        .student-row { margin-bottom: 4px; display: flex; align-items: center; font-size: 0.75rem; font-weight: 800; }
-        .tag { font-size: 0.5rem; font-weight: 900; margin-right: 6px; padding: 2px 4px; border-radius: 4px; background: #333; color: #aaa; }
+        .student-row { margin-bottom: 4px; display: flex; align-items: center; font-size: 0.7rem; font-weight: 700; }
+        
+        /* TAGS DE NIVEAU COULEUR */
+        .tag { font-size: 0.5rem; font-weight: 900; margin-right: 6px; padding: 2px 4px; border-radius: 4px; color: #000; }
+        .tag-ce2 { background: #fbbf24; } /* Jaune */
+        .tag-cm2 { background: #4ade80; } /* Vert */
+        .tag-default { background: #333; color: #aaa; }
+
         .name-f { color: var(--pink); } 
         .name-g { color: var(--blue-light); } 
 
-        /* MODIFICATION : Marges pour éviter la barre système du téléphone */
         .bottom-nav { 
-            display: flex; 
-            gap: 12px; 
-            width: 100%; 
-            max-width: 400px; 
-            margin-top: 30px; 
-            padding-bottom: 80px; /* Espace généreux en bas */
+            display: flex; gap: 12px; width: 100%; max-width: 400px; margin-top: 30px; padding-bottom: 60px; 
         }
-        .btn-nav { font-weight: 800; padding: 14px; border-radius: 50px; font-size: 9px; text-align: center; border: none; cursor: pointer; flex: 1; text-transform: uppercase; }
-        .btn-raz { background-color: #c10007; color: #ffffff; }
-        .btn-home { background-color: var(--btn-home); color: var(--home-text); }
+        .btn-nav { font-weight: 800; padding: 16px; border-radius: 50px; font-size: 10px; text-align: center; border: none; cursor: pointer; flex: 1;}
         
         button:active { transform: scale(0.95); }
     </style>
@@ -137,8 +127,8 @@
     <div class="selector-grid">
         <button class="num-btn" onclick="selectNum(2)">2</button>
         <button class="num-btn" onclick="selectNum(3)">3</button>
-        <button class="num-btn active" onclick="selectNum(4)">4</button>
-        <button class="num-btn" onclick="selectNum(5)">5</button>
+        <button class="num-btn" onclick="selectNum(4)">4</button>
+        <button class="num-btn active" onclick="selectNum(5)">5</button>
         <button class="num-btn" onclick="selectNum(6)">6</button>
         <button class="num-btn" onclick="selectNum(7)">7</button>
         <button class="num-btn" onclick="selectNum(8)">8</button>
@@ -149,46 +139,43 @@
     <div id="results" class="grid-teams"></div>
 
     <div class="bottom-nav">
-        <button onclick="resetAll()" class="btn-nav btn-raz">RàZ Équipes</button>
-        <button onclick="window.location.href='index.html'" class="btn-nav btn-home">Accueil</button>
+        <button onclick="resetAll()" class="btn-nav bg-red-500 text-red-100">RàZ équipes</button>
+        <button onclick="window.location.href='index.html'" class="btn-nav bg-[#71bd7b] text-green-950">Accueil</button>
     </div>
 
 <script>
-    let selectedNumTeams = 4;
+    let selectedNumTeams = 5;
     let ALL_STUDENTS = JSON.parse(localStorage.getItem('maListeEleves')) || [];
     let absents = new Set(); 
 
-    function formatFirstName(fullName) {
-        const p = fullName.trim().split(" ");
-        return p[0].charAt(0).toUpperCase() + p[0].slice(1).toLowerCase();
+    function formatDisplayName(fullName) {
+        const parts = fullName.trim().split(" ");
+        if (parts.length === 0) return fullName;
+        const firstName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase();
+        const lastName = parts.slice(1).join(" ").toUpperCase();
+        return (firstName + " " + lastName).trim();
     }
 
     function renderAttendance() {
         const container = document.getElementById('attendance-container');
         container.innerHTML = '';
-
         const groupes = {};
         ALL_STUDENTS.forEach(el => {
             const niv = el.niveau.toUpperCase();
             if (!groupes[niv]) groupes[niv] = [];
             groupes[niv].push(el);
         });
-
-        const nomsNiveaux = Object.keys(groupes).sort();
-
-        nomsNiveaux.forEach(niv => {
+        Object.keys(groupes).sort().forEach(niv => {
             const section = document.createElement('div');
             section.className = "level-section";
             section.innerHTML = `<div class="text-center text-[9px] font-black text-zinc-600 mb-2 uppercase tracking-widest">${niv}</div>`;
-            
             const grid = document.createElement('div');
             grid.className = "student-grid";
-
             groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(el => {
                 const isAbsent = absents.has(el.id);
                 const item = document.createElement('div');
                 item.className = `student-item bg-${el.sexe} ${isAbsent ? 'absent' : ''}`;
-                item.innerText = formatFirstName(el.identite);
+                item.innerText = el.identite.split(" ")[0].charAt(0).toUpperCase() + el.identite.split(" ")[0].slice(1).toLowerCase();
                 item.onclick = () => toggleAbsent(el.id);
                 grid.appendChild(item);
             });
@@ -223,8 +210,14 @@
         if (presents.length === 0) return alert("Tous les élèves sont absents !");
 
         let teams = Array.from({ length: selectedNumTeams }, () => []);
-        const groups = { f_ce2: [], g_ce2: [], f_cm2: [], g_cm2: [], autres: [] };
-        
+
+        // Équilibrage : On sépare les élèves par sexe et niveau
+        const groups = {
+            f_ce2: [], g_ce2: [],
+            f_cm2: [], g_cm2: [],
+            autres: []
+        };
+
         presents.forEach(el => {
             const niv = el.niveau.toUpperCase();
             const sexe = el.sexe.toLowerCase();
@@ -232,16 +225,23 @@
                 sexe === 'f' ? groups.f_ce2.push(el) : groups.g_ce2.push(el);
             } else if (niv.includes('CM2')) {
                 sexe === 'f' ? groups.f_cm2.push(el) : groups.g_cm2.push(el);
-            } else { groups.autres.push(el); }
+            } else {
+                groups.autres.push(el);
+            }
         });
 
+        // Mélange et création d'une file d'attente intelligente
         let pool = [];
-        Object.values(groups).forEach(g => { pool = pool.concat(shuffle([...g])); });
+        Object.keys(groups).forEach(key => {
+            pool = pool.concat(shuffle([...groups[key]]));
+        });
 
+        // Distribution alternée
         pool.forEach((student, index) => {
             teams[index % selectedNumTeams].push(student);
         });
 
+        localStorage.setItem('savedTeams', JSON.stringify(teams));
         renderTeams(teams);
     }
 
@@ -257,12 +257,18 @@
             
             let card = document.createElement('div');
             card.className = 'team-card';
-            
-            let studentsHTML = team.map(s => `
+            let studentsHTML = team.map(s => {
+                const niv = s.niveau.toUpperCase();
+                let tagClass = 'tag-default';
+                if (niv.includes('CE2')) tagClass = 'tag-ce2';
+                else if (niv.includes('CM2')) tagClass = 'tag-cm2';
+
+                return `
                 <div class="student-row">
-                    <span class="tag">${s.niveau.toUpperCase()}</span>
-                    <span class="${s.sexe.toLowerCase() === 'f' ? 'name-f' : 'name-g'}">${formatFirstName(s.identite)}</span>
-                </div>`).join('');
+                    <span class="tag ${tagClass}">${niv}</span>
+                    <span class="${s.sexe.toLowerCase() === 'f' ? 'name-f' : 'name-g'}">${formatDisplayName(s.identite)}</span>
+                </div>`;
+            }).join('');
             
             card.innerHTML = `
                 <div class="team-header">
@@ -273,18 +279,23 @@
             `;
             resultsDiv.appendChild(card);
         });
-        
-        // Scroll automatique vers le bas pour voir les résultats
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
     function resetAll() {
         if(confirm("Effacer les équipes ?")) {
             document.getElementById('results').innerHTML = '';
+            localStorage.removeItem('savedTeams');
         }
     }
 
-    window.onload = renderAttendance;
+    window.onload = () => {
+        renderAttendance();
+        const saved = localStorage.getItem('savedTeams');
+        if (saved) {
+            const teams = JSON.parse(saved);
+            renderTeams(teams);
+        }
+    };
 </script>
 </body>
 </html>
