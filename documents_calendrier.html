@@ -2,54 +2,54 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calendrier</title>
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script>
     <style>
-        /* 1. ON BLOQUE LE CORPS DE LA PAGE */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Empêche absolument le scroll de l'app */
-            background-color: #000;
-            position: fixed; /* Fixe la page pour que l'app ne puisse pas la "tirer" */
+        body { 
+            margin: 0; padding: 0; background-color: #121212; 
+            font-family: sans-serif; display: flex; flex-direction: column;
+            align-items: center; min-height: 100vh;
+            /* On autorise le scroll normal mais on bloque le pull-to-refresh */
+            touch-action: pan-y; 
         }
 
-        /* 2. BOUTON RETOUR (Toujours au dessus) */
         .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #71bd7b;
-            color: #052e16;
-            padding: 12px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 800;
-            z-index: 9999;
-            font-family: sans-serif;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            position: fixed; top: 20px; left: 20px;
+            background: #71bd7b; color: #052e16;
+            padding: 12px 20px; border-radius: 50px;
+            text-decoration: none; font-weight: 800;
+            z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            font-size: 13px;
         }
 
-        /* 3. LE CONTENEUR MAGIQUE */
-        #scroll-container {
-            width: 100vw;
-            height: 100vh;
-            overflow: auto; /* Seul ce conteneur a le droit de scroller */
-            -webkit-overflow-scrolling: touch; /* Scroll fluide sur iPhone */
-            display: flex;
-            align-items: flex-start; /* Commence bien en haut */
-            justify-content: center;
+        .content {
+            padding-top: 100px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
         }
 
-        /* 4. L'IMAGE */
-        img {
-            max-width: 100%; /* S'adapte à la largeur au départ */
-            height: auto;
-            display: block;
-            /* On autorise le zoom natif du navigateur sur l'image seule */
-            touch-action: pinch-zoom; 
+        /* L'image de base */
+        .zoom-img {
+            width: 100%;
+            border-radius: 8px;
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+
+        /* Style de l'arrière-plan quand on zoome */
+        .medium-zoom-overlay {
+            background-color: #000 !important;
+            z-index: 2000;
+        }
+
+        .medium-zoom-image--opened {
+            z-index: 2001;
+        }
+
+        .hint {
+            color: #666; font-size: 12px; margin-top: 15px;
         }
     </style>
 </head>
@@ -57,19 +57,25 @@
 
     <a href="documents.html" class="back-btn">← Retour</a>
 
-    <div id="scroll-container">
-        <img src="documents_calendrier.jpg" alt="Calendrier">
+    <div class="content">
+        <img src="documents_calendrier.jpg" class="zoom-img" alt="Calendrier">
+        <p class="hint">Touchez l'image pour l'agrandir et zoomer</p>
     </div>
 
     <script>
-        // Ce script est une barrière de sécurité supplémentaire
-        document.getElementById('scroll-container').addEventListener('touchstart', function(e) {
-            // Si on est en haut du conteneur, on décale d'un pixel 
-            // pour que l'app ne croie pas qu'on "tire" sur le bord
-            if (this.scrollTop === 0) {
-                this.scrollTop = 1;
+        // Initialisation du zoom
+        const zoom = mediumZoom('.zoom-img', {
+            margin: 0,
+            background: '#000',
+            scrollOffset: 0, // Désactive la fermeture au scroll
+        });
+
+        // Sécurité : on empêche l'App de rafraîchir quand on touche l'image
+        document.querySelector('.zoom-img').addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
             }
-        }, { passive: true });
+        }, { passive: false });
     </script>
 </body>
 </html>
