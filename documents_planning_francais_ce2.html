@@ -5,62 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planning français CE2</title>
     <style>
+        /* 1. CONFIGURATION DE BASE */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             background-color: #000;
+            /* On enlève position: fixed pour laisser le zoom natif fonctionner */
         }
 
+        /* 2. CONTENEUR DE ZOOM */
         #zoom-box {
-            width: 100%;
-            min-height: 100vh;
+            width: 100vw;
+            height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: center; /* Centre verticalement si l'image est plus petite */
             justify-content: center;
+            overflow: auto; /* Permet le scroll si l'image dépasse après zoom */
         }
 
         .image-container {
             width: 100%;
+            height: auto;
         }
 
         img {
-            width: 100%;
+            width: 100%; /* L'image prend toute la largeur de l'écran par défaut */
             height: auto;
             display: block;
         }
 
-        /* 3. LE BOUTON FLOTTANT */
-        #floating-container {
+        /* 3. BOUTON RETOUR FIXE */
+        .back-btn {
             position: fixed;
-            /* On utilise des coordonnées de base, le JS fera le reste */
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 9999;
-            pointer-events: none; /* Laisse passer le touch derrière */
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .back-btn {
-            pointer-events: auto; /* Active le clic sur le bouton */
             background: #71bd7b;
             color: #052e16;
             padding: 12px 30px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 800;
+            z-index: 9999;
             font-family: sans-serif;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             font-size: 11px;
             white-space: nowrap;
-            /* Origine de transformation pour que le scale reste centré */
-            transform-origin: center bottom;
         }
 
+        /* Ombre pour la lisibilité */
         .bottom-shadow {
             position: fixed;
             bottom: 0;
@@ -77,52 +72,17 @@
 
     <div id="zoom-box">
         <div class="image-container">
-            <img src="documents_planning_francais_ce2.jpg" alt="Planning">
+            <img src="documents_planning_francais_ce2.jpg">
         </div>
     </div>
 
-    <div class="bottom-shadow" id="shadow"></div>
-    
-    <div id="floating-container">
-        <a href="documents.html" class="back-btn" id="btn">👈 RETOUR AUX DOCUMENTS</a>
-    </div>
+    <div class="bottom-shadow"></div>
+    <a href="documents.html" class="back-btn">👈 retour aux documents</a>
 
     <script>
-        const btnContainer = document.getElementById('floating-container');
-        const btn = document.getElementById('btn');
-        const shadow = document.getElementById('shadow');
-
-        function updatePosition() {
-            const vv = window.visualViewport;
-            if (!vv) return;
-
-            // 1. On calcule l'échelle inverse du zoom (ex: si zoom x2, on scale x0.5)
-            const scale = 1 / vv.scale;
-
-            // 2. On repositionne le conteneur pour qu'il reste collé au bas de la vue réelle
-            // On compense le décalage (offset) dû au zoom
-            btnContainer.style.transform = `
-                translate(${vv.offsetLeft}px, ${vv.offsetTop + vv.height - window.innerHeight}px) 
-                translateX(-50%)
-                scale(${scale})
-            `;
-            
-            // 3. Optionnel : On ajuste l'ombre aussi
-            shadow.style.transform = `
-                translate(${vv.offsetLeft}px, ${vv.offsetTop + vv.height - window.innerHeight}px)
-                scale(${scale})
-            `;
-            shadow.style.transformOrigin = "left bottom";
-        }
-
-        // Écouter le zoom et le scroll
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('scroll', updatePosition);
-            window.visualViewport.addEventListener('resize', updatePosition);
-        }
-        
-        // Initialisation
-        updatePosition();
+        // On supprime les blocages de scroll et de zoom pour laisser 
+        // le comportement naturel du téléphone prendre le relais.
+        // L'utilisateur pourra "pincer" l'écran pour zoomer.
     </script>
 </body>
 </html>
