@@ -6,20 +6,62 @@
     <title>Documents - Menu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #121212; color: #e0e0e0; margin: 0; padding: 10px; }
-        .container { max-width: 450px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
-        .doc-card { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: 100%; transition: transform 0.1s; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body { 
+            background-color: #121212; 
+            color: #e0e0e0; 
+            margin: 0; 
+            padding: 10px; 
+            font-family: 'Inter', sans-serif;
+        }
+
+        .container { 
+            max-width: 450px; 
+            margin: 0 auto; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            /* ESPACE AJOUTÉ ICI : 80px au lieu de 60px pour bien dégager le bas */
+            padding-bottom: calc(80px + env(safe-area-inset-bottom)); 
+        }
+
+        .doc-card { 
+            background: #1e1e1e; 
+            border: 1px solid #333; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            transition: transform 0.1s; 
+            cursor: pointer; 
+        }
         .doc-card:active { transform: scale(0.96); }
+
+        .nav-btn {
+            width: 100%; 
+            background-color: #71bd7b; 
+            color: #052e16; 
+            font-weight: 800; 
+            padding: 16px; 
+            border-radius: 50px; 
+            text-[11px] 
+            uppercase; 
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="text-center mb-4 pt-2">
+        <header class="text-center mb-6 pt-4">
             <h1 class="text-yellow-500 font-bold text-[10px] uppercase tracking-[0.2em]">Documents & Ressources</h1>
         </header>
 
         <nav class="grid grid-cols-2 grid-rows-4 gap-3 flex-grow">
-            <div class="doc-card" onclick="window.location.href='calendrier.html'">
+            
+            <div class="doc-card" onclick="window.location.href='2025-calendrier.jpg'">
                 <div class="flex-grow overflow-hidden bg-zinc-900">
                     <img src="2025-CALENDRIER.jpg" class="w-full h-full object-cover opacity-70">
                 </div>
@@ -28,14 +70,25 @@
                 </div>
             </div>
 
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">📄</div>
-                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Emploi du temps</p></div>
-            </div>
-            </nav>
+            <script>
+                const labels = ["Emploi du temps", "Mots outils", "Poésies", "Cantine", "Règlement", "Projets", "Sorties"];
+                labels.forEach(label => {
+                    document.write(`
+                        <div class="doc-card opacity-40">
+                            <div class="flex-grow flex items-center justify-center text-xl">📄</div>
+                            <div class="p-2 text-center bg-[#1e1e1e]">
+                                <p class="text-[9px] font-bold text-white uppercase">${label}</p>
+                            </div>
+                        </div>
+                    `);
+                });
+            </script>
+        </nav>
 
-        <footer class="mt-4">
-            <button onclick="window.location.href='index.html'" class="w-full bg-[#71bd7b] text-green-950 font-bold py-4 rounded-full text-[11px] uppercase">Retour à l'Accueil</button>
+        <footer class="mt-8">
+            <button onclick="window.location.href='index.html'" class="nav-btn">
+                Retour à l'Accueil
+            </button>
         </footer>
     </div>
 </body>
