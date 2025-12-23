@@ -7,90 +7,114 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
         body { 
             background-color: #121212; 
             color: #e0e0e0; 
             margin: 0; 
-            padding: 8px; 
+            padding: 12px; 
             font-family: 'Inter', sans-serif; 
-            overflow: hidden; 
+            /* On laisse le navigateur gérer le défilement naturellement */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
         }
+
         .container { 
             max-width: 450px; 
             margin: 0 auto; 
-            height: 100vh; 
+            /* On définit une hauteur minimale mais pas fixe */
+            min-height: 100vh;
             display: flex; 
-            flex-direction: column; 
-            justify-content: space-between;
-            padding-bottom: env(safe-area-inset-bottom); 
+            flex-direction: column;
         }
-        /* Ajustement de la hauteur des cartes pour éviter le scroll */
+
+        .grid-docs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* On fixe une hauteur minimale par ligne pour que ce soit joli */
+            grid-auto-rows: minmax(120px, auto);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
         .doc-card { 
             background: #1e1e1e; 
             border: 1px solid #333; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
-            height: 100%; 
             transition: transform 0.1s; 
-            cursor: pointer; 
+            cursor: pointer;
         }
+        
         .doc-card:active { transform: scale(0.96); }
+
+        .img-slot {
+            flex-grow: 1;
+            height: 80px; /* Hauteur minimale de l'image */
+            background-color: #18181b;
+            overflow: hidden;
+        }
+
+        footer {
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            margin-top: auto; /* Pousse le bouton vers le bas */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="text-center py-2">
-            <h1 class="text-yellow-500 font-bold text-[9px] uppercase tracking-[0.2em]">Documents & Ressources</h1>
+        <header class="text-center py-4">
+            <h1 class="text-yellow-500 font-bold text-[10px] uppercase tracking-[0.2em]">Documents & Ressources</h1>
         </header>
 
-        <nav class="grid grid-cols-2 grid-rows-4 gap-2 flex-grow mb-4">
-            
+        <nav class="grid-docs">
             <div class="doc-card" onclick="window.location.href='documents_calendrier.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_calendrier.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Calendrier</p></div>
+                <div class="img-slot"><img src="documents_calendrier.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Calendrier</p></div>
             </div>
 
             <div class="doc-card" onclick="window.location.href='documents_planning_terrain.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_terrain.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Terrain</p></div>
+                <div class="img-slot"><img src="documents_planning_terrain.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Terrain</p></div>
             </div>
 
             <div class="doc-card" onclick="window.location.href='documents_planning_francais_ce2.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_francais_ce2.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Français CE2</p></div>
+                <div class="img-slot"><img src="documents_planning_francais_ce2.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Français CE2</p></div>
             </div>
 
             <div class="doc-card" onclick="window.location.href='documents_planning_maths_ce2.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_maths_ce2.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Maths CE2</p></div>
+                <div class="img-slot"><img src="documents_planning_maths_ce2.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Maths CE2</p></div>
             </div>
 
-             <div class="doc-card" onclick="window.location.href='documents_planning_francais_cm2.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_francais_cm2.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Français CM2</p></div>
+            <div class="doc-card" onclick="window.location.href='documents_planning_francais_cm2.html'">
+                <div class="img-slot"><img src="documents_planning_francais_cm2.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Français CM2</p></div>
             </div>
 
             <div class="doc-card" onclick="window.location.href='documents_planning_maths_cm2.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_maths_cm2.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Maths CM2</p></div>
+                <div class="img-slot"><img src="documents_planning_maths_cm2.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Maths CM2</p></div>
             </div>
 
-             <div class="doc-card" onclick="window.location.href='documents_planning_terrain.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_terrain.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Sorties</p></div>
+            <div class="doc-card" onclick="window.location.href='documents_planning_terrain.html'">
+                <div class="img-slot"><img src="documents_planning_terrain.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Sorties</p></div>
             </div>
 
-             <div class="doc-card" onclick="window.location.href='documents_planning_terrain.html'">
-                <div class="flex-grow overflow-hidden bg-zinc-900"><img src="documents_planning_terrain.jpg" class="w-full h-full object-cover opacity-70"></div>
-                <div class="py-1 text-center bg-[#1e1e1e]"><p class="text-[8px] font-bold text-white uppercase">Projets</p></div>
+            <div class="doc-card" onclick="window.location.href='documents_planning_terrain.html'">
+                <div class="img-slot"><img src="documents_planning_terrain.jpg" class="w-full h-full object-cover opacity-70"></div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Projets</p></div>
             </div>
-
         </nav>
 
-        <footer class="pb-2">
-            <button onclick="window.location.href='index.html'" class="w-full bg-[#71bd7b] text-green-950 font-bold py-3 rounded-full text-[10px] uppercase shadow-lg">Retour à l'Accueil</button>
+        <footer>
+            <button onclick="window.location.href='index.html'" class="w-full bg-[#71bd7b] text-green-950 font-bold py-4 rounded-full text-[11px] uppercase shadow-lg">
+                Retour à l'Accueil
+            </button>
         </footer>
     </div>
 </body>
