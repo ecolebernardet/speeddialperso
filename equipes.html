@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Générateur d'Équipes Optimisées</title>
+    <title>Générateur d'Équipes Haute Précision</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         :root { --primary: #ff637e; --bg: #000000; --text: #ffffff; --card-bg: #1a1a1a; --blue-light: #40c4ff; --pink: #ff80ab; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; min-height: 100vh; }
         .section-title { font-size: 10px; color: #555; margin: 15px 0; font-weight: 900; letter-spacing: 1px; text-align: center; text-transform: uppercase; }
-        .student-item { padding: 8px 2px; border-radius: 50px; font-size: 0.55rem; font-weight: 800; text-align: center; cursor: pointer; border: 1px solid transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.2s; }
+        .student-item { padding: 8px 2px; border-radius: 50px; font-size: 0.55rem; font-weight: 800; text-align: center; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
         .bg-f { background: #fce7f3; color: #831843; } 
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
         .absent { background: #2a2a2a !important; color: #777777 !important; text-decoration: line-through; opacity: 0.7; transform: scale(0.9); }
@@ -33,25 +33,24 @@
 </head>
 <body class="flex flex-col items-center">
 
-    <p class="section-title">Appel (Cliquez sur les absents)</p>
+    <p class="section-title">Appel (Absents en gris)</p>
     <div id="attendance-container" class="w-full max-w-2xl grid grid-cols-5 gap-1 px-2"></div>
 
     <p class="section-title">Nombre d'équipes</p>
     <div class="flex gap-2 mb-4" id="selector"></div>
 
-    <button class="generate-btn" onclick="generateAndBalance()">Générer l'équilibre optimal</button>
+    <button class="generate-btn" onclick="generateAndBalance()">Générer l'équilibre parfait</button>
 
     <div id="results" class="grid-teams"></div>
 
     <div class="bottom-nav">
-        <button onclick="resetTeams()" class="btn-nav bg-red-500 text-rose-100">Effacer Équipes</button>
+        <button onclick="resetTeams()" class="btn-nav bg-red-500 text-rose-100">Effacer</button>
         <button onclick="window.location.href='index.html'" class="btn-nav bg-[#71bd7b] text-green-950">Accueil</button>
     </div>
 
 <script>
     let selectedNumTeams = 4;
     let ALL_STUDENTS = JSON.parse(localStorage.getItem('maListeEleves')) || [];
-    
     let savedAbsents = JSON.parse(localStorage.getItem('absentsList')) || [];
     let absents = new Set(savedAbsents);
 
@@ -86,57 +85,74 @@
     }
 
     function toggleAbs(id) {
-        if(absents.has(id)) {
-            absents.delete(id);
-        } else {
-            absents.add(id);
-        }
+        if(absents.has(id)) { absents.delete(id); } else { absents.add(id); }
         localStorage.setItem('absentsList', JSON.stringify(Array.from(absents)));
         renderAttendance();
     }
 
     function generateAndBalance() {
         let presents = ALL_STUDENTS.filter(s => !absents.has(s.id));
-        if (presents.length < selectedNumTeams) return alert("Effectif insuffisant pour ce nombre d'équipes.");
+        if (presents.length < selectedNumTeams) return alert("Pas assez d'élèves.");
 
         let teams = Array.from({ length: selectedNumTeams }, () => []);
 
-        const groups = {
-            f_ce2: presents.filter(s => s.sexe.toLowerCase()==='f' && s.niveau.toUpperCase().includes('CE2')).sort(() => Math.random() - 0.5),
-            m_ce2: presents.filter(s => s.sexe.toLowerCase()!=='f' && s.niveau.toUpperCase().includes('CE2')).sort(() => Math.random() - 0.5),
-            f_cm2: presents.filter(s => s.sexe.toLowerCase()==='f' && s.niveau.toUpperCase().includes('CM2')).sort(() => Math.random() - 0.5),
-            m_cm2: presents.filter(s => s.sexe.toLowerCase()!=='f' && s.niveau.toUpperCase().includes('CM2')).sort(() => Math.random() - 0.5)
-        };
-
-        let teamIdx = 0;
-        [groups.f_ce2, groups.m_ce2, groups.f_cm2, groups.m_cm2].forEach(sub => {
-            sub.forEach(student => {
-                teams[teamIdx].push(student);
-                teamIdx = (teamIdx + 1) % selectedNumTeams;
-            });
+        // Mélange initial aléatoire complet
+        presents.sort(() => Math.random() - 0.5);
+        
+        // Distribution initiale simple
+        presents.forEach((s, idx) => {
+            teams[idx % selectedNumTeams].push(s);
         });
 
+        // Fonction de calcul de score de déséquilibre
+        const getStats = (team) => ({
+            f: team.filter(s => s.sexe.toLowerCase()==='f').length,
+            ce2: team.filter(s => s.niveau.includes('CE2')).length,
+            total: team.length
+        });
+
+        // BOUCLE D'OPTIMISATION (Max 200 tentatives d'échanges)
         let improved = true;
-        while(improved) {
+        let attempts = 0;
+        while(improved && attempts < 200) {
             improved = false;
-            let counts = teams.map(t => t.filter(s => s.sexe.toLowerCase()==='f').length);
-            let maxF = Math.max(...counts);
-            let minF = Math.min(...counts);
+            attempts++;
 
-            if (maxF - minF > 1) {
-                let highIdx = counts.indexOf(maxF);
-                let lowIdx = counts.indexOf(minF);
+            for(let i=0; i < teams.length; i++) {
+                for(let j=0; j < teams.length; j++) {
+                    if(i === j) continue;
 
-                for (let level of ['CE2', 'CM2']) {
-                    let girlIdx = teams[highIdx].findIndex(s => s.sexe.toLowerCase()==='f' && s.niveau.includes(level));
-                    let boyIdx = teams[lowIdx].findIndex(s => s.sexe.toLowerCase()!=='f' && s.niveau.includes(level));
+                    let statI = getStats(teams[i]);
+                    let statJ = getStats(teams[j]);
 
-                    if (girlIdx !== -1 && boyIdx !== -1) {
-                        let temp = teams[highIdx][girlIdx];
-                        teams[highIdx][girlIdx] = teams[lowIdx][boyIdx];
-                        teams[lowIdx][boyIdx] = temp;
-                        improved = true;
-                        break; 
+                    // LOGIQUE 1 : Équilibrer les Filles
+                    // Si l'écart de filles est > 1, on tente un échange F contre G
+                    if (statI.f - statJ.f > 1) {
+                        let fIdx = teams[i].findIndex(s => s.sexe.toLowerCase()==='f');
+                        let gIdx = teams[j].findIndex(s => s.sexe.toLowerCase()!=='f');
+                        if(fIdx !== -1 && gIdx !== -1) {
+                            // On vérifie que l'échange ne massacre pas l'équilibre des niveaux
+                            if(teams[i][fIdx].niveau === teams[j][gIdx].niveau) {
+                                [teams[i][fIdx], teams[j][gIdx]] = [teams[j][gIdx], teams[i][fIdx]];
+                                improved = true;
+                            }
+                        }
+                    }
+
+                    // LOGIQUE 2 : Équilibrer les Niveaux (CE2)
+                    // Si l'écart de CE2 est > 1, on tente un échange CE2 contre CM2
+                    statI = getStats(teams[i]); // Refresh stats
+                    statJ = getStats(teams[j]);
+                    if (statI.ce2 - statJ.ce2 > 1) {
+                        let ce2Idx = teams[i].findIndex(s => s.niveau.includes('CE2'));
+                        let cm2Idx = teams[j].findIndex(s => s.niveau.includes('CM2'));
+                        if(ce2Idx !== -1 && cm2Idx !== -1) {
+                            // On vérifie que l'échange ne massacre pas l'équilibre des sexes
+                            if(teams[i][ce2Idx].sexe === teams[j][cm2Idx].sexe) {
+                                [teams[i][ce2Idx], teams[j][cm2Idx]] = [teams[j][cm2Idx], teams[i][ce2Idx]];
+                                improved = true;
+                            }
+                        }
                     }
                 }
             }
@@ -159,7 +175,6 @@
             let html = `<div class="team-card"><div class="team-header"><span class="team-title">Équipe ${i+1}</span><span class="team-stats">${f}F/${m}G • ${ce2}CE/${cm2}CM</span></div>`;
             team.forEach(s => {
                 const isCE2 = s.niveau.toUpperCase().includes('CE2');
-                // MODIFICATION ICI : s.identite.split(" ")[0] pour ne garder que le prénom
                 const prenom = s.identite.split(" ")[0];
                 html += `<div class="flex items-center mb-1 text-[0.65rem] font-bold">
                     <span class="tag ${isCE2?'tag-ce2':'tag-cm2'}">${isCE2?'CE2':'CM2'}</span>
@@ -171,7 +186,7 @@
     }
 
     function resetTeams() {
-        if(confirm("Effacer les équipes ?")) {
+        if(confirm("Effacer ?")) {
             localStorage.removeItem('savedTeams');
             document.getElementById('results').innerHTML = '';
         }
