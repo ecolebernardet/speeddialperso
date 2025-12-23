@@ -2,41 +2,47 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendrier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+    <title>Calendrier Interactif</title>
     <style>
-        /* 1. CONFIGURATION DE BASE */
+        /* 1. CONFIGURATION DE L'ÉCRAN */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             background-color: #000;
-            /* On enlève position: fixed pour laisser le zoom natif fonctionner */
+            overflow: hidden; /* Empêche le rebond de page inutile */
+            font-family: sans-serif;
         }
 
-        /* 2. CONTENEUR DE ZOOM */
-        #zoom-box {
+        /* 2. ZONE DE ZOOM (Le conteneur de défilement) */
+        #zoom-container {
             width: 100vw;
             height: 100vh;
+            overflow: auto; /* Active le glissement quand l'image dépasse */
             display: flex;
-            align-items: center; /* Centre verticalement si l'image est plus petite */
-            justify-content: center;
-            overflow: auto; /* Permet le scroll si l'image dépasse après zoom */
+            align-items: center; /* Centre verticalement au départ */
+            justify-content: center; /* Centre horizontalement au départ */
+            cursor: zoom-in;
+            -webkit-overflow-scrolling: touch; /* Défilement fluide iOS */
         }
 
-        .image-container {
-            width: 100%;
+        /* 3. L'IMAGE */
+        #calendar-img {
+            width: 100%; /* Taille initiale : pleine largeur */
             height: auto;
-        }
-
-        img {
-            width: 100%; /* L'image prend toute la largeur de l'écran par défaut */
-            height: auto;
+            transition: width 0.3s ease; /* Animation fluide du zoom */
             display: block;
         }
 
-        /* 3. BOUTON RETOUR FIXE */
+        /* État Zoomé */
+        #calendar-img.zoomed {
+            width: 250%; /* Zoom à 250% pour une bonne lisibilité */
+            cursor: zoom-out;
+        }
+
+        /* 4. INTERFACE (Bouton et Ombre) */
         .back-btn {
             position: fixed;
             bottom: 30px;
@@ -44,45 +50,64 @@
             transform: translateX(-50%);
             background: #71bd7b;
             color: #052e16;
-            padding: 12px 30px;
+            padding: 15px 35px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 800;
-            z-index: 9999;
-            font-family: sans-serif;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
             font-size: 14px;
             white-space: nowrap;
         }
 
-        /* Ombre pour la lisibilité */
         .bottom-shadow {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 80px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            height: 100px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
             pointer-events: none;
-            z-index: 9998;
+            z-index: 90;
         }
     </style>
 </head>
 <body>
 
-    <div id="zoom-box">
-        <div class="image-container">
-            <img src="documents_calendrier.jpg" alt="Calendrier">
-        </div>
+    <div id="zoom-container">
+        <img src="documents_calendrier.jpg" id="calendar-img" alt="Calendrier">
     </div>
 
     <div class="bottom-shadow"></div>
     <a href="documents.html" class="back-btn">👈 retour aux documents</a>
 
     <script>
-        // On supprime les blocages de scroll et de zoom pour laisser 
-        // le comportement naturel du téléphone prendre le relais.
-        // L'utilisateur pourra "pincer" l'écran pour zoomer.
+        const img = document.getElementById('calendar-img');
+        const container = document.getElementById('zoom-container');
+
+        // Gestion du double-clic / double-tap
+        img.addEventListener('dblclick', function(e) {
+            if (!this.classList.contains('zoomed')) {
+                // PASSAGE EN MODE ZOOMÉ
+                this.classList.add('zoomed');
+                
+                // Petit délai pour laisser l'image grandir avant de centrer
+                setTimeout(() => {
+                    // Calcule la position du clic pour centrer le zoom là où on a cliqué
+                    const rect = img.getBoundingClientRect();
+                    container.scrollLeft = (container.scrollWidth - window.innerWidth) / 2;
+                    container.scrollTop = (container.scrollHeight - window.innerHeight) / 2;
+                }, 100);
+            } else {
+                // RETOUR À LA TAILLE INITIALE
+                this.classList.remove('zoomed');
+                container.scrollLeft = 0;
+                container.scrollTop = 0;
+            }
+        });
+
+        // Empêche le menu contextuel du clic droit sur mobile (optionnel)
+        img.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
 </html>
