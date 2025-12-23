@@ -1,15 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Calendrier scolaire</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
-        body { 
-            margin: 0; padding: 0; background-color: #000; 
-            overflow: hidden; /* Bloque le scroll de la page */
-            touch-action: none; /* Bloque le Pull-to-Refresh de l'app */
-            font-family: sans-serif;
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000; overflow: hidden;
+            /* Empêche le rebond élastique et les gestes système */
+            touch-action: none; 
+            -webkit-user-select: none;
         }
         
         .back-btn {
@@ -17,86 +20,91 @@
             background: #71bd7b; color: #052e16;
             padding: 12px 20px; border-radius: 50px;
             text-decoration: none; font-weight: 800;
-            z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        #viewport {
-            width: 100vw; height: 100vh;
-            display: flex; cursor: grab;
+        #zoom-wrapper {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        #target-img {
+            max-width: 100%; 
+            height: auto;
+            /* Utilisation du GPU pour une fluidité maximale */
+            will-change: transform;
+            transform-origin: 0 0;
         }
     </style>
 </head>
 <body>
 
     <a href="documents.html" class="back-btn">← Retour</a>
-    <canvas id="canvas"></canvas>
+
+    <div id="zoom-wrapper">
+        <img id="target-img" src="documents_calendrier.jpg" alt="Calendrier">
+    </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        img.src = 'documents_calendrier.jpg'; // <--- Nom de votre image
+        const img = document.getElementById('target-img');
+        const wrapper = document.getElementById('zoom-wrapper');
+
+        // Initialisation de Hammer sur le conteneur
+        const mc = new Hammer.Manager(wrapper);
+        const pinch = new Hammer.Pinch();
+        const pan = new Hammer.Pan({ threshold: 0, pointers: 0 });
+
+        pinch.recognizeWith(pan);
+        mc.add([pinch, pan]);
 
         let scale = 1;
-        let viewX = 0;
-        let viewY = 0;
+        let lastScale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let lastTranslateX = 0;
+        let lastTranslateY = 0;
 
-        img.onload = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            // Centre l'image au départ
-            scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-            viewX = (canvas.width - img.width * scale) / 2;
-            viewY = (canvas.height - img.height * scale) / 2;
-            draw();
-        };
+        // Force l'arrêt du "Pull-to-refresh" au niveau global
+        window.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, viewX, viewY, img.width * scale, img.height * scale);
+        mc.on("pinchmove panmove", (e) => {
+            // Calcul du zoom
+            scale = lastScale * e.scale;
+            if (scale < 0.8) scale = 0.8; // Limite mini
+            if (scale > 5) scale = 5;     // Limite maxi
+
+            // Calcul du déplacement
+            translateX = lastTranslateX + e.deltaX;
+            translateY = lastTranslateY + e.deltaY;
+
+            updateTransform();
+        });
+
+        mc.on("pinchend panend", (e) => {
+            lastScale = scale;
+            lastTranslateX = translateX;
+            lastTranslateY = translateY;
+        });
+
+        function updateTransform() {
+            // translate3d force l'accélération matérielle (GPU)
+            const transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+            img.style.transform = transform;
+            img.style.webkitTransform = transform;
         }
 
-        // --- GESTION TACTILE AVANCÉE (ANTI-SACCADE) ---
-        let lastDist = 0;
-        let lastX = 0;
-        let lastY = 0;
-
-        canvas.addEventListener('touchstart', e => {
-            if (e.touches.length === 1) {
-                lastX = e.touches[0].clientX;
-                lastY = e.touches[0].clientY;
-            } else if (e.touches.length === 2) {
-                lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            }
-        }, { passive: false });
-
-        canvas.addEventListener('touchmove', e => {
-            e.preventDefault(); // BLOQUE l'actualisation de l'App (Pull-to-refresh)
-
-            if (e.touches.length === 1) {
-                // Déplacement (Pan)
-                const dx = e.touches[0].clientX - lastX;
-                const dy = e.touches[0].clientY - lastY;
-                viewX += dx; viewY += dy;
-                lastX = e.touches[0].clientX;
-                lastY = e.touches[0].clientY;
-            } else if (e.touches.length === 2) {
-                // Zoom (Pinch)
-                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                const zoom = dist / lastDist;
-                
-                // Zoomer vers le centre des doigts
-                const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                
-                viewX = centerX - (centerX - viewX) * zoom;
-                viewY = centerY - (centerY - viewY) * zoom;
-                scale *= zoom;
-                lastDist = dist;
-            }
-            draw();
-        }, { passive: false });
-
+        // Centrage initial de l'image
+        img.onload = () => {
+            const rect = img.getBoundingClientRect();
+            translateX = (window.innerWidth - rect.width) / 2;
+            translateY = (window.innerHeight - rect.height) / 2;
+            lastTranslateX = translateX;
+            lastTranslateY = translateY;
+            updateTransform();
+        };
     </script>
 </body>
 </html>
