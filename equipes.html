@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Générateur d'Équipes Haute Précision</title>
+    <title>Générateur Équilibre Absolu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -21,7 +21,7 @@
         .team-card { border-radius: 1.2rem; padding: 12px; background: var(--card-bg); border: 1px solid #333; }
         .team-header { border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 4px; }
         .team-title { font-weight: 900; font-size: 0.65rem; color: #fff; text-transform: uppercase; }
-        .team-stats { font-size: 0.5rem; color: #aaa; display: block; }
+        .team-stats { font-size: 0.45rem; color: #aaa; display: block; line-height: 1.4; }
         .tag { font-size: 0.45rem; font-weight: 900; margin-right: 5px; padding: 2px 4px; border-radius: 3px; color: #000; }
         .tag-ce2 { background: #fbbf24; } 
         .tag-cm2 { background: #4ade80; }
@@ -39,7 +39,7 @@
     <p class="section-title">Nombre d'équipes</p>
     <div class="flex gap-2 mb-4" id="selector"></div>
 
-    <button class="generate-btn" onclick="generateAndBalance()">Générer l'équilibre parfait</button>
+    <button class="generate-btn" onclick="generateAndFix()">Générer & Rectifier</button>
 
     <div id="results" class="grid-teams"></div>
 
@@ -90,68 +90,61 @@
         renderAttendance();
     }
 
-    function generateAndBalance() {
+    const getStats = (team) => ({
+        f: team.filter(s => s.sexe.toLowerCase()==='f').length,
+        ce2: team.filter(s => s.niveau.toUpperCase().includes('CE2')).length,
+        cm2: team.filter(s => s.niveau.toUpperCase().includes('CM2')).length,
+        total: team.length
+    });
+
+    function generateAndFix() {
         let presents = ALL_STUDENTS.filter(s => !absents.has(s.id));
-        if (presents.length < selectedNumTeams) return alert("Pas assez d'élèves.");
+        if (presents.length < selectedNumTeams) return alert("Effectif insuffisant.");
 
         let teams = Array.from({ length: selectedNumTeams }, () => []);
-
-        // Mélange initial aléatoire complet
         presents.sort(() => Math.random() - 0.5);
-        
-        // Distribution initiale simple
-        presents.forEach((s, idx) => {
-            teams[idx % selectedNumTeams].push(s);
-        });
+        presents.forEach((s, idx) => teams[idx % selectedNumTeams].push(s));
 
-        // Fonction de calcul de score de déséquilibre
-        const getStats = (team) => ({
-            f: team.filter(s => s.sexe.toLowerCase()==='f').length,
-            ce2: team.filter(s => s.niveau.includes('CE2')).length,
-            total: team.length
-        });
-
-        // BOUCLE D'OPTIMISATION (Max 200 tentatives d'échanges)
+        let iterations = 0;
         let improved = true;
-        let attempts = 0;
-        while(improved && attempts < 200) {
+
+        while(improved && iterations < 1000) {
             improved = false;
-            attempts++;
+            iterations++;
 
             for(let i=0; i < teams.length; i++) {
                 for(let j=0; j < teams.length; j++) {
                     if(i === j) continue;
 
-                    let statI = getStats(teams[i]);
-                    let statJ = getStats(teams[j]);
+                    let sI = getStats(teams[i]);
+                    let sJ = getStats(teams[j]);
 
-                    // LOGIQUE 1 : Équilibrer les Filles
-                    // Si l'écart de filles est > 1, on tente un échange F contre G
-                    if (statI.f - statJ.f > 1) {
-                        let fIdx = teams[i].findIndex(s => s.sexe.toLowerCase()==='f');
-                        let gIdx = teams[j].findIndex(s => s.sexe.toLowerCase()!=='f');
-                        if(fIdx !== -1 && gIdx !== -1) {
-                            // On vérifie que l'échange ne massacre pas l'équilibre des niveaux
-                            if(teams[i][fIdx].niveau === teams[j][gIdx].niveau) {
-                                [teams[i][fIdx], teams[j][gIdx]] = [teams[j][gIdx], teams[i][fIdx]];
-                                improved = true;
-                            }
-                        }
-                    }
+                    // Correction écart > 1 sur Filles, CE2 ou CM2
+                    if (Math.abs(sI.f - sJ.f) > 1 || Math.abs(sI.ce2 - sJ.ce2) > 1 || Math.abs(sI.cm2 - sJ.cm2) > 1) {
+                        
+                        // On teste chaque élève de I avec chaque élève de J pour voir si l'échange réduit l'écart total
+                        for(let idxI=0; idxI < teams[i].length; idxI++) {
+                            for(let idxJ=0; idxJ < teams[j].length; idxJ++) {
+                                
+                                let currentDiff = Math.abs(sI.f - sJ.f) + Math.abs(sI.ce2 - sJ.ce2) + Math.abs(sI.cm2 - sJ.cm2);
+                                
+                                // Simulation d'échange
+                                let tempI = [...teams[i]];
+                                let tempJ = [...teams[j]];
+                                [tempI[idxI], tempJ[idxJ]] = [tempJ[idxJ], tempI[idxI]];
+                                
+                                let nI = getStats(tempI);
+                                let nJ = getStats(tempJ);
+                                let nextDiff = Math.abs(nI.f - nJ.f) + Math.abs(nI.ce2 - nJ.ce2) + Math.abs(nI.cm2 - nJ.cm2);
 
-                    // LOGIQUE 2 : Équilibrer les Niveaux (CE2)
-                    // Si l'écart de CE2 est > 1, on tente un échange CE2 contre CM2
-                    statI = getStats(teams[i]); // Refresh stats
-                    statJ = getStats(teams[j]);
-                    if (statI.ce2 - statJ.ce2 > 1) {
-                        let ce2Idx = teams[i].findIndex(s => s.niveau.includes('CE2'));
-                        let cm2Idx = teams[j].findIndex(s => s.niveau.includes('CM2'));
-                        if(ce2Idx !== -1 && cm2Idx !== -1) {
-                            // On vérifie que l'échange ne massacre pas l'équilibre des sexes
-                            if(teams[i][ce2Idx].sexe === teams[j][cm2Idx].sexe) {
-                                [teams[i][ce2Idx], teams[j][cm2Idx]] = [teams[j][cm2Idx], teams[i][ce2Idx]];
-                                improved = true;
+                                // Si l'échange réduit l'écart global ET maintient l'équilibre total des effectifs
+                                if(nextDiff < currentDiff) {
+                                    [teams[i][idxI], teams[j][idxJ]] = [teams[j][idxJ], teams[i][idxI]];
+                                    improved = true;
+                                    break;
+                                }
                             }
+                            if(improved) break;
                         }
                     }
                 }
@@ -167,18 +160,18 @@
         results.innerHTML = '';
         teams.forEach((team, i) => {
             team.sort((a, b) => a.niveau.localeCompare(b.niveau));
-            const f = team.filter(s => s.sexe.toLowerCase()==='f').length;
-            const m = team.filter(s => s.sexe.toLowerCase()!=='f').length;
-            const ce2 = team.filter(s => s.niveau.toUpperCase().includes('CE2')).length;
-            const cm2 = team.filter(s => s.niveau.toUpperCase().includes('CM2')).length;
-
-            let html = `<div class="team-card"><div class="team-header"><span class="team-title">Équipe ${i+1}</span><span class="team-stats">${f}F/${m}G • ${ce2}CE/${cm2}CM</span></div>`;
-            team.forEach(s => {
-                const isCE2 = s.niveau.toUpperCase().includes('CE2');
-                const prenom = s.identite.split(" ")[0];
+            const s = getStats(team);
+            let html = `<div class="team-card">
+                <div class="team-header">
+                    <span class="team-title">Équipe ${i+1}</span>
+                    <span class="team-stats">${s.f}F/${s.total-s.f}G • ${s.ce2}CE2/${s.cm2}CM2</span>
+                </div>`;
+            team.forEach(eleve => {
+                const isCE2 = eleve.niveau.toUpperCase().includes('CE2');
+                const prenom = eleve.identite.split(" ")[0];
                 html += `<div class="flex items-center mb-1 text-[0.65rem] font-bold">
                     <span class="tag ${isCE2?'tag-ce2':'tag-cm2'}">${isCE2?'CE2':'CM2'}</span>
-                    <span class="${s.sexe.toLowerCase()==='f'?'name-f':'name-g'}">${prenom}</span>
+                    <span class="${eleve.sexe.toLowerCase()==='f'?'name-f':'name-g'}">${prenom}</span>
                 </div>`;
             });
             results.innerHTML += html + `</div>`;
@@ -191,7 +184,6 @@
             document.getElementById('results').innerHTML = '';
         }
     }
-
     window.onload = init;
 </script>
 </body>
