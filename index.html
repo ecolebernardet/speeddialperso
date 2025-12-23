@@ -7,83 +7,89 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: black; }
-        .menu-card { transition: transform 0.2s, background-color 0.2s; border-radius: 0rem; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: black; 
+            overflow: hidden; /* Supprime le scroll */
+        }
+        .menu-card { transition: transform 0.1s; border-radius: 0rem; }
         .menu-card:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="flex items-start justify-center min-h-screen p-4 pt-8">
+<body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4">
   
-    <div class="w-full max-w-sm">
-        <header class="text-center mb-8">
-                <h1 class="flex items-center justify-center gap-4 text-white text-3xl font-bold p-1 tracking-normal">
-                    <span>CE2</span>
-                    <img src="logo-ecole-jean-rostand-v2-006.png" class="w-16 h-auto" alt="Logo">
-                    <span>CM2</span>
-                </h1>
-            </a>
+    <div class="w-full max-w-[320px]"> <header class="text-center mb-4">
+            <h1 class="flex items-center justify-center gap-2 text-white text-xl font-bold tracking-tight">
+                <span>CE2</span>
+                <img src="logo-ecole-jean-rostand-v2-006.png" class="w-10 h-auto" alt="Logo">
+                <span>CM2</span>
+            </h1>
         </header>
 
-        <nav class="grid grid-cols-2 gap-8">
+        <nav class="grid grid-cols-2 gap-5">
 
-            <a href="inscriptions.html" class="menu-card bg-zinc-700 border border-zinc-300 p-4 flex flex-col items-center text-center gap-3 hover:bg-zinc-800">
-                <div class="bg-purple-500 px-2 py-3 border border-zinc-400 rounded-full">
-                    <span class="text-4xl block">📝</span>
+            <a href="inscriptions.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-purple-500 w-10 h-10 flex items-center justify-center border border-zinc-400 rounded-full mb-1">
+                    <span class="text-xl">📝</span>
                 </div>
-                <div>
-                    <h2 class="text-white font-bold text-md">Inscriptions</h2>
-                    <p class="text-gray-400 text-[10px]">Gérer la liste des élèves</p>
-                </div>
+                <h2 class="text-white font-semibold text-[11px]">Inscriptions</h2>
+                <h3 class="text-gray-400 text-[9px]">Liste des élèves</h3>
             </a>        
 
-            <a href="notes.html" class="menu-card bg-zinc-700 border border-zinc-300 p-4 flex flex-col items-center text-center gap-3 hover:bg-zinc-800">
-                <div class="bg-red-500 px-2 py-3 border border-zinc-300 rounded-full">
-                    <span class="text-4xl block">📒</span>
+            <a href="https://login.ac-grenoble.fr/idp/profile/oidc/authorize?execution=e1s2" target="_blank" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-rose-500 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">📭</span>
                 </div>
-                <div>
-                    <h2 class="text-white font-bold text-md">Notes</h2>
-                    <p class="text-gray-400 text-[10px]">Pense-bête</p>
-                </div>
+                <h2 class="text-white font-semibold text-[11px]">Webmail</h2>
+                <h3 class="text-gray-400 text-[9px]">Courrier académique</h3>
             </a>
-    
-            <a href="tirage.html" class="menu-card bg-zinc-700 border border-zinc-300 p-4 flex flex-col items-center text-center gap-3 hover:bg-zinc-800">
-                <div class="bg-yellow-500/80 px-2 py-3 border border-zinc-300 rounded-full">
-                    <span class="text-4xl block">🎲</span>
+
+            <a href="tirage.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-yellow-500/80 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">🎲</span>
                 </div>
-                <div>
-                    <h2 class="text-white font-bold text-md">Tirage</h2>
-                    <p class="text-gray-400 text-[10px]">Tirer un prénom au hasard</p>
-                </div>
+                <h2 class="text-white font-semibold text-[11px]">Tirage</h2>
+                <h3 class="text-gray-400 text-[9px]">Prénom au hasard</h3>
             </a>      
 
-            <a href="equipes.html" class="menu-card bg-zinc-700 border border-zinc-300 p-4 flex flex-col items-center text-center gap-3 hover:bg-zinc-800">
-                <div class="bg-rose-400 px-2 py-3 border border-zinc-300 rounded-full">
-                    <span class="text-4xl block">👥</span>
+            <a href="equipes.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-rose-400 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">👥</span>
                 </div>
-                <div>
-                    <h2 class="text-white font-bold text-md">Équipes</h2>
-                    <p class="text-gray-400 text-[10px]">Former des groupes mixtes</p>
-                </div>
+                <h2 class="text-white font-semibold text-[11px]">Équipes</h2>
+                <h3 class="text-gray-400 text-[9px]">Groupes mixtes</h3>
             </a>
 
-            <a href="observations.html" class="menu-card bg-zinc-700 border border-zinc-300 p-4 flex flex-col items-center text-center gap-3 hover:bg-zinc-800">
-                <div class="bg-green-500 px-2 py-3 border border-zinc-300 rounded-full">
-                    <span class="text-4xl block">✏️</span>
+            <a href="observations.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-green-500 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">✏️</span>
                 </div>
-                <div>
-                    <h2 class="text-white font-bold text-md">Observations</h2>
-                    <p class="text-gray-400 text-[10px]">Infos importantes</p>
+                <h2 class="text-white font-semibold text-[11px]">Observations</h2>
+                <h3 class="text-gray-400 text-[9px]">Infos importantes</h3>
+            </a>
+    
+                       <a href="planning.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-indigo-600 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">📅</span>
                 </div>
+                <h2 class="text-white font-semibold text-[11px]">Planning</h2>
+                <h3 class="text-gray-400 text-[9px]">À venir</h3>
             </a>
 
-            <a href="compteur.html" class="menu-card bg-zinc-700 border border-zinc-300 p-4 flex flex-col items-center text-center gap-3 hover:bg-zinc-800">
-                <div class="bg-sky-500 px-2 py-3 border border-zinc-300 rounded-full">
-                    <span class="text-4xl block">🚥</span>
+            <a href="notes.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-red-500 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">📒</span>
                 </div>
-                <div>
-                    <h2 class="text-white font-bold text-md">Compteur</h2>
-                    <p class="text-gray-400 text-[10px]">Suivi du comportement</p>
+                <h2 class="text-white font-semibold text-[11px]">Notes</h2>
+                <h3 class="text-gray-400 text-[9px]">Pense-bête</h3>
+            </a>
+
+            <a href="compteur.html" class="menu-card bg-zinc-700 border border-zinc-500 flex flex-col items-center justify-center text-center p-3 hover:bg-zinc-800">
+                <div class="bg-sky-500 w-10 h-10 flex items-center justify-center border border-zinc-300 rounded-full mb-1">
+                    <span class="text-xl">🚥</span>
                 </div>
+                <h2 class="text-white font-semibold text-[11px]">Compteur</h2>
+                <h3 class="text-gray-400 text-[9px]">Suivi du comportement</h3>
             </a>
 
         </nav>
