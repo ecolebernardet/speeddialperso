@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>Documents - CE2/CM2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -16,55 +16,70 @@
             margin: 0; padding: 10px; 
             overflow: hidden; 
         }
-        .container { max-width: 400px; margin: 0 auto; height: 98vh; display: flex; flex-direction: column; }
+        
+        .container { 
+            max-width: 400px; 
+            margin: 0 auto; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
 
         .doc-card {
             background: #1e1e1e;
             border: 1px solid #333;
             border-radius: 12px;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             transition: transform 0.1s;
         }
-        .doc-card:active { transform: scale(0.95); }
 
-        /* Overlay Plein Écran avec support ZOOM */
+        /* Overlay Plein Écran */
         #overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,1);
+            background: black;
             z-index: 100;
-            overflow: auto; /* Permet de naviguer dans l'image zoomée */
+            overflow: auto; /* Permet le défilement quand l'image est grande */
             -webkit-overflow-scrolling: touch;
         }
 
-        #fullImage {
-            display: block;
-            margin: auto;
-            min-width: 100%;
-            transition: transform 0.3s ease;
+        /* Image en mode normal (tient dans l'écran) */
+        .img-fit {
+            width: 100%;
+            height: 100vh;
+            object-contain: contain;
             cursor: zoom-in;
+        }
+
+        /* Image en mode ZOOM (plus grande que l'écran pour se déplacer) */
+        .img-zoom {
+            width: 250%; /* Largeur augmentée pour permettre le déplacement */
+            max-width: none;
+            height: auto;
+            cursor: zoom-out;
+            display: block;
         }
 
         .close-btn {
             position: fixed;
-            top: 20px;
+            top: env(safe-area-inset-top, 20px);
             right: 20px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.6);
             color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
+            border: 2px solid white;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 28px;
             z-index: 110;
-            backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .bottom-nav { margin-top: auto; padding-bottom: 15px; }
-        .nav-btn { font-weight: 800; border-radius: 50px; font-size: 11px; padding: 12px; border: none; width: 100%; cursor: pointer; text-transform: uppercase; }
+        .bottom-nav { margin-top: auto; padding-top: 10px; }
+        .nav-btn { font-weight: 800; border-radius: 50px; font-size: 11px; padding: 14px; border: none; width: 100%; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -75,7 +90,6 @@
         </header>
 
         <nav class="grid grid-cols-2 gap-2 flex-grow">
-            
             <div class="doc-card" onclick="openLightbox('2025-CALENDRIER.jpg')">
                 <div class="h-16 overflow-hidden bg-black">
                     <img src="2025-CALENDRIER.jpg" class="w-full h-full object-cover opacity-60">
@@ -96,7 +110,6 @@
                     `);
                 });
             </script>
-
         </nav>
 
         <footer class="bottom-nav">
@@ -106,7 +119,9 @@
 
     <div id="overlay">
         <button class="close-btn" onclick="closeLightbox()">&times;</button>
-        <img id="fullImage" src="" onclick="toggleZoom()">
+        <div id="imgContainer">
+            <img id="fullImage" src="" onclick="toggleZoom()" class="img-fit">
+        </div>
     </div>
 
     <script>
@@ -116,10 +131,15 @@
             const overlay = document.getElementById('overlay');
             const fullImg = document.getElementById('fullImage');
             fullImg.src = imgSrc;
-            fullImg.style.transform = "scale(1)";
+            
+            // Reset à l'état normal
             isZoomed = false;
-            overlay.style.display = 'flex';
+            fullImg.className = "img-fit";
+            
+            overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
+            overlay.scrollTop = 0;
+            overlay.scrollLeft = 0;
         }
 
         function closeLightbox() {
@@ -127,17 +147,26 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Fonction pour zoomer/dézoomer au clic (en plus du pinch-to-zoom naturel du mobile)
         function toggleZoom() {
             const fullImg = document.getElementById('fullImage');
+            const overlay = document.getElementById('overlay');
+            
             if (!isZoomed) {
-                fullImg.style.transform = "scale(2.5)"; // Zoom x2.5
-                fullImg.style.cursor = "zoom-out";
+                // Passage en mode Zoom : l'image devient très grande
+                fullImg.className = "img-zoom";
                 isZoomed = true;
+                
+                // Optionnel : centre l'image après le zoom
+                setTimeout(() => {
+                    overlay.scrollLeft = (fullImg.clientWidth - window.innerWidth) / 2;
+                    overlay.scrollTop = (fullImg.clientHeight - window.innerHeight) / 2;
+                }, 10);
             } else {
-                fullImg.style.transform = "scale(1)";
-                fullImg.style.cursor = "zoom-in";
+                // Retour au mode normal
+                fullImg.className = "img-fit";
                 isZoomed = false;
+                overlay.scrollTop = 0;
+                overlay.scrollLeft = 0;
             }
         }
     </script>
