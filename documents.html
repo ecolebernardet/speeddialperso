@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Documents - CE2/CM2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        :root { --bg-dark: #121212; --text-light: #e0e0e0; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text-light); 
+            margin: 0; padding: 10px; 
+            overflow: hidden; /* Empêche le scroll pour tenir sur un écran */
+        }
+        .container { max-width: 400px; margin: 0 auto; height: 98vh; display: flex; flex-direction: column; }
+
+        /* Style des cases de documents */
+        .doc-card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.1s;
+        }
+        .doc-card:active { transform: scale(0.95); }
+
+        /* Overlay Plein Écran */
+        #overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .bottom-nav { margin-top: auto; padding-bottom: 15px; }
+        .nav-btn { font-weight: 800; border-radius: 50px; font-size: 11px; padding: 12px; border: none; width: 100%; cursor: pointer; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="text-center mb-3">
+            <h1 class="text-yellow-500 font-bold text-[10px] uppercase tracking-[0.2em]">Documents & Ressources</h1>
+        </header>
+
+        <nav class="grid grid-cols-2 gap-2 flex-grow">
+            
+            <div class="doc-card" onclick="openLightbox('2025-CALENDRIER.jpg')">
+                <div class="h-16 overflow-hidden bg-black">
+                    <img src="2025-CALENDRIER.jpg" class="w-full h-full object-cover opacity-60">
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white truncate">Calendrier</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Emploi du temps</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Mots outils</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Poésies</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Menu Cantine</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Règlement</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Projets</p>
+                </div>
+            </div>
+
+            <div class="doc-card opacity-40">
+                <div class="h-16 bg-zinc-800 flex items-center justify-center">
+                    <span class="text-xl">📄</span>
+                </div>
+                <div class="p-2 text-center">
+                    <p class="text-[10px] font-bold text-white">Sorties</p>
+                </div>
+            </div>
+
+        </nav>
+
+        <footer class="bottom-nav">
+            <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950 shadow-lg">Accueil</button>
+        </footer>
+    </div>
+
+    <div id="overlay" onclick="closeLightbox()">
+        <img id="fullImage" src="" class="max-w-full max-h-full object-contain">
+        <button class="absolute top-5 right-5 text-white text-4xl">&times;</button>
+    </div>
+
+    <script>
+        function openLightbox(imgSrc) {
+            const overlay = document.getElementById('overlay');
+            const fullImg = document.getElementById('fullImage');
+            fullImg.src = imgSrc;
+            overlay.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
