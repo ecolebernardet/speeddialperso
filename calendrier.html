@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Calendrier 2025</title>
+    <style>
+        /* Fond noir pour faire ressortir le document blanc */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #000; 
+            font-family: sans-serif;
+            /* Empêche le rebond élastique sur certains navigateurs pour un meilleur confort */
+            overscroll-behavior: contain;
+        }
+        
+        /* Bouton Retour élégant et fixe */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #71bd7b; /* Ton vert */
+            color: #052e16;
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: none;
+        }
+
+        /* Conteneur de l'image */
+        .page-content {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Aligne l'image en haut */
+            padding-top: 80px; /* Laisse de la place pour le bouton retour au début */
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="documents.html" class="back-btn">← Retour</a>
+
+    <div class="page-content">
+        <img src="2025-CALENDRIER.jpg" alt="Calendrier Scolaire 2025">
+    </div>
+
+</body>
+</html>

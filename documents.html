@@ -2,235 +2,41 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-    <title>Documents - CE2/CM2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Documents - Menu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #121212; 
-            color: #e0e0e0;
-            margin: 0; padding: 10px;
-            overflow: hidden; 
-        }
-
-        /* Grille principale */
-        .container {
-            max-width: 450px;
-            margin: 0 auto;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            /* Espace important en bas pour la barre de navigation du téléphone */
-            padding-bottom: calc(70px + env(safe-area-inset-bottom));
-        }
-
-        /* Style des 8 cases */
-        .doc-card {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.1s;
-            height: 100%;
-        }
+        body { background-color: #121212; color: #e0e0e0; margin: 0; padding: 10px; }
+        .container { max-width: 450px; margin: 0 auto; height: 100vh; display: flex; flex-direction: column; padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+        .doc-card { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: 100%; transition: transform 0.1s; cursor: pointer; }
         .doc-card:active { transform: scale(0.96); }
-
-        /* Fenêtre de zoom (Overlay) */
-        #overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background-color: black;
-            z-index: 100;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        #zoomWrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 100%;
-            min-height: 100vh;
-        }
-
-        #fullImage {
-            width: 100%;
-            height: auto;
-            transition: transform 0.3s ease-out;
-            cursor: zoom-in;
-            transform-origin: center center;
-        }
-
-        /* Bouton Fermer flottant */
-        .close-btn {
-            position: fixed;
-            top: env(safe-area-inset-top, 20px);
-            right: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: 2px solid white;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            font-size: 24px;
-            z-index: 110;
-            backdrop-filter: blur(10px);
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .nav-btn {
-            font-weight: 800;
-            border-radius: 50px;
-            font-size: 11px;
-            padding: 16px;
-            width: 100%;
-            text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
     </style>
 </head>
 <body>
-
     <div class="container">
         <header class="text-center mb-4 pt-2">
             <h1 class="text-yellow-500 font-bold text-[10px] uppercase tracking-[0.2em]">Documents & Ressources</h1>
         </header>
 
         <nav class="grid grid-cols-2 grid-rows-4 gap-3 flex-grow">
-            
-            <div class="doc-card" onclick="openLightbox('2025-CALENDRIER.jpg')">
+            <div class="doc-card" onclick="window.location.href='calendrier.html'">
                 <div class="flex-grow overflow-hidden bg-zinc-900">
                     <img src="2025-CALENDRIER.jpg" class="w-full h-full object-cover opacity-70">
                 </div>
                 <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Calendrier</p>
+                    <p class="text-[9px] font-bold text-white uppercase">Calendrier</p>
                 </div>
             </div>
 
             <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">📅</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Emploi du temps</p>
-                </div>
+                <div class="flex-grow flex items-center justify-center text-xl">📄</div>
+                <div class="p-2 text-center bg-[#1e1e1e]"><p class="text-[9px] font-bold text-white uppercase">Emploi du temps</p></div>
             </div>
-
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">📝</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Mots Outils</p>
-                </div>
-            </div>
-
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">🎭</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Poésies</p>
-                </div>
-            </div>
-
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">🍎</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Menu Cantine</p>
-                </div>
-            </div>
-
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">📜</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Règlement</p>
-                </div>
-            </div>
-
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">🚀</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Projets</p>
-                </div>
-            </div>
-
-            <div class="doc-card opacity-50">
-                <div class="flex-grow flex items-center justify-center text-xl">🚌</div>
-                <div class="p-2 text-center bg-[#1e1e1e]">
-                    <p class="text-[9px] font-bold text-white uppercase truncate">Sorties</p>
-                </div>
-            </div>
-
-        </nav>
+            </nav>
 
         <footer class="mt-4">
-            <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950">
-                Retour à l'Accueil
-            </button>
+            <button onclick="window.location.href='index.html'" class="w-full bg-[#71bd7b] text-green-950 font-bold py-4 rounded-full text-[11px] uppercase">Retour à l'Accueil</button>
         </footer>
     </div>
-
-    <div id="overlay">
-        <button class="close-btn" onclick="closeLightbox()">&times;</button>
-        <div id="zoomWrapper">
-            <img id="fullImage" src="" onclick="handleZoom(event)">
-        </div>
-    </div>
-
-    <script>
-        let isZoomed = false;
-        const zoomScale = 2.0; // Puissance du zoom
-
-        function openLightbox(imgSrc) {
-            const overlay = document.getElementById('overlay');
-            const fullImg = document.getElementById('fullImage');
-            fullImg.src = imgSrc;
-            resetZoom();
-            overlay.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLightbox() {
-            document.getElementById('overlay').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        function resetZoom() {
-            const fullImg = document.getElementById('fullImage');
-            const overlay = document.getElementById('overlay');
-            isZoomed = false;
-            fullImg.style.transform = "scale(1)";
-            overlay.scrollLeft = 0;
-            overlay.scrollTop = 0;
-        }
-
-        function handleZoom(e) {
-            const fullImg = document.getElementById('fullImage');
-            const overlay = document.getElementById('overlay');
-
-            if (!isZoomed) {
-                fullImg.style.transform = `scale(${zoomScale})`;
-                isZoomed = true;
-
-                // Coordonnées du clic
-                const rect = fullImg.getBoundingClientRect();
-                const touchX = (e.clientX || e.pageX) - rect.left;
-                const touchY = (e.clientY || e.pageY) - rect.top;
-
-                // Déplacement du scroll pour centrer le point cliqué
-                setTimeout(() => {
-                    overlay.scrollTo({
-                        left: (touchX * zoomScale) - (window.innerWidth / 2),
-                        top: (touchY * zoomScale) - (window.innerHeight / 2),
-                        behavior: 'smooth'
-                    });
-                }, 10);
-            } else {
-                resetZoom();
-            }
-        }
-    </script>
-
 </body>
 </html>
