@@ -2,67 +2,67 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendrier</title>
     <style>
-        /* 1. VERROUILLAGE DE LA PAGE */
+        /* 1. CONFIGURATION DE BASE */
         html, body {
             margin: 0;
             padding: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
             background-color: #000;
-            position: fixed; 
+            /* On enlève position: fixed pour laisser le zoom natif fonctionner */
         }
 
-        /* 2. BOUTON RETOUR EN BAS */
+        /* 2. CONTENEUR DE ZOOM */
+        #zoom-box {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center; /* Centre verticalement si l'image est plus petite */
+            justify-content: center;
+            overflow: auto; /* Permet le scroll si l'image dépasse après zoom */
+        }
+
+        .image-container {
+            width: 100%;
+            height: auto;
+        }
+
+        img {
+            width: 100%; /* L'image prend toute la largeur de l'écran par défaut */
+            height: auto;
+            display: block;
+        }
+
+        /* 3. BOUTON RETOUR FIXE */
         .back-btn {
             position: fixed;
-            bottom: 50px; /* Placé en bas */
+            bottom: 30px;
             left: 50%;
-            transform: translateX(-50%); /* Centrage parfait */
+            transform: translateX(-50%);
             background: #71bd7b;
             color: #052e16;
-            padding: 15px 40px;
+            padding: 12px 30px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 800;
             z-index: 9999;
             font-family: sans-serif;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             font-size: 14px;
             white-space: nowrap;
         }
 
-        /* 3. ZONE DE NAVIGATION DANS L'IMAGE */
-        #zoom-box {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            display: block;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .image-container {
-            width: 250%; /* Image pré-zoomée pour éviter le pinch-to-zoom instable */
-            display: block;
-        }
-
-        img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Petit fondu noir en bas pour que le bouton ressorte bien */
+        /* Ombre pour la lisibilité */
         .bottom-shadow {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 100px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            height: 80px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
             pointer-events: none;
             z-index: 9998;
         }
@@ -80,26 +80,9 @@
     <a href="documents.html" class="back-btn">👈 retour aux documents</a>
 
     <script>
-        const box = document.getElementById('zoom-box');
-        
-        // Sécurité anti-rafraîchissement
-        window.onload = () => {
-            box.scrollTop = 2; // On décale de 2px pour être sûr
-            // Centre l'image horizontalement au démarrage
-            box.scrollLeft = (box.scrollWidth - window.innerWidth) / 2;
-        };
-
-        // Si l'utilisateur remonte tout en haut, on le bloque à 2px
-        box.addEventListener('scroll', () => {
-            if (box.scrollTop <= 0) {
-                box.scrollTop = 2;
-            }
-        });
-
-        // Empêche les gestes natifs de zoom qui font sauter l'app
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
+        // On supprime les blocages de scroll et de zoom pour laisser 
+        // le comportement naturel du téléphone prendre le relais.
+        // L'utilisateur pourra "pincer" l'écran pour zoomer.
     </script>
 </body>
 </html>
