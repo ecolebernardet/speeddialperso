@@ -19,11 +19,11 @@
         /* 2. BOUTON RETOUR EN BAS */
         .back-btn {
             position: fixed;
-            bottom: 30px; /* Placé en bas */
+            bottom: 50px; /* Placé en bas */
             left: 50%;
             transform: translateX(-50%); /* Centrage parfait */
             background: #71bd7b;
-            color: #052e16;
+            color: green-950;
             padding: 15px 40px;
             border-radius: 50px;
             text-decoration: none;
@@ -31,7 +31,6 @@
             z-index: 9999;
             font-family: sans-serif;
             box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-            text-transform: uppercase;
             font-size: 14px;
             white-space: nowrap;
         }
@@ -46,7 +45,7 @@
         }
 
         .image-container {
-            width: 250%; /* Image pré-zoomée pour éviter le pinch-to-zoom instable */
+            width: 200%; /* Image pré-zoomée pour éviter le pinch-to-zoom instable */
             display: block;
         }
 
@@ -78,7 +77,7 @@
     </div>
 
     <div class="bottom-shadow"></div>
-    <a href="documents.html" class="back-btn">← Retour</a>
+    <a href="documents.html" class="back-btn">👈 retour aux documents</a>
 
     <script>
         const box = document.getElementById('zoom-box');
