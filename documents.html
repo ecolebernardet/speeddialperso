@@ -23,7 +23,7 @@
             height: 100vh; 
             display: flex; 
             flex-direction: column;
-            padding-bottom: calc(40px + env(safe-area-inset-bottom)); /* Espace augmenté pour la navigation */
+            padding-bottom: calc(50px + env(safe-area-inset-bottom));
         }
 
         .doc-card {
@@ -33,46 +33,51 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.1s;
         }
-        .doc-card:active { transform: scale(0.95); }
 
+        /* Overlay Plein Écran */
         #overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,1);
+            background: black;
             z-index: 100;
-            overflow: auto; /* Crucial pour le déplacement */
+            overflow: auto; /* Autorise le défilement */
             -webkit-overflow-scrolling: touch;
         }
 
+        /* Conteneur interne qui grandit avec le zoom */
+        #zoomWrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
         #fullImage {
-            display: block;
-            margin: auto;
             width: 100%;
             height: auto;
+            max-width: 100%;
             transition: transform 0.3s ease;
-            transform-origin: top left; /* On zoome à partir du coin pour garder le contrôle du scroll */
             cursor: zoom-in;
+            transform-origin: center center; /* Zoom depuis le centre */
         }
 
         .close-btn {
             position: fixed;
             top: env(safe-area-inset-top, 20px);
             right: 20px;
-            background: rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.7);
             color: white;
             border: 2px solid white;
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 28px;
             z-index: 110;
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .bottom-nav { margin-top: auto; padding-top: 10px; }
@@ -116,7 +121,7 @@
 
     <div id="overlay">
         <button class="close-btn" onclick="closeLightbox()">&times;</button>
-        <div id="zoomWrapper" style="width: 100%; min-height: 100vh; display: flex; align-items: center;">
+        <div id="zoomWrapper">
             <img id="fullImage" src="" onclick="toggleZoom()">
         </div>
     </div>
@@ -130,18 +135,16 @@
             const wrapper = document.getElementById('zoomWrapper');
             
             fullImg.src = imgSrc;
-            
-            // État initial : image ajustée
-            isZoomed = false;
             fullImg.style.transform = "scale(1)";
-            fullImg.style.width = "100%";
             wrapper.style.width = "100%";
             wrapper.style.height = "100vh";
+            isZoomed = false;
             
             overlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
-            overlay.scrollLeft = 0;
+            
             overlay.scrollTop = 0;
+            overlay.scrollLeft = 0;
         }
 
         function closeLightbox() {
@@ -153,25 +156,24 @@
             const fullImg = document.getElementById('fullImage');
             const wrapper = document.getElementById('zoomWrapper');
             const overlay = document.getElementById('overlay');
-
+            
             if (!isZoomed) {
-                // On passe à 2.5x. Pour que le scroll fonctionne partout, 
-                // on agrandit le conteneur (wrapper) à la même taille que l'image zoomée.
-                fullImg.style.transform = "scale(2.5)";
-                wrapper.style.width = "250%"; 
-                wrapper.style.height = (fullImg.offsetHeight * 2.5) + "px";
-                
+                // Zoom à 150%
+                fullImg.style.transform = "scale(1.5)";
+                // On agrandit le wrapper pour permettre au scroll d'exister
+                wrapper.style.width = "150%";
+                wrapper.style.height = "150vh";
                 fullImg.style.cursor = "zoom-out";
                 isZoomed = true;
             } else {
+                // Retour normal
                 fullImg.style.transform = "scale(1)";
                 wrapper.style.width = "100%";
                 wrapper.style.height = "100vh";
-                
                 fullImg.style.cursor = "zoom-in";
                 isZoomed = false;
-                overlay.scrollLeft = 0;
                 overlay.scrollTop = 0;
+                overlay.scrollLeft = 0;
             }
         }
     </script>
