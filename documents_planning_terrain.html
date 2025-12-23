@@ -2,122 +2,104 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Planning du terrain</title>
     <style>
-        body { 
-            margin: 0; padding: 0; background-color: #000; 
-            font-family: sans-serif; overflow: hidden; 
-            touch-action: none; /* Désactive les gestes par défaut du navigateur */
-        }
-        
-        .back-btn {
-            position: fixed; top: 20px; left: 20px;
-            background: #71bd7b; color: #052e16;
-            padding: 12px 20px; border-radius: 50px;
-            text-decoration: none; font-weight: 800;
-            font-size: 13px; text-transform: uppercase;
-            z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        #zoom-container {
+        /* 1. VERROUILLAGE DE LA PAGE */
+        html, body {
+            margin: 0;
+            padding: 0;
             width: 100vw;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
-            cursor: grab;
+            background-color: #000;
+            position: fixed; 
+        }
+
+        /* 2. BOUTON RETOUR EN BAS */
+        .back-btn {
+            position: fixed;
+            bottom: 50px; /* Placé en bas */
+            left: 50%;
+            transform: translateX(-50%); /* Centrage parfait */
+            background: #71bd7b;
+            color: #052e16;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 800;
+            z-index: 9999;
+            font-family: sans-serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        /* 3. ZONE DE NAVIGATION DANS L'IMAGE */
+        #zoom-box {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            display: block;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .image-container {
+            width: 250%; /* Image pré-zoomée pour éviter le pinch-to-zoom instable */
+            display: block;
         }
 
         img {
-            max-width: 100%;
+            width: 100%;
             height: auto;
-            transform-origin: center center;
-            transition: transform 0.1s ease-out; /* Très court pour la réactivité */
-            will-change: transform;
+            display: block;
+        }
+
+        /* Petit fondu noir en bas pour que le bouton ressorte bien */
+        .bottom-shadow {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            pointer-events: none;
+            z-index: 9998;
         }
     </style>
 </head>
 <body>
 
-    <a href="documents.html" class="back-btn">← Retour</a>
-
-    <div id="zoom-container">
-        <img id="calendar-img" src="documents_planning_terrain.jpg">
+    <div id="zoom-box">
+        <div class="image-container">
+            <img src="documents_planning_terrain.jpg"">
+        </div>
     </div>
 
+    <div class="bottom-shadow"></div>
+    <a href="documents.html" class="back-btn">👈 retour aux documents</a>
+
     <script>
-        const img = document.getElementById('calendar-img');
-        const container = document.getElementById('zoom-container');
+        const box = document.getElementById('zoom-box');
         
-        let scale = 1;
-        let pointX = 0;
-        let pointY = 0;
-        let start = { x: 0, y: 0 };
-
-        const setTransform = () => {
-            img.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        // Sécurité anti-rafraîchissement
+        window.onload = () => {
+            box.scrollTop = 2; // On décale de 2px pour être sûr
+            // Centre l'image horizontalement au démarrage
+            box.scrollLeft = (box.scrollWidth - window.innerWidth) / 2;
         };
 
-        container.onpointerdown = (e) => {
-            e.preventDefault();
-            start = { x: e.clientX - pointX, y: e.clientY - pointY };
-            container.onpointermove = (e) => {
-                e.preventDefault();
-                pointX = e.clientX - start.x;
-                pointY = e.clientY - start.y;
-                setTransform();
-            };
-        };
-
-        container.onpointerup = () => {
-            container.onpointermove = null;
-        };
-
-        // Gestion du zoom à la molette ou au pincement (Wheel)
-        container.onwheel = (e) => {
-            e.preventDefault();
-            const xs = (e.clientX - pointX) / scale;
-            const ys = (e.clientY - pointY) / scale;
-            const delta = -e.deltaY;
-            (delta > 0) ? (scale *= 1.2) : (scale /= 1.2);
-            
-            // Limites de zoom
-            if (scale < 1) scale = 1;
-            if (scale > 5) scale = 5;
-
-            pointX = e.clientX - xs * scale;
-            pointY = e.clientY - ys * scale;
-            setTransform();
-        };
-
-        // Support mobile pour le pincement (Gesture simplifiée)
-        let initialDist = 0;
-        container.ontouchmove = (e) => {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                let dist = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                if (initialDist === 0) {
-                    initialDist = dist;
-                } else {
-                    let diff = dist / initialDist;
-                    scale *= diff;
-                    if (scale < 1) scale = 1;
-                    if (scale > 5) scale = 5;
-                    initialDist = dist;
-                    setTransform();
-                }
+        // Si l'utilisateur remonte tout en haut, on le bloque à 2px
+        box.addEventListener('scroll', () => {
+            if (box.scrollTop <= 0) {
+                box.scrollTop = 2;
             }
-        };
+        });
 
-        container.ontouchend = () => {
-            initialDist = 0;
-        };
+        // Empêche les gestes natifs de zoom qui font sauter l'app
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
     </script>
-
 </body>
 </html>
