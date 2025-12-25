@@ -38,7 +38,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
-            <h1 class="text-lg font-black uppercase tracking-tighter">Infos et paramètres de l'appli</h1>
+            <h1 class="text-lg font-black tracking-tighter">Infos et paramètres</h1>
             <div class="w-10"></div> 
         </div>
 
@@ -51,47 +51,72 @@
         <div class="p-4">
             <div id="emploi" class="tab-content active">
                 <div class="card-info">
-                    <h3 class="text-blue-400 font-black text-xs uppercase mb-2">📌 Inscriptions</h3>
+                    <h3 id="title-inscr" class="font-black text-xs uppercase mb-2">📌 Inscriptions</h3>
                     <p class="text-xs text-zinc-400 leading-relaxed">Ajoutez vos élèves un par un. Précisez son prénom et son nom, puis cliquez sur son genre et son niveau avant de l'enregistrer. <br><br> Vous pouvez aussi importer une liste d'un ficher .txt dans lequel les infos concernant chaque élève se présentent de cette manière :<br>Prénom;NOM;genre(f ou g);niveau(CP ou CE1 ou CE ou CM1 ou CM2 ou Autre). <br><br> L'appli générera ensuite une liste qui sera utilisée dans les autres rubriques.</p>
                 </div>
                 <div class="card-info">
-                    <h3 class="text-blue-400 font-black text-xs uppercase mb-2">⏲️ 108 heures</h3>
+                    <h3 id="title-docs" class="font-black text-xs uppercase mb-2">📂 Documents</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Déposez vos documents utiles au quotidien.</p>
+                </div>
+                <div class="card-info">
+                    <h3 id="title-liens" class="font-black text-xs uppercase mb-2">🔗️ Liens</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Lister les sites que vous utilisez souvent pour vous y rendre en un clic.</p>
+                </div>
+                <div class="card-info">
+                    <h3 id="title-h108" class="font-black text-xs uppercase mb-2">⏲️ 108 heures</h3>
                     <p class="text-xs text-zinc-400 leading-relaxed">Cette rubrique vous permet de gérer vos 108 heures annuelles dans 4 catégories différentes :<br> 1) Les APC <br>2) Les réunions (conseils des maîtres, conseils de cycle, rencontres avec les familles... <br>3) La formation continue <br>4) Les conseils d'écoles <br><br> Il est possible d'exporter et d'importer une liste d'heures déjà effectuées.</p>
                 </div>
                 <div class="card-info">
-                    <h3 class="text-green-400 font-black text-xs uppercase mb-2">🎲 Tirage</h3>
-                    <p class="text-xs text-zinc-400 leading-relaxed">Cocher ou décocher les élèves présents ou absents puis tirer un prénom d'élève au hasard.</p>
+                    <h3 id="title-memos" class="font-black text-xs uppercase mb-2">📒️ Mémos</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Enregistrez des notes sous forme de pense-bête. <br> Les couleurs sont personnalisables. <br> Vous pouvez exporter ou importer des notes.</p>
                 </div>
                 <div class="card-info">
-                    <h3 class="text-green-400 font-black text-xs uppercase mb-2">✏️ Observations</h3>
-                    <p class="text-xs text-zinc-400 leading-relaxed">Cliquez sur un élève pour noter un comportement ou une remarque. Utilisez le bouton d'export pour sauvegarder vos notes sur votre appareil.</p>
+                    <h3 id="title-tirage" class="font-black text-xs uppercase mb-2">🎲 Tirage</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Cochez ou décochez les élèves présents ou absents puis tirez un prénom d'élève au hasard.</p>
                 </div>
                 <div class="card-info">
-                    <h3 class="text-sky-400 font-black text-xs uppercase mb-2">🚥 Compteur</h3>
-                    <p class="text-xs text-zinc-400 leading-relaxed">Appui simple = +1. Double appui = -1. Idéal pour le suivi du comportement ou la participation.</p>
+                    <h3 id="title-equipes" class="font-black text-xs uppercase mb-2">👥 Équipes</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Cochez ou décochez les élèves présents ou absents, validez le nombre d'équipes que vous souhaitez obtenir puis cliquez sur "Générer". <br> Les élèves seront répartis en essayant au maximum de garder un équilibre filles/garçons et en répartissant au mieux les différents niveaux.</p>
+                </div>
+                <div class="card-info">
+                    <h3 id="title-obs" class="font-black text-xs uppercase mb-2">✏️ Observations</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Cliquez sur un élève pour noter des informations le concernant. <br> Utilisez le bouton d'export pour sauvegarder vos notes sur votre appareil.</p>
+                </div>
+                <div class="card-info">
+                    <h3 id="title-compt" class="font-black text-xs uppercase mb-2">🚥 Compteur</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">Cette rubrique permet un suivi du comportement des élèves. <br> Appui simple = +1. Double appui = -1.</p>
                 </div>
             </div>
 
             <div id="perso" class="tab-content">
                 <div id="settingsContainer" class="space-y-1"></div>
-                
                 <div class="flex gap-4 mt-6 pb-10">
                     <button onclick="reinitialiser()" class="btn-nav bg-red-600 text-white flex-1 shadow-lg active:scale-95">RàZ Couleurs</button>
                     <a href="index.html" class="btn-nav bg-green-600 text-white flex items-center justify-center no-underline shadow-lg flex-1 active:scale-95">Enregistrer</a>
                 </div>
             </div>
 
-            <div id="propos" class="tab-content text-center py-10">
-                <div class="card-info">
+            <div id="propos" class="tab-content text-center py-6">
+                <div class="card-info flex flex-col items-center">
+                    <img src="logo-ecole-jean-rostand-v2-006.png" alt="Logo École Jean Rostand" class="w-32 h-auto mb-6 drop-shadow-lg">
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Version 1.2.0</p>
                     <p class="text-sm italic text-zinc-300">"Conçu par et pour les professeurs des écoles."</p>
-                    <div class="h-[1px] bg-zinc-800 my-6"></div>
+                    <div class="h-[1px] bg-zinc-800 w-full my-6"></div>
+                    <p class="text-[10px] text-zinc-500 uppercase">École Jean Rostand</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        const mapCouleurs = {
+            'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+            'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+            'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+            'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+            'rose': '#f43f5e', 'gray': '#6b7280'
+        };
+
         function openTab(evt, tabName) {
             let i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -115,13 +140,35 @@
             { id: 'compt', label: 'Compteur', emoji: '🚥' }
         ];
 
-        const couleurs = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose', 'gray'];
+        const couleurs = Object.keys(mapCouleurs);
 
         let prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {
             param: 'gray', inscr: 'lime', h108: 'orange', docs: 'red', 
             liens: 'indigo', tirage: 'yellow', equipes: 'rose', 
-            notes: 'purple', obs: 'green', compt: 'sky'
+            memos: 'purple', obs: 'green', compt: 'sky'
         };
+
+        function appliquerCouleursEmploi() {
+            const mapping = {
+                'title-inscr': 'inscr',
+                'title-docs': 'docs',
+                'title-liens': 'liens',
+                'title-h108': 'h108',
+                'title-memos': 'memos',
+                'title-tirage': 'tirage',
+                'title-equipes': 'equipes',
+                'title-obs': 'obs',
+                'title-compt': 'compt'
+            };
+
+            for (let [elementId, prefId] of Object.entries(mapping)) {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    const colorName = prefs[prefId] || 'gray';
+                    el.style.color = mapCouleurs[colorName];
+                }
+            }
+        }
 
         function renderSettings() {
             const container = document.getElementById('settingsContainer');
@@ -129,29 +176,34 @@
             
             const btnRetour = document.getElementById('btn-retour');
             const mainColor = prefs.param;
-            // Mise à jour de la couleur de fond et d'une bordure subtile
-            btnRetour.className = `flex items-center justify-center w-10 h-10 rounded-full bg-${mainColor}-600 border border-${mainColor}-400/30 transition-all duration-300`;
+            const hexaRetour = mapCouleurs[mainColor] || '#6b7280';
+            
+            btnRetour.style.backgroundColor = hexaRetour;
+            btnRetour.style.border = "1px solid rgba(255,255,255,0.2)";
 
             tuiles.forEach(tuile => {
                 const configDiv = document.createElement('div');
                 configDiv.className = 'tile-config';
-                const currentColor = prefs[tuile.id];
+                const currentColor = prefs[tuile.id] || 'gray';
                 configDiv.innerHTML = `
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs">${tuile.emoji}</span>
                             <span class="text-[9px] font-black uppercase tracking-tight text-zinc-400">${tuile.label}</span>
                         </div>
-                        <span class="text-[8px] font-bold uppercase text-${currentColor}-400 border border-zinc-800 px-1.5 rounded">${currentColor}</span>
+                        <span class="text-[8px] font-bold uppercase border border-zinc-800 px-1.5 rounded" style="color: ${mapCouleurs[currentColor]}">${currentColor}</span>
                     </div>
                     <div class="flex flex-wrap gap-1.5 justify-start">
                         ${couleurs.map(c => `
                             <button onclick="setTileColor('${tuile.id}', '${c}')" 
-                                    class="color-dot bg-${c}-500 ${currentColor === c ? 'active' : ''}">
+                                    class="color-dot ${currentColor === c ? 'active' : ''}"
+                                    style="background-color: ${mapCouleurs[c]}">
                             </button>`).join('')}
                     </div>`;
                 container.appendChild(configDiv);
             });
+            
+            appliquerCouleursEmploi();
         }
 
         function setTileColor(tuileId, couleur) {

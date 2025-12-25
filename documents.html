@@ -10,115 +10,175 @@
         body { font-family: 'Inter', sans-serif; background: #000; color: #eee; padding: 10px; margin: 0; }
         
         .doc-card { 
-            background: #111; border: 1px solid #222; 
-            border-radius: 1.2rem; padding: 15px; 
-            display: flex; align-items: center; gap: 15px;
-            transition: transform 0.1s;
+            background: #0a0a0a; border: 1px solid #1a1a1a; 
+            border-radius: 1.2rem; padding: 12px; 
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s;
         }
-        .doc-card:active { transform: scale(0.98); }
-        
-        .icon-box {
-            width: 45px; height: 45px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
+
+        .preview-box {
+            width: 50px; height: 65px; border-radius: 8px;
+            background: #1a1a1a; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; border: 1px solid #333;
         }
+
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
 
         .nav-btn { 
             font-weight: 900; border-radius: 50px; font-size: 10px; 
             padding: 14px; text-align: center; text-transform: uppercase;
             flex: 1;
         }
+
+        /* Modal simple */
+        #uploadModal, #viewerModal {
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.95); z-index: 100;
+            padding: 20px;
+        }
     </style>
 </head>
 <body class="pb-24">
     <div class="max-w-md mx-auto">
         
-        <div class="flex items-center justify-between py-4 mt-4 mb-2">
+        <div class="flex items-center justify-between py-4 mt-4">
             <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
-            <h1 id="pageTitle" class="text-2xl font-black uppercase tracking-tighter">
-                Documents
-            </h1>
-            <div class="w-10"></div> 
+            <h1 id="pageTitle" class="text-2xl font-black tracking-tighter ">Documents</h1>
+            <button onclick="openModal()" class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-xl font-bold">+</button>
         </div>
-        <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-center mb-8">Accès rapide aux ressources</p>
+        <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-center mb-6 italic">Mes ressources importées</p>
 
-        <div class="flex flex-col gap-3 px-2">
-            
-            <a href="#" class="doc-card">
-                <div class="icon-box theme-bg-light">📂</div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white">Livret Scolaire (LSU)</h2>
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold">Portail officiel</p>
-                </div>
-                <span class="text-zinc-700">→</span>
-            </a>
+        <div id="docsList" class="flex flex-col gap-3 px-2">
+            </div>
 
-            <a href="#" class="doc-card">
-                <div class="icon-box theme-bg-light">📝</div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white">Cahier Journal</h2>
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold">Google Drive / Word</p>
-                </div>
-                <span class="text-zinc-700">→</span>
-            </a>
-
-            <a href="#" class="doc-card">
-                <div class="icon-box theme-bg-light">📅</div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white">Emploi du temps</h2>
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold">Format PDF</p>
-                </div>
-                <span class="text-zinc-700">→</span>
-            </a>
-
-            <a href="#" class="doc-card">
-                <div class="icon-box theme-bg-light">🛡️</div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-white">PPMS / Sécurité</h2>
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold">Consignes d'urgence</p>
-                </div>
-                <span class="text-zinc-700">→</span>
-            </a>
-
-        </div>
-
-        <div class="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-lg border-t border-zinc-900">
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-lg border-t border-zinc-900 z-50">
             <div class="max-w-md mx-auto flex gap-4">
-                <button onclick="window.print()" class="nav-btn bg-white text-black shadow-lg w-full">Imprimer la liste</button>
+                <button onclick="clearDocs()" class="nav-btn border border-red-900/50 text-red-500">Vider la liste</button>
+                <button onclick="window.print()" class="nav-btn bg-white text-black">Imprimer</button>
             </div>
         </div>
     </div>
 
+    <div id="uploadModal" class="flex flex-col justify-center">
+        <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+            <h2 class="text-xl font-black mb-4">Nouveau Document</h2>
+            <input type="text" id="docName" placeholder="Nom du document (ex: Emploi du temps)" class="w-full bg-black border border-zinc-700 p-3 rounded-lg mb-4 text-sm">
+            <input type="file" id="fileInput" accept="image/*,application/pdf" class="text-xs text-zinc-400 mb-6">
+            <div class="flex gap-2">
+                <button onclick="closeModal()" class="flex-1 p-3 text-xs font-bold uppercase text-zinc-500">Annuler</button>
+                <button onclick="saveDocument()" id="btnSave" class="flex-1 p-3 text-xs font-bold uppercase rounded-lg text-white">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewerModal" onclick="this.style.display='none'">
+        <div class="h-full w-full flex items-center justify-center">
+            <div id="viewerContent" class="max-w-full max-h-full"></div>
+        </div>
+        <p class="absolute bottom-10 left-0 right-0 text-center text-xs text-zinc-500">Cliquez pour fermer</p>
+    </div>
+
     <script>
+        const mapCouleurs = {
+            'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+            'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+            'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+            'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+            'rose': '#f43f5e', 'gray': '#6b7280'
+        };
+
         const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
         const couleurDocs = themePrefs.docs || 'red';
+        const hexa = mapCouleurs[couleurDocs];
+        
+        let mesDocs = JSON.parse(localStorage.getItem('mes_documents_stockes')) || [];
 
-        function appliquerTheme() {
-            // 1. Couleur du titre
-            const title = document.getElementById('pageTitle');
-            if(title) title.classList.add(`text-${couleurDocs}-500`);
-
-            // 2. Application au bouton Retour Iconique
-            const btnRetour = document.getElementById('btn-retour');
-            if (btnRetour) {
-                btnRetour.classList.add(`bg-${couleurDocs}-600`);
-                btnRetour.classList.add(`border`, `border-${couleurDocs}-400/30`);
-            }
-
-            // 3. Couleurs des icônes
-            const iconBoxes = document.querySelectorAll('.theme-bg-light');
-            iconBoxes.forEach(box => {
-                box.classList.add(`bg-${couleurDocs}-900/30`);
-                box.classList.add(`text-${couleurDocs}-400`);
-                box.style.border = `1px solid rgba(var(--tw-color-${couleurDocs}-500), 0.2)`;
+        function renderDocs() {
+            const list = document.getElementById('docsList');
+            list.innerHTML = mesDocs.length === 0 ? '<p class="text-center text-zinc-600 text-xs py-10">Aucun document importé.</p>' : '';
+            
+            mesDocs.forEach((doc, index) => {
+                const div = document.createElement('div');
+                div.className = 'doc-card';
+                div.innerHTML = `
+                    <div class="preview-box" onclick="viewDoc(${index})">
+                        ${doc.type.includes('pdf') ? '<span class="text-[10px] font-bold text-red-500">PDF</span>' : `<img src="${doc.data}">`}
+                    </div>
+                    <div class="flex-1" onclick="viewDoc(${index})">
+                        <h3 class="text-sm font-bold text-white">${doc.name}</h3>
+                        <p class="text-[9px] text-zinc-500 uppercase">${doc.date}</p>
+                    </div>
+                    <button onclick="deleteDoc(${index})" class="text-zinc-700 p-2">✕</button>
+                `;
+                list.appendChild(div);
             });
         }
 
-        window.addEventListener('DOMContentLoaded', appliquerTheme);
+        function openModal() { document.getElementById('uploadModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('uploadModal').style.display = 'none'; }
+
+        function saveDocument() {
+            const name = document.getElementById('docName').value;
+            const file = document.getElementById('fileInput').files[0];
+
+            if (!name || !file) return alert("Veuillez donner un nom et choisir un fichier");
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newDoc = {
+                    name: name,
+                    data: e.target.result,
+                    type: file.type,
+                    date: new Date().toLocaleDateString('fr-FR')
+                };
+                mesDocs.push(newDoc);
+                localStorage.setItem('mes_documents_stockes', JSON.stringify(mesDocs));
+                document.getElementById('docName').value = '';
+                closeModal();
+                renderDocs();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function viewDoc(index) {
+            const doc = mesDocs[index];
+            const viewer = document.getElementById('viewerModal');
+            const content = document.getElementById('viewerContent');
+            
+            if (doc.type.includes('pdf')) {
+                content.innerHTML = `<iframe src="${doc.data}" class="w-[90vw] h-[80vh] rounded-lg"></iframe>`;
+            } else {
+                content.innerHTML = `<img src="${doc.data}" class="max-w-full max-h-full rounded-lg shadow-2xl">`;
+            }
+            viewer.style.display = 'block';
+        }
+
+        function deleteDoc(index) {
+            if(confirm("Supprimer ce document ?")) {
+                mesDocs.splice(index, 1);
+                localStorage.setItem('mes_documents_stockes', JSON.stringify(mesDocs));
+                renderDocs();
+            }
+        }
+
+        function clearDocs() {
+            if(confirm("Tout supprimer ?")) {
+                mesDocs = [];
+                localStorage.removeItem('mes_documents_stockes');
+                renderDocs();
+            }
+        }
+
+        // Appliquer thème
+        document.getElementById('pageTitle').style.color = hexa;
+        document.getElementById('btn-retour').style.backgroundColor = hexa;
+        document.getElementById('btnSave').style.backgroundColor = hexa;
+
+        window.onload = renderDocs;
     </script>
 </body>
 </html>
