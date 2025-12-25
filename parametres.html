@@ -38,7 +38,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
-            <h1 class="text-lg font-black uppercase tracking-tighter">Paramètre de l'appli</h1>
+            <h1 class="text-lg font-black uppercase tracking-tighter">Infos et paramètres de l'appli</h1>
             <div class="w-10"></div> 
         </div>
 
@@ -76,8 +76,8 @@
                 <div id="settingsContainer" class="space-y-1"></div>
                 
                 <div class="flex gap-4 mt-6 pb-10">
-                    <button onclick="reinitialiser()" class="btn-nav bg-zinc-900 text-red-400 border border-red-900/20 flex-1">RàZ Couleurs</button>
-                    <a href="index.html" class="btn-nav bg-white text-black flex items-center justify-center no-underline shadow-md flex-1">Enregistrer</a>
+                    <button onclick="reinitialiser()" class="btn-nav bg-red-600 text-white flex-1 shadow-lg active:scale-95">RàZ Couleurs</button>
+                    <a href="index.html" class="btn-nav bg-green-600 text-white flex items-center justify-center no-underline shadow-lg flex-1 active:scale-95">Enregistrer</a>
                 </div>
             </div>
 
@@ -105,12 +105,12 @@
         const tuiles = [
             { id: 'param', label: 'Paramètres', emoji: '⚙️' },
             { id: 'inscr', label: 'Inscriptions', emoji: '📝' },
-            { id: 'h108', label: '108 Heures', emoji: '⏲️' },
             { id: 'docs', label: 'Documents', emoji: '📂' },
             { id: 'liens', label: 'Liens', emoji: '🔗' },
+            { id: 'h108', label: '108 Heures', emoji: '⏲️' },
+            { id: 'memos', label: 'Mémos', emoji: '📒' },
             { id: 'tirage', label: 'Tirage', emoji: '🎲' },
             { id: 'equipes', label: 'Équipes', emoji: '👥' },
-            { id: 'memos', label: 'Mémos', emoji: '📒' },
             { id: 'obs', label: 'Observations', emoji: '✏️' },
             { id: 'compt', label: 'Compteur', emoji: '🚥' }
         ];
