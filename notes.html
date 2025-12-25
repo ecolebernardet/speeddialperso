@@ -20,6 +20,24 @@
         }
         .container { max-width: 600px; margin: 0 auto; }
 
+        /* HEADER AVEC BOUTON RETOUR */
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #btn-retour {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
         .create-note-box { 
             background: #282828; 
             border: 1px solid var(--card-border); 
@@ -104,16 +122,21 @@
         .modal-content textarea { width: 100%; margin: 15px 0; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 15px; background: #f4f4f4; color: #000 !important; font-family: monospace; }
         .btns { display: flex; gap: 8px; }
         .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .btn-save { background: var(--primary); color: white; }
+        .btn-save { color: white; }
         .btn-cancel { background: #eee; color: #555; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <header class="text-center mb-4">
+        <header class="header-nav">
+            <a href="index.html" id="btn-retour">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
             <h1 id="pageTitle" class="font-bold text-xs uppercase tracking-widest">Mes Notes</h1>
-        </header>
+            <div style="width: 40px;"></div> </header>
 
         <div class="create-note-box">
             <textarea id="newNoteInput" placeholder="Saisir une note..." oninput="autoExpand(this)"></textarea>
@@ -136,12 +159,11 @@
         <div id="notesGrid" class="note-grid mb-6"></div>
 
         <footer class="bottom-nav flex gap-2">
-            <button onclick="exportNotesToFile()" class="nav-btn bg-zinc-800 text-white">👆exporter .txt👆</button>
-            <label class="nav-btn bg-zinc-800 text-white cursor-pointer">
-                👇importer .txt👇
+            <button onclick="exportNotesToFile()" class="nav-btn bg-zinc-800 text-white uppercase">👆 exporter .txt</button>
+            <label class="nav-btn bg-zinc-800 text-white cursor-pointer uppercase">
+                👇 importer .txt
                 <input type="file" id="importNotesFile" class="hidden" accept=".txt">
             </label>
-            <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950">Accueil</button>
         </footer>
     </div>
 
@@ -160,28 +182,44 @@
     </div>
 
     <script>
+        const mapCouleurs = {
+            'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+            'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+            'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+            'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+            'rose': '#f43f5e', 'gray': '#6b7280'
+        };
+
         // --- GESTION DU THÈME DYNAMIQUE ---
         const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-        const couleurDominante = themePrefs.notes || 'yellow'; // 'yellow' par défaut comme dans votre HTML d'origine
+        const couleurDominante = themePrefs.notes || 'yellow';
 
         function appliquerTheme() {
             const title = document.getElementById('pageTitle');
             const btn = document.getElementById('addBtn');
             const modalBtn = document.getElementById('modalSaveBtn');
+            const btnRetour = document.getElementById('btn-retour');
+            const hex = mapCouleurs[couleurDominante] || '#eab308';
 
-            // Application au titre (en version 500 pour le texte)
-            title.classList.add(`text-${couleurDominante}-500`);
-
-            // Application au bouton ajouter
-            btn.classList.add(`bg-${couleurDominante}-500`);
-            
-            // Application au bouton du modal
-            if(modalBtn) modalBtn.classList.add(`bg-${couleurDominante}-500`);
-
-            // Gestion du contraste du texte (noir si couleur claire)
-            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurDominante)) {
-                btn.classList.replace('text-white', 'text-black');
+            // Titre et bouton retour
+            if(title) title.style.color = hex;
+            if(btnRetour) {
+                btnRetour.style.backgroundColor = hex;
+                btnRetour.style.border = "1px solid rgba(255,255,255,0.2)";
             }
+
+            // Application aux boutons
+            const elements = [btn, modalBtn];
+            elements.forEach(el => {
+                if(el) {
+                    el.style.backgroundColor = hex;
+                    if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurDominante)) {
+                        el.style.color = 'black';
+                    } else {
+                        el.style.color = 'white';
+                    }
+                }
+            });
         }
 
         // --- LOGIQUE DES NOTES ---
@@ -298,7 +336,6 @@
         function saveAndRender() { localStorage.setItem('myKeepNotes', JSON.stringify(notes)); renderNotes(); }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         
-        // Initialisation
         window.onload = () => {
             appliquerTheme();
             setupColorPickers();

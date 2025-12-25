@@ -31,7 +31,6 @@
             color: #888; padding: 8px 16px; border-radius: 20px;
             font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer;
         }
-        /* La couleur .active est maintenant gérée par le script JS */
 
         /* Liste des liens */
         .link-item {
@@ -64,9 +63,15 @@
 <body>
 
 <div class="container">
-    <header class="text-center mb-6">
-        <h1 id="mainTitle" class="font-bold text-xs uppercase tracking-widest text-green-400">🌐 Mes Liens Éducatifs</h1>
-    </header>
+    <div class="flex items-center justify-between py-2 mb-4">
+        <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 id="mainTitle" class="font-bold text-xs uppercase tracking-widest">🌐 Mes Liens Éducatifs</h1>
+        <div class="w-10"></div> 
+    </div>
 
     <div class="add-box">
         <input type="text" id="linkName" placeholder="Nom du site (ex: Vikidia)">
@@ -91,12 +96,11 @@
     <div id="linksList" class="mb-6"></div>
 
     <footer class="bottom-nav">
-        <button onclick="exportData()" class="nav-btn bg-zinc-800 text-white">👆exporter .txt👆</button>
-        <label class="nav-btn bg-zinc-800 text-white cursor-pointer">
+        <button onclick="exportData()" class="nav-btn bg-zinc-800 text-white flex-1">👆exporter .txt👆</button>
+        <label class="nav-btn bg-zinc-800 text-white cursor-pointer flex-1 text-center">
             👇importer .txt👇
             <input type="file" id="importFile" class="hidden" accept=".txt">
         </label>
-        <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950">Accueil</button>
     </footer>
 </div>
 
@@ -108,9 +112,15 @@
     function appliquerTheme() {
         const title = document.getElementById('mainTitle');
         const btn = document.getElementById('mainAddBtn');
+        const btnRetour = document.getElementById('btn-retour');
         
         if(title) title.className = `font-bold text-xs uppercase tracking-widest text-${couleurLiens}-400`;
         
+        if(btnRetour) {
+            btnRetour.classList.add(`bg-${couleurLiens}-600`);
+            btnRetour.classList.add(`border`, `border-${couleurLiens}-400/30`);
+        }
+
         if(btn) {
             btn.className = `btn-add uppercase tracking-tighter bg-${couleurLiens}-500 text-white`;
             if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurLiens)) {
@@ -132,7 +142,7 @@
                 btn.className = `tab-btn active ${colorClassActive} ${textClassActive} ${borderClassActive}`;
             } else {
                 btn.className = `tab-btn`;
-                btn.style.backgroundColor = ""; // Reset inline
+                btn.style.backgroundColor = ""; 
             }
         });
     }
@@ -185,7 +195,7 @@
             btn.classList.remove('active');
             if(btn.innerText.includes(cat)) btn.classList.add('active');
         });
-        updateTabColors(); // Mise à jour des couleurs des onglets
+        updateTabColors(); 
         render();
     }
 

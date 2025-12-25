@@ -10,14 +10,34 @@
         :root { --primary: #ff637e; --bg-dark: #000000; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-dark); margin: 0; padding: 10px; min-height: 100vh; color: white; }
         
-        /* TITRE DYNAMIQUE */
+        /* HEADER AVEC BOUTON RETOUR */
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto 20px auto;
+            padding: 0 10px;
+        }
+        #btn-retour {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
         #mainTitle {
             text-align: center;
             font-weight: 800;
-            font-size: 1.1rem;
-            margin: 15px 0 20px 0;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
+            margin: 0;
+            flex-grow: 1;
         }
 
         .columns-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; margin: 0 auto; }
@@ -35,9 +55,8 @@
             transition: all 0.1s;
         }
 
-        /* COULEURS DE POLICE PAR GENRE */
-        .text-girl { color: #db2777; border-color: #fbcfe8; } 
-        .text-boy { color: #2563eb; border-color: #bfdbfe; } 
+        .text-girl { color: #db2777; } 
+        .text-boy { color: #2563eb; } 
         
         .is-absent { opacity: 0.25 !important; filter: grayscale(1); text-decoration: line-through; }
         
@@ -61,17 +80,24 @@
 </head>
 <body>
 
-    <h1 id="mainTitle">Infos concernant les élèves</h1>
+    <header class="header-nav">
+        <a href="index.html" id="btn-retour">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 id="mainTitle">Infos concernant les élèves</h1>
+        <div style="width: 40px;"></div>
+    </header>
 
     <div id="listeContainer" class="columns-container"></div>
 
-    <footer class="bottom-nav flex gap-2">
-        <button onclick="exportToFile()" class="nav-btn bg-zinc-800 text-white">👆exporter .txt👆</button>
-        <label class="nav-btn bg-zinc-800 text-white cursor-pointer">
-            👇importer .txt👇
+    <footer class="bottom-nav flex gap-2 px-2">
+        <button onclick="exportToFile()" class="nav-btn bg-zinc-800 text-white uppercase">👆 exporter .txt</button>
+        <label class="nav-btn bg-zinc-800 text-white cursor-pointer uppercase text-center">
+            👇 importer .txt
             <input type="file" id="importFile" class="hidden" accept=".txt">
         </label>
-        <button onclick="window.location.href='index.html'" class="nav-btn bg-[#71bd7b] text-green-950">Accueil</button>
     </footer>
 
     <div id="modal" class="modal-overlay">
@@ -91,25 +117,39 @@
         let absentsList = JSON.parse(localStorage.getItem('absentsList')) || [];
         let currentStudentId = "";
 
-        // --- FONCTION DE THÈME ---
+        const mapCouleurs = {
+            'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+            'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+            'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+            'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+            'rose': '#f43f5e', 'gray': '#6b7280'
+        };
+
         function appliquerTheme() {
             const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-            const nomCouleur = prefs['obs'] || 'green'; // 'obs' est l'ID dans parametres.html
-
-            const mapCouleurs = {
-                'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
-                'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
-                'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
-                'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
-                'rose': '#f43f5e', 'slate': '#64748b', 'gray': '#6b7280', 'zinc': '#71717a',
-                'neutral': '#737373', 'stone': '#78716c'
-            };
-
+            const nomCouleur = prefs['obs'] || 'green';
             const couleurHexa = mapCouleurs[nomCouleur] || '#22c55e';
             
-            // Appliquer au titre
-            document.getElementById('mainTitle').style.color = couleurHexa;
-            // Appliquer au bouton de sauvegarde de la modal
+            const mainTitle = document.getElementById('mainTitle');
+            const btnRetour = document.getElementById('btn-retour');
+            const btnSave = document.querySelector('.btn-save');
+
+            if(mainTitle) mainTitle.style.color = couleurHexa;
+            
+            if(btnRetour) {
+                btnRetour.style.backgroundColor = couleurHexa;
+                btnRetour.style.border = "1px solid rgba(255,255,255,0.2)";
+            }
+
+            if(btnSave) {
+                btnSave.style.backgroundColor = couleurHexa;
+                if(['yellow', 'lime', 'amber', 'cyan'].includes(nomCouleur)) {
+                    btnSave.style.color = 'black';
+                } else {
+                    btnSave.style.color = 'white';
+                }
+            }
+            
             document.documentElement.style.setProperty('--primary', couleurHexa);
         }
 

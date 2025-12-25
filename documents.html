@@ -32,12 +32,19 @@
 </head>
 <body class="pb-24">
     <div class="max-w-md mx-auto">
-        <header class="my-8 text-center">
+        
+        <div class="flex items-center justify-between py-4 mt-4 mb-2">
+            <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
             <h1 id="pageTitle" class="text-2xl font-black uppercase tracking-tighter italic">
                 Documents
             </h1>
-            <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">Accès rapide aux ressources</p>
-        </header>
+            <div class="w-10"></div> 
+        </div>
+        <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-center mb-8">Accès rapide aux ressources</p>
 
         <div class="flex flex-col gap-3 px-2">
             
@@ -81,25 +88,28 @@
 
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-black/80 backdrop-blur-lg border-t border-zinc-900">
             <div class="max-w-md mx-auto flex gap-4">
-                <a href="index.html" class="nav-btn bg-zinc-900 text-white border border-zinc-800 no-underline flex items-center justify-center gap-2">
-                   <span>←</span> Accueil
-                </a>
-                <button onclick="window.print()" class="nav-btn bg-white text-black shadow-lg">Imprimer</button>
+                <button onclick="window.print()" class="nav-btn bg-white text-black shadow-lg w-full">Imprimer la liste</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. Gestion du thème dynamique
         const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-        const couleurDocs = themePrefs.docs || 'red'; // Rouge par défaut
+        const couleurDocs = themePrefs.docs || 'red';
 
         function appliquerTheme() {
-            // Couleur du titre
+            // 1. Couleur du titre
             const title = document.getElementById('pageTitle');
-            title.classList.add(`text-${couleurDocs}-500`);
+            if(title) title.classList.add(`text-${couleurDocs}-500`);
 
-            // Couleurs des icônes (fond léger)
+            // 2. Application au bouton Retour Iconique
+            const btnRetour = document.getElementById('btn-retour');
+            if (btnRetour) {
+                btnRetour.classList.add(`bg-${couleurDocs}-600`);
+                btnRetour.classList.add(`border`, `border-${couleurDocs}-400/30`);
+            }
+
+            // 3. Couleurs des icônes
             const iconBoxes = document.querySelectorAll('.theme-bg-light');
             iconBoxes.forEach(box => {
                 box.classList.add(`bg-${couleurDocs}-900/30`);
@@ -108,7 +118,6 @@
             });
         }
 
-        // Lancement au chargement
         window.addEventListener('DOMContentLoaded', appliquerTheme);
     </script>
 </body>

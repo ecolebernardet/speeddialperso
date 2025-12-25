@@ -19,10 +19,8 @@
         }
         .card-input:checked + .card-label { background: #fff; border-color: #fff; color: #000; transform: scale(0.98); }
 
-        /* Colonnes de niveaux sans bordures */
         .level-column { background: rgba(24, 24, 27, 0.6); border: none; border-radius: 1.5rem; padding: 12px; height: fit-content; }
 
-        /* Couleurs élèves */
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
         .bg-f { background: #fce7f3; color: #831843; } 
         
@@ -32,7 +30,16 @@
 </head>
 <body>
     <div class="max-w-4xl mx-auto">
-        <h1 class="text-center text-xl font-black uppercase my-6 tracking-tighter">Inscriptions</h1>
+        
+        <div class="flex items-center justify-between py-4 mb-2">
+            <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 class="text-xl font-black uppercase tracking-tighter italic">Inscriptions</h1>
+            <div class="w-10"></div> 
+        </div>
         
         <div class="max-w-md mx-auto bg-zinc-900 border border-zinc-800 rounded-[2rem] p-5 mb-10 shadow-2xl">
             <form id="eleveForm" class="flex flex-col gap-5">
@@ -64,44 +71,42 @@
 
         <div id="listeContainer"></div>
 
-        <div class="max-w-md mx-auto flex gap-4 mt-5 mb-20">
-            <button onclick="toutEffacer()" class="btn-nav bg-red-500 text-rose-100">RàZ de la liste</button>
-            <a href="index.html" class="btn-nav bg-[#71bd7b] text-green-950 flex items-center justify-center no-underline shadow-md">Accueil</a>
+        <div class="max-w-md mx-auto flex gap-4 mt-8 mb-20">
+            <button onclick="toutEffacer()" class="btn-nav bg-red-500 text-rose-100 flex-1">RàZ de la liste</button>
         </div>
     </div>
 
     <script>
-	
-// 1. Récupération de la couleur choisie pour "inscriptions"
-const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-const couleurInscr = themePrefs.inscr || 'lime';
+        // 1. Récupération de la couleur choisie pour "inscriptions"
+        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+        const couleurInscr = themePrefs.inscr || 'lime';
 
-// 2. Application dynamique au chargement
-window.addEventListener('DOMContentLoaded', () => {
-    // Application au Titre "Inscriptions"
-    const titrePage = document.querySelector('h1');
-    if (titrePage) {
-        // On lui applique la couleur du thème (en nuance 500 pour une bonne visibilité sur noir)
-        titrePage.classList.add(`text-${couleurInscr}-500`);
-    }
+        // 2. Application dynamique au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            // Application au Titre "Inscriptions"
+            const titrePage = document.querySelector('h1');
+            if (titrePage) {
+                titrePage.classList.add(`text-${couleurInscr}-500`);
+            }
 
-    // Application au bouton "Enregistrer"
-    const btnEnregistrer = document.querySelector('#eleveForm button[type="submit"]');
-    if (btnEnregistrer) {
-        // On remplace le rose par défaut par la couleur du thème
-        btnEnregistrer.classList.remove('bg-pink-500');
-        btnEnregistrer.classList.add(`bg-${couleurInscr}-500`);
-        
-        // Ajustement du contraste si la couleur est claire
-        if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurInscr)) {
-            btnEnregistrer.classList.replace('text-white', 'text-black');
-        }
-    }
-});
+            // Application au bouton Retour Iconique
+            const btnRetour = document.getElementById('btn-retour');
+            if (btnRetour) {
+                btnRetour.classList.add(`bg-${couleurInscr}-600`);
+                btnRetour.classList.add(`border`, `border-${couleurInscr}-400/30`);
+            }
 
-// --- La suite de ton code (let eleves = ...) reste inchangée ---
-
-// --- La suite de ton code (let eleves = ...) reste strictement identique ---
+            // Application au bouton "Enregistrer"
+            const btnEnregistrer = document.querySelector('#eleveForm button[type="submit"]');
+            if (btnEnregistrer) {
+                btnEnregistrer.classList.remove('bg-pink-500');
+                btnEnregistrer.classList.add(`bg-${couleurInscr}-500`);
+                
+                if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurInscr)) {
+                    btnEnregistrer.classList.replace('text-white', 'text-black');
+                }
+            }
+        });
 
         let eleves = JSON.parse(localStorage.getItem('maListeEleves')) || [];
 

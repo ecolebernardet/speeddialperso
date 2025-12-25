@@ -33,11 +33,13 @@
     <div class="max-w-md mx-auto">
         
         <div class="flex items-center justify-between p-4 bg-black/50 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-900">
-            <a href="index.html" id="btn-retour" class="text-white px-4 py-2 rounded-full text-[10px] font-black uppercase border border-white/10">
-                ← Retour
+            <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
             </a>
             <h1 class="text-lg font-black uppercase tracking-tighter italic">Réglages</h1>
-            <div class="w-16"></div> 
+            <div class="w-10"></div> 
         </div>
 
         <div class="flex border-b border-zinc-900 sticky top-[65px] bg-black z-40">
@@ -84,7 +86,6 @@
                     <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Version 1.2.0</p>
                     <p class="text-sm italic text-zinc-300">"Conçu par et pour les professeurs des écoles."</p>
                     <div class="h-[1px] bg-zinc-800 my-6"></div>
-                    <p class="text-xs text-zinc-500">Données locales uniquement.</p>
                 </div>
             </div>
         </div>
@@ -126,10 +127,10 @@
             const container = document.getElementById('settingsContainer');
             container.innerHTML = '';
             
-            // Mise à jour de la couleur du bouton Retour
             const btnRetour = document.getElementById('btn-retour');
             const mainColor = prefs.param;
-            btnRetour.className = `bg-${mainColor}-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase border border-${mainColor}-400/30`;
+            // Mise à jour de la couleur de fond et d'une bordure subtile
+            btnRetour.className = `flex items-center justify-center w-10 h-10 rounded-full bg-${mainColor}-600 border border-${mainColor}-400/30 transition-all duration-300`;
 
             tuiles.forEach(tuile => {
                 const configDiv = document.createElement('div');

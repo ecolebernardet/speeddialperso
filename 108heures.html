@@ -40,7 +40,7 @@
             background: #111827; color: #fff; white-space: nowrap;
         }
 
-        /* BOUTONS NAVIGATION (Version originale) */
+        /* BOUTONS NAVIGATION */
         .bottom-nav { width: 100%; max-width: 500px; margin: 20px auto 0; padding-bottom: 40px; display: flex; gap: 8px; }
         .nav-btn { font-weight: 900; border-radius: 50px; font-size: 9px; padding: 12px; border: none; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
 
@@ -57,7 +57,16 @@
 </head>
 <body>
     <div class="max-w-4xl mx-auto">
-        <h1 class="text-center text-lg font-black uppercase my-4 tracking-tighter text-white">Compteur d'Heures</h1>
+        
+        <div class="flex items-center justify-between py-4 mb-2">
+            <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 class="text-lg font-black uppercase tracking-tighter italic text-white">Compteur d'Heures</h1>
+            <div class="w-10"></div> 
+        </div>
         
         <div class="max-w-md mx-auto light-card p-4 mb-6 shadow-2xl">
             <form id="heuresForm" class="flex flex-col gap-3">
@@ -97,171 +106,169 @@
         <div id="displayContainer" class="grid grid-cols-2 gap-3"></div>
 
         <footer class="bottom-nav">
-            <button onclick="exportData()" class="nav-btn bg-zinc-800 text-white ">👆exporter👆</button>
-            <label class="nav-btn bg-zinc-800 text-white cursor-pointer text-center">
+            <button onclick="exportData()" class="nav-btn bg-zinc-800 text-white flex-1">👆exporter👆</button>
+            <label class="nav-btn bg-zinc-800 text-white cursor-pointer text-center flex-1">
                 👇importer👇
                 <input type="file" id="importFile" class="hidden" accept=".txt">
             </label>
-            <a href="index.html" class="nav-btn bg-[#71bd7b] text-green-950 no-underline ">Accueil</a>
         </footer>
     </div>
 
     <script>
-	
-	// 1. Configuration du thème depuis le localStorage
-const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-const couleurH108 = themePrefs.h108 || 'orange'; // Récupère la couleur h108 ou orange par défaut
+    
+    const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+    const couleurH108 = themePrefs.h108 || 'orange'; 
 
-const QUOTAS = { "APC": 36 * 60, "PEDAGO": 48 * 60, "FORM": 18 * 60, "CONSEIL": 6 * 60 };
-const TOTAL_ANNUEL = 108 * 60;
-const LABELS = { "APC": "APC", "PEDAGO": "Réunions", "FORM": "Formation", "CONSEIL": "Conseils d'école" };
+    const QUOTAS = { "APC": 36 * 60, "PEDAGO": 48 * 60, "FORM": 18 * 60, "CONSEIL": 6 * 60 };
+    const TOTAL_ANNUEL = 108 * 60;
+    const LABELS = { "APC": "APC", "PEDAGO": "Réunions", "FORM": "Formation", "CONSEIL": "Conseils d'école" };
 
-let reunions = JSON.parse(localStorage.getItem('mesHeuresReu')) || [];
+    let reunions = JSON.parse(localStorage.getItem('mesHeuresReu')) || [];
 
-// 2. Application au bouton de soumission
-window.addEventListener('DOMContentLoaded', () => {
-   // 1. Application au Titre "Compteur d'Heures"
-    const titrePage = document.querySelector('h1');
-    if (titrePage) {
-        titrePage.classList.add(`text-${couleurH108}-500`);
-    }
-
-    // 2. Application au bouton "Enregistrer"
-    const btnEnregistrer = document.querySelector('#heuresForm button[type="submit"]');
-    if (btnEnregistrer) {
-        btnEnregistrer.classList.remove('bg-indigo-600');
-        btnEnregistrer.classList.add(`bg-${couleurH108}-600`);
-        
-        if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurH108)) {
-            btnEnregistrer.classList.replace('text-white', 'text-black');
+    window.addEventListener('DOMContentLoaded', () => {
+        const titrePage = document.querySelector('h1');
+        if (titrePage) {
+            titrePage.classList.add(`text-${couleurH108}-500`);
         }
-    }
-});
 
-document.getElementById('heuresForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const cat = document.querySelector('input[name="cat"]:checked').value;
-    const date = document.getElementById('dateReu').value;
-    const h = parseInt(document.getElementById('h').value) || 0;
-    const m = parseInt(document.getElementById('m').value) || 0;
-    const comm = document.getElementById('comm').value.trim();
-    reunions.push({ id: Date.now(), cat, date, minutes: (h * 60) + m, comm });
-    sauvegarder(); e.target.reset(); initDate();
-});
+        // Application au bouton Retour Iconique
+        const btnRetour = document.getElementById('btn-retour');
+        if (btnRetour) {
+            btnRetour.classList.add(`bg-${couleurH108}-600`);
+            btnRetour.classList.add(`border`, `border-${couleurH108}-400/30`);
+        }
 
-function formatDuree(totalMinutes) {
-    const h = Math.floor(Math.abs(totalMinutes) / 60);
-    const m = Math.abs(totalMinutes) % 60;
-    return `${totalMinutes < 0 ? "-" : ""}${h}h${m > 0 ? m.toString().padStart(2, '0') : ''}`;
-}
-
-function sauvegarder() { localStorage.setItem('mesHeuresReu', JSON.stringify(reunions)); render(); }
-function supprimer(id) { if(confirm("Supprimer ?")) { reunions = reunions.filter(r => r.id !== id); sauvegarder(); } }
-
-function toggleListe(catKey) {
-    const listDiv = document.getElementById(`list-${catKey}`);
-    const btn = document.getElementById(`btn-${catKey}`);
-    if (listDiv.style.display === "block") {
-        listDiv.style.display = "none";
-        btn.innerText = "Détails";
-    } else {
-        listDiv.style.display = "block";
-        btn.innerText = "Masquer";
-    }
-}
-
-function render() {
-    const container = document.getElementById('displayContainer');
-    container.innerHTML = "";
-    let minutesGlobales = 0;
-
-    Object.keys(QUOTAS).forEach(catKey => {
-        const reuCat = reunions.filter(r => r.cat === catKey);
-        const totalFait = reuCat.reduce((sum, r) => sum + r.minutes, 0);
-        minutesGlobales += totalFait;
-        const restant = QUOTAS[catKey] - totalFait;
-        const pourcentage = Math.min((totalFait / QUOTAS[catKey]) * 100, 100);
-        
-        const col = document.createElement('div');
-        col.className = "level-column";
-        
-        // --- MODIFICATION ICI : Couleur de la jauge catégorie ---
-        let colorBar = restant <= 0 ? "bg-green-600" : `bg-${couleurH108}-600`;
-
-        col.innerHTML = `
-            <div class="mb-1">
-                <div class="flex flex-wrap justify-between items-center gap-1 mb-1">
-                    <h3 class="text-[9px] font-black uppercase text-gray-900 leading-tight">${LABELS[catKey]}</h3>
-                    <span class="quota-badge">RESTE : ${formatDuree(restant)}</span>
-                </div>
-                <div class="progress-container"><div class="progress-bar ${colorBar}" style="width: ${pourcentage}%"></div></div>
-                <p class="text-[8px] font-extrabold text-gray-500 uppercase">${formatDuree(totalFait)} / ${formatDuree(QUOTAS[catKey])}</p>
-            </div>
-            <button id="btn-${catKey}" onclick="toggleListe('${catKey}')" class="toggle-list-btn">Détails</button>
-            <div id="list-${catKey}" class="hidden-list"></div>
-        `;
-
-        const listDiv = col.querySelector(`#list-${catKey}`);
-        reuCat.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
-            const dateFmt = new Date(r.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
-            listDiv.innerHTML += `
-                <div class="reunion-item flex justify-between items-start">
-                    <div class="flex-1 overflow-hidden">
-                        <span class="font-black text-pink-700">${dateFmt}</span> - 
-                        <span class="font-bold text-gray-900">${formatDuree(r.minutes)}</span>
-                        <div class="text-gray-500 italic truncate">${r.comm || ''}</div>
-                    </div>
-                    <button onclick="supprimer(${r.id})" class="text-gray-400 font-black ml-1 text-sm leading-none">&times;</button>
-                </div>`;
-        });
-        container.appendChild(col);
+        const btnEnregistrer = document.querySelector('#heuresForm button[type="submit"]');
+        if (btnEnregistrer) {
+            btnEnregistrer.classList.remove('bg-indigo-600');
+            btnEnregistrer.classList.add(`bg-${couleurH108}-600`);
+            
+            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurH108)) {
+                btnEnregistrer.classList.replace('text-white', 'text-black');
+            }
+        }
     });
 
-    const globalReste = TOTAL_ANNUEL - minutesGlobales;
-    const globalPercent = Math.min((minutesGlobales / TOTAL_ANNUEL) * 100, 100);
+    document.getElementById('heuresForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const cat = document.querySelector('input[name="cat"]:checked').value;
+        const date = document.getElementById('dateReu').value;
+        const h = parseInt(document.getElementById('h').value) || 0;
+        const m = parseInt(document.getElementById('m').value) || 0;
+        const comm = document.getElementById('comm').value.trim();
+        reunions.push({ id: Date.now(), cat, date, minutes: (h * 60) + m, comm });
+        sauvegarder(); e.target.reset(); initDate();
+    });
+
+    function formatDuree(totalMinutes) {
+        const h = Math.floor(Math.abs(totalMinutes) / 60);
+        const m = Math.abs(totalMinutes) % 60;
+        return `${totalMinutes < 0 ? "-" : ""}${h}h${m > 0 ? m.toString().padStart(2, '0') : ''}`;
+    }
+
+    function sauvegarder() { localStorage.setItem('mesHeuresReu', JSON.stringify(reunions)); render(); }
+    function supprimer(id) { if(confirm("Supprimer ?")) { reunions = reunions.filter(r => r.id !== id); sauvegarder(); } }
+
+    function toggleListe(catKey) {
+        const listDiv = document.getElementById(`list-${catKey}`);
+        const btn = document.getElementById(`btn-${catKey}`);
+        if (listDiv.style.display === "block") {
+            listDiv.style.display = "none";
+            btn.innerText = "Détails";
+        } else {
+            listDiv.style.display = "block";
+            btn.innerText = "Masquer";
+        }
+    }
+
+    function render() {
+        const container = document.getElementById('displayContainer');
+        container.innerHTML = "";
+        let minutesGlobales = 0;
+
+        Object.keys(QUOTAS).forEach(catKey => {
+            const reuCat = reunions.filter(r => r.cat === catKey);
+            const totalFait = reuCat.reduce((sum, r) => sum + r.minutes, 0);
+            minutesGlobales += totalFait;
+            const restant = QUOTAS[catKey] - totalFait;
+            const pourcentage = Math.min((totalFait / QUOTAS[catKey]) * 100, 100);
+            
+            const col = document.createElement('div');
+            col.className = "level-column";
+            
+            let colorBar = restant <= 0 ? "bg-green-600" : `bg-${couleurH108}-600`;
+
+            col.innerHTML = `
+                <div class="mb-1">
+                    <div class="flex flex-wrap justify-between items-center gap-1 mb-1">
+                        <h3 class="text-[9px] font-black uppercase text-gray-900 leading-tight">${LABELS[catKey]}</h3>
+                        <span class="quota-badge">RESTE : ${formatDuree(restant)}</span>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar ${colorBar}" style="width: ${pourcentage}%"></div></div>
+                    <p class="text-[8px] font-extrabold text-gray-500 uppercase">${formatDuree(totalFait)} / ${formatDuree(QUOTAS[catKey])}</p>
+                </div>
+                <button id="btn-${catKey}" onclick="toggleListe('${catKey}')" class="toggle-list-btn">Détails</button>
+                <div id="list-${catKey}" class="hidden-list"></div>
+            `;
+
+            const listDiv = col.querySelector(`#list-${catKey}`);
+            reuCat.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
+                const dateFmt = new Date(r.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+                listDiv.innerHTML += `
+                    <div class="reunion-item flex justify-between items-start">
+                        <div class="flex-1 overflow-hidden">
+                            <span class="font-black text-pink-700">${dateFmt}</span> - 
+                            <span class="font-bold text-gray-900">${formatDuree(r.minutes)}</span>
+                            <div class="text-gray-500 italic truncate">${r.comm || ''}</div>
+                        </div>
+                        <button onclick="supprimer(${r.id})" class="text-gray-400 font-black ml-1 text-sm leading-none">&times;</button>
+                    </div>`;
+            });
+            container.appendChild(col);
+        });
+
+        const globalReste = TOTAL_ANNUEL - minutesGlobales;
+        const globalPercent = Math.min((minutesGlobales / TOTAL_ANNUEL) * 100, 100);
+        
+        const statsCard = document.getElementById('globalStats');
+        statsCard.querySelector('span.text-indigo-700, span[class*="text-"]').className = `text-[10px] font-black uppercase tracking-widest text-${couleurH108}-700`;
+        document.getElementById('globalReste').className = `text-[10px] font-black text-${couleurH108}-900`;
+        document.getElementById('globalPercent').className = `text-${couleurH108}-700`;
+
+        document.getElementById('globalFait').innerText = `Fait : ${formatDuree(minutesGlobales)}`;
+        document.getElementById('globalReste').innerText = `Reste : ${formatDuree(globalReste)}`;
+        document.getElementById('globalPercent').innerText = `${Math.round(globalPercent)}%`;
+        
+        const bar = document.getElementById('globalBar');
+        bar.style.width = globalPercent + "%";
+        bar.className = `progress-bar ${globalPercent >= 100 ? 'bg-green-600' : `bg-${couleurH108}-600`}`;
+    }
+
+    function exportData() {
+        const blob = new Blob([JSON.stringify(reunions, null, 2)], { type: 'text/plain' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `108heures.txt`; a.click();
+    }
+
+    document.getElementById('importFile').addEventListener('change', function(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (Array.isArray(data) && confirm("Importer les données ?")) { reunions = data; sauvegarder(); }
+            } catch (err) { alert("Erreur."); }
+        };
+        reader.readAsText(file);
+    });
+
+    function initDate() {
+        document.getElementById('dateReu').value = new Date().toISOString().split('T')[0];
+        document.getElementById('h').value = 1; document.getElementById('m').value = 0;
+    }
+
+    initDate(); render();
     
-    // --- MODIFICATION ICI : Couleur des textes stats globales ---
-    const statsCard = document.getElementById('globalStats');
-    statsCard.querySelector('span.text-indigo-700').className = `text-[10px] font-black uppercase tracking-widest text-${couleurH108}-700`;
-    document.getElementById('globalReste').className = `text-[10px] font-black text-${couleurH108}-900`;
-    document.getElementById('globalPercent').className = `text-${couleurH108}-700`;
-
-    document.getElementById('globalFait').innerText = `Fait : ${formatDuree(minutesGlobales)}`;
-    document.getElementById('globalReste').innerText = `Reste : ${formatDuree(globalReste)}`;
-    document.getElementById('globalPercent').innerText = `${Math.round(globalPercent)}%`;
-    
-    // --- MODIFICATION ICI : Couleur de la jauge globale ---
-    const bar = document.getElementById('globalBar');
-    bar.style.width = globalPercent + "%";
-    bar.className = `progress-bar ${globalPercent >= 100 ? 'bg-green-600' : `bg-${couleurH108}-600`}`;
-}
-
-// ... (reste des fonctions export/import/initDate identiques)
-function exportData() {
-    const blob = new Blob([JSON.stringify(reunions, null, 2)], { type: 'text/plain' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `108heures.txt`; a.click();
-}
-
-document.getElementById('importFile').addEventListener('change', function(e) {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (Array.isArray(data) && confirm("Importer les données ?")) { reunions = data; sauvegarder(); }
-        } catch (err) { alert("Erreur."); }
-    };
-    reader.readAsText(file);
-});
-
-function initDate() {
-    document.getElementById('dateReu').value = new Date().toISOString().split('T')[0];
-    document.getElementById('h').value = 1; document.getElementById('m').value = 0;
-}
-
-initDate(); render();
-	
     </script>
 </body>
 </html>
