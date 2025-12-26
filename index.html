@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Outils pour les profs d'école</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body { 
@@ -12,9 +13,24 @@
             background-color: black; 
             overflow-y: auto; 
         }
-        .menu-card { transition: transform 0.1s; border-radius: 30% 0% 30% 0%; border-width: 2px; }
-        .menu-card:active { transform: scale(0.95); }
+        .menu-card { 
+            transition: transform 0.1s; 
+            border-radius: 30% 0% 30% 0%; 
+            border-width: 2px; 
+            cursor: grab;
+            touch-action: none; /* Empêche le scroll pendant le drag sur mobile */
+        }
+        .menu-card:active { transform: scale(0.95); cursor: grabbing; }
         .icon-bg { border-width: 1px; }
+        
+        /* Style de la tuile fantôme pendant le déplacement */
+        .sortable-ghost {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+        .sortable-chosen {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4">
@@ -29,17 +45,16 @@
             </a>
         </header>
 
-        <nav class="grid grid-cols-2 gap-4 mb-6">
-
-            <a href="inscriptions.html" id="tile-inscr" class="menu-card flex flex-col items-center justify-center text-center p-3">
+        <nav id="grid-menu" class="grid grid-cols-2 gap-4 mb-6">
+            <a href="inscriptions.html" id="tile-inscr" data-id="inscr" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">📝</span>
                 </div>
                 <h2 class="text-black font-semibold text-[11px]">Inscriptions</h2>
-                <h3 class="text-gray-600 text-[9px]">Enregistrement des élèves</h3>
-            </a>         
+                <h3 class="text-gray-600 text-[9px]">Gestion de la liste</h3>
+            </a>          
 
-            <a href="liens.html" id="tile-liens" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="liens.html" id="tile-liens" data-id="liens" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">🔗</span>
                 </div>
@@ -47,7 +62,7 @@
                 <h3 class="text-gray-600 text-[9px]">Bibliothèque</h3>
             </a>
 
-            <a href="108heures.html" id="tile-h108" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="108heures.html" id="tile-h108" data-id="h108" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">⏲️</span>
                 </div>
@@ -55,7 +70,7 @@
                 <h3 class="text-gray-600 text-[9px]">Suivi des réunions</h3>
             </a>
 
-            <a href="notes.html" id="tile-notes" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="notes.html" id="tile-notes" data-id="memos" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">📒</span>
                 </div>
@@ -63,7 +78,7 @@
                 <h3 class="text-gray-600 text-[9px]">Pense-bête</h3>
             </a>
 
-            <a href="tirage.html" id="tile-tirage" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="tirage.html" id="tile-tirage" data-id="tirage" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">🎲</span>
                 </div>
@@ -71,7 +86,7 @@
                 <h3 class="text-gray-600 text-[9px]">Prénom au hasard</h3>
             </a>      
 
-            <a href="equipes.html" id="tile-equipes" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="equipes.html" id="tile-equipes" data-id="equipes" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">👥</span>
                 </div>
@@ -79,7 +94,7 @@
                 <h3 class="text-gray-600 text-[9px]">Groupes mixtes</h3>
             </a>
 
-            <a href="observations.html" id="tile-obs" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="observations.html" id="tile-obs" data-id="obs" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">✏️</span>
                 </div>
@@ -87,14 +102,13 @@
                 <h3 class="text-gray-600 text-[9px]">Infos élèves</h3>
             </a>
     
-            <a href="compteur.html" id="tile-compt" class="menu-card flex flex-col items-center justify-center text-center p-3">
+            <a href="compteur.html" id="tile-compt" data-id="compt" class="menu-card flex flex-col items-center justify-center text-center p-3">
                 <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
                     <span class="text-2xl">🚥</span>
                 </div>
                 <h2 class="text-black font-semibold text-[11px]">Compteur</h2>
-                <h3 class="text-gray-600 text-[9px]">Suivi du comportement</h3>
+                <h3 class="text-gray-600 text-[9px]">Comportement</h3>
             </a>
-
         </nav>
     </div>
 
@@ -116,21 +130,42 @@
         memos: 'purple', obs: 'green', compt: 'sky'
     };
 
+    // --- CHARGEMENT ET APPLICATION DU THÈME ---
     const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || defaultColors;
 
     Object.keys(tuilesMap).forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             const colorName = prefs[tuilesMap[id]] || 'gray';
-            
-            el.classList.add(`bg-${colorName}-200`);
-            el.classList.add(`border-${colorName}-900`);
-            
+            el.classList.add(`bg-${colorName}-200`, `border-${colorName}-900`);
             const iconCircle = el.querySelector('.icon-bg');
             if (iconCircle) {
-                iconCircle.classList.add(`bg-${colorName}-500`);
-                iconCircle.classList.add(`border-${colorName}-900`);
+                iconCircle.classList.add(`bg-${colorName}-500`, `border-${colorName}-900`);
             }
+        }
+    });
+
+    // --- GESTION DE L'ORDRE ET DRAG & DROP ---
+    const gridMenu = document.getElementById('grid-menu');
+    
+    // Charger l'ordre sauvegardé
+    const savedOrder = JSON.parse(localStorage.getItem('menu_order'));
+    if (savedOrder) {
+        savedOrder.forEach(id => {
+            const tile = document.querySelector(`[data-id="${id}"]`);
+            if (tile) gridMenu.appendChild(tile);
+        });
+    }
+
+    // Initialisation de Sortable
+    new Sortable(gridMenu, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        onEnd: function() {
+            // Sauvegarder le nouvel ordre
+            const order = Array.from(gridMenu.children).map(child => child.getAttribute('data-id'));
+            localStorage.setItem('menu_order', JSON.stringify(order));
         }
     });
 </script>
