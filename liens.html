@@ -78,9 +78,8 @@
         <input type="text" id="linkName" placeholder="Nom du site (ex: Vikidia)">
         <input type="text" id="linkUrl" placeholder="Adresse URL (https://...)">
         <select id="linkCat">
-            <option value="Français">📚 Français</option>
-            <option value="Maths">🔢 Maths</option>
-            <option value="Sciences">🔬 Sciences</option>
+            <option value="Ressources">📚 Ressources pédagogiques</option>
+            <option value="Institutionnel">🔢 Institutionnel</option>
             <option value="Autre">🌍 Autre</option>
         </select>
         <button id="mainAddBtn" onclick="addLink()" class="btn-add uppercase tracking-tighter">Ajouter à ma bibliothèque</button>
@@ -88,9 +87,8 @@
 
     <div class="tabs-container" id="tabs">
         <button class="tab-btn active" onclick="filterCat('Tous')">Tous</button>
-        <button class="tab-btn" onclick="filterCat('Français')">Français</button>
-        <button class="tab-btn" onclick="filterCat('Maths')">Maths</button>
-        <button class="tab-btn" onclick="filterCat('Sciences')">Sciences</button>
+        <button class="tab-btn" onclick="filterCat('Ressources')">Ressources</button>
+        <button class="tab-btn" onclick="filterCat('Institutionnel')">Institutionnel</button>
         <button class="tab-btn" onclick="filterCat('Autre')">Autre</button>
     </div>
 
