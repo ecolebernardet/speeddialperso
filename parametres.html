@@ -27,6 +27,8 @@
         
         .btn-nav { font-weight: 900; padding: 14px 4px; border-radius: 50px; font-size: 10px; text-align: center; text-transform: uppercase; }
         .card-info { background: #111; border: 1px solid #222; border-radius: 1rem; padding: 15px; margin-bottom: 15px; }
+        /* Style spécifique pour l'avertissement */
+        .card-warning { background: #1a1500; border: 1px solid #422006; border-radius: 1rem; padding: 15px; margin-bottom: 15px; }
     </style>
 </head>
 <body class="pb-10">
@@ -58,6 +60,13 @@
                 <div class="card-info"><h3 id="title-equipes" class="font-black text-xs uppercase mb-2">👥 Équipes</h3><p class="text-xs text-zinc-400 leading-relaxed">Générez des groupes mixtes et équilibrés par niveau automatiquement.</p></div>
                 <div class="card-info"><h3 id="title-obs" class="font-black text-xs uppercase mb-2">✏️ Observations</h3><p class="text-xs text-zinc-400 leading-relaxed">Notez des informations sur chaque élève et sauvegardez vos données.</p></div>
                 <div class="card-info"><h3 id="title-compt" class="font-black text-xs uppercase mb-2">🚥 Compteur</h3><p class="text-xs text-zinc-400 leading-relaxed">Suivi rapide du comportement. Appui simple = +1. Double appui = -1.</p></div>
+                
+                <div class="card-warning">
+                    <h3 class="font-black text-xs uppercase mb-2 text-amber-500">⚠️ Attention</h3>
+                    <p class="text-xs text-zinc-400 leading-relaxed">
+                        Les infos enregistrées sur un appareil (PC, smartphone, tablette...) et/ou sur un navigateur (Firefox, DuckDuckGo, Chrome...) ne sont enregistrées que dans la <strong>mémoire locale</strong>. Pour retrouver vos infos, exportez-les d'abord puis importez-les sur le nouvel appareil en utilisant les boutons d'exportation et d'importation.
+                    </p>
+                </div>
             </div>
 
             <div id="perso" class="tab-content">
