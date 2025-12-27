@@ -20,15 +20,19 @@
             transition: all 0.2s;
         }
 
-        /* Couleurs spécifiques demandées pour les niveaux (Formulaire) */
-        .input-cp:checked + .card-label { background: #ec4899; border-color: #ec4899; color: #fff; } /* rose */
-        .input-ce1:checked + .card-label { background: #3b82f6; border-color: #3b82f6; color: #fff; } /* bleu */
-        .input-ce2:checked + .card-label { background: #eab308; border-color: #eab308; color: #000; } /* jaune */
-        .input-cm1:checked + .card-label { background: #ef4444; border-color: #ef4444; color: #fff; } /* rouge */
-        .input-cm2:checked + .card-label { background: #22c55e; border-color: #22c55e; color: #fff; } /* vert */
-        .input-autre:checked + .card-label { background: #8b5cf6; border-color: #8b5cf6; color: #fff; } /* violet */
+        /* CHANGEMENT ICI : Couleurs de texte pour Garçon/Fille */
+        .input-garcon:checked + .card-label { color: #2563eb; border-color: #2563eb; font-weight: 900; } /* Bleu */
+        .input-fille:checked + .card-label { color: #db2777; border-color: #db2777; font-weight: 900; } /* Rose */
 
-        .card-input:checked + .card-label { transform: scale(0.95); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        /* Couleurs spécifiques demandées pour les niveaux (Formulaire) */
+        .input-cp:checked + .card-label { background: #ec4899; border-color: #ec4899; color: #fff; } 
+        .input-ce1:checked + .card-label { background: #3b82f6; border-color: #3b82f6; color: #fff; } 
+        .input-ce2:checked + .card-label { background: #eab308; border-color: #eab308; color: #000; } 
+        .input-cm1:checked + .card-label { background: #ef4444; border-color: #ef4444; color: #fff; } 
+        .input-cm2:checked + .card-label { background: #22c55e; border-color: #22c55e; color: #fff; } 
+        .input-autre:checked + .card-label { background: #8b5cf6; border-color: #8b5cf6; color: #fff; } 
+
+        .card-input:checked + .card-label { transform: scale(0.95); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
 
         .level-column { background: rgba(24, 24, 27, 0.6); border: none; border-radius: 1.25rem; padding: 10px; height: fit-content; }
 
@@ -59,8 +63,8 @@
                 <input type="text" id="nomComplet" placeholder="Prénom NOM" class="input-field w-full" required>
                 
                 <div class="grid grid-cols-2 gap-2">
-                    <label><input type="radio" name="sexe" value="m" class="card-input" checked><div class="card-label">Garçon</div></label>
-                    <label><input type="radio" name="sexe" value="f" class="card-input"><div class="card-label">Fille</div></label>
+                    <label><input type="radio" name="sexe" value="m" class="card-input input-garcon" checked><div class="card-label">Garçon</div></label>
+                    <label><input type="radio" name="sexe" value="f" class="card-input input-fille"><div class="card-label">Fille</div></label>
                 </div>
 
                 <div class="grid grid-cols-3 gap-1.5">
