@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Outils pour les profs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: black; 
+            overflow-y: auto; 
+        }
+        .menu-card { transition: transform 0.1s; border-radius: 0.7rem; border-radius: 20% 0% 20% 0%; border-width: 2px; }
+        .menu-card:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4">
+  
+    <div class="w-full max-w-[320px]">
+        <header class="text-center mb-4">
+            <h1 class="flex items-center justify-center gap-2 text-white text-xl font-bold tracking-tight">
+                <span>Outils profs d'école</span>
+            </h1>
+        </header>
+
+        <nav class="grid grid-cols-2 gap-4 mb-6">
+
+            <a href="parametres.html" id="tile-param" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">⚙️</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Paramètres</h2>
+                <h3 class="text-gray-600 text-[9px]">Paramètres de l'app</h3>
+            </a>        
+
+            <a href="inscriptions.html" id="tile-inscr" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">📝</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Inscriptions</h2>
+                <h3 class="text-gray-600 text-[9px]">Gestion de la liste</h3>
+            </a>        
+
+            <a href="documents.html" id="tile-docs" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">📂</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Documents</h2>
+                <h3 class="text-gray-600 text-[9px]">Docs utiles</h3>
+            </a>
+
+            <a href="liens.html" id="tile-liens" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">🔗</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Liens</h2>
+                <h3 class="text-gray-600 text-[9px]">Bibliothèque</h3>
+            </a>
+
+            <a href="108heures.html" id="tile-h108" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">⏲️</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">108 heures</h2>
+                <h3 class="text-gray-600 text-[9px]">Suivi des réunions</h3>
+            </a>
+
+            <a href="notes.html" id="tile-notes" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">📒</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Mémos</h2>
+                <h3 class="text-gray-600 text-[9px]">Pense-bête</h3>
+            </a>
+
+            <a href="tirage.html" id="tile-tirage" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">🎲</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Tirage</h2>
+                <h3 class="text-gray-600 text-[9px]">Prénom au hasard</h3>
+            </a>      
+
+            <a href="equipes.html" id="tile-equipes" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">👥</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Équipes</h2>
+                <h3 class="text-gray-600 text-[9px]">Groupes mixtes</h3>
+            </a>
+
+            <a href="observations.html" id="tile-obs" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">✏️</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Observations</h2>
+                <h3 class="text-gray-600 text-[9px]">Infos élèves</h3>
+            </a>
+    
+            <a href="compteur.html" id="tile-compt" class="menu-card flex flex-col items-center justify-center text-center p-3 hover:border-stone-50">
+                <div class="icon-bg w-12 h-12 flex items-center justify-center border rounded-full mb-1">
+                    <span class="text-2xl">🚥</span>
+                </div>
+                <h2 class="text-black font-semibold text-[11px]">Compteur</h2>
+                <h3 class="text-gray-600 text-[9px]">Comportement</h3>
+            </a>
+
+        </nav>
+    </div>
+
+<script>
+    // Configuration de correspondance entre les IDs HTML et les clés du localStorage
+    const tuilesMap = {
+        'tile-param': 'param',
+        'tile-inscr': 'inscr',
+        'tile-h108': 'h108',
+        'tile-docs': 'docs',
+        'tile-liens': 'liens',
+        'tile-tirage': 'tirage',
+        'tile-equipes': 'equipes',
+        'tile-notes': 'notes',
+        'tile-obs': 'obs',
+        'tile-compt': 'compt'
+    };
+
+    // Valeurs par défaut si l'utilisateur n'a rien paramétré encore
+    const defaultColors = {
+        param: 'stone', inscr: 'lime', h108: 'orange', docs: 'red', 
+        liens: 'indigo', tirage: 'yellow', equipes: 'rose', 
+        notes: 'purple', obs: 'green', compt: 'sky'
+    };
+
+    // 1. Récupération des préférences
+    const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || defaultColors;
+
+    // 2. Application dynamique des styles
+    Object.keys(tuilesMap).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            const colorName = prefs[tuilesMap[id]] || 'gray';
+            
+            // Applique les classes à la tuile
+            el.classList.add(`bg-${colorName}-200`);
+            el.classList.add(`border-${colorName}-900`);
+            
+            // Applique les classes au cercle de l'icône
+            const iconCircle = el.querySelector('.icon-bg');
+            if (iconCircle) {
+                iconCircle.classList.add(`bg-${colorName}-500`);
+                iconCircle.classList.add(`border-${colorName}-900`);
+            }
+        }
+    });
+
+    // 3. On garde à jour le thème principal pour les pages annexes (ex: Inscriptions)
+    localStorage.setItem('app_theme', prefs.inscr || 'lime');
+</script>
+
+</body>
+</html>
