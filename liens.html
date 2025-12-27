@@ -130,12 +130,13 @@
 
     <div id="linksList" class="links-grid"></div>
 
-    <footer class="bottom-nav">
-        <button onclick="exportData()" class="nav-btn">👆exporter .txt👆</button>
-        <label class="nav-btn cursor-pointer">
+    <footer class="bottom-nav flex gap-2 px-2">
+        <label class="nav-btn bg-zinc-800 text-white cursor-pointer text-center">
             👇importer .txt👇
             <input type="file" id="importFile" class="hidden" accept=".txt">
         </label>
+        
+        <button onclick="exportToFile()" class="nav-btn bg-zinc-800 text-white ">👆exporter .txt👆</button>
     </footer>
 </div>
 
