@@ -36,7 +36,7 @@
         .text-f { color: #db2777; } 
         
         .student-item { background: #fff; padding: 6px 10px; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .btn-nav { font-weight: 800; padding: 12px 4px; border-radius: 50px; font-size: 9px; text-align: center; flex: 1; }
+        .btn-nav { font-weight: 800; padding: 12px 4px; border-radius: 50px; font-size: 9px; text-align: center; width: 100%; }
         
         .input-field { background: #ffffff; border: 1px solid #9ca3af; color: #111827; border-radius: 0.75rem; padding: 10px; outline: none; font-size: 0.75rem; font-weight: 600; }
     </style>
@@ -83,9 +83,9 @@
 
         <div id="listeContainer"></div>
 
-        <div class="max-w-md mx-auto flex gap-3 mt-6 mb-10">
+        <div class="max-w-md mx-auto flex flex-col gap-3 mt-6 mb-10">
             <button onclick="exporterListe()" class="btn-nav bg-neutral-800 text-white">👆exporter la liste .txt👆 </button>
-            <button onclick="toutEffacer()" class="btn-nav bg-red-500 text-red-100">Effacer la liste</button>
+            <button onclick="toutEffacer()" class="btn-nav bg-red-500 text-red-100">⚠️ effacer la liste</button>
         </div>
     </div>
 
@@ -107,7 +107,6 @@
             'AUTRE': '#8b5cf6'
         };
 
-        // Ordre imposé pour l'affichage
         const ordreNiveaux = ['CP', 'CE1', 'CE2', 'CM1', 'CM2', 'AUTRE'];
 
         const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
@@ -193,7 +192,6 @@
                 groupes[niv].push(el);
             });
 
-            // Tri des niveaux selon l'ordre défini dans ordreNiveaux
             const nomsNiveauxPresents = Object.keys(groupes).sort((a, b) => {
                 return ordreNiveaux.indexOf(a) - ordreNiveaux.indexOf(b);
             });
