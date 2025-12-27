@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>108 heures</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         
         body { font-family: 'Inter', sans-serif; background: #000; color: #eee; padding: 10px; margin: 0; }
         
-        /* CADRES CLAIRS */
         .light-card { background: #e5e7eb; color: #111827; border-radius: 1.5rem; }
 
         .card-input { display: none; }
@@ -23,7 +23,6 @@
         }
         .card-input:checked + .card-label { background: #111827; border-color: #111827; color: #fff; transform: scale(0.98); }
 
-        /* DEUX COLONNES MOBILE */
         .level-column { 
             background: #f3f4f6; color: #111827; border-radius: 1.2rem; 
             padding: 10px; border: 1px solid #ffffff; 
@@ -35,11 +34,14 @@
         .progress-container { width: 100%; background: #d1d5db; height: 7px; border-radius: 10px; margin: 6px 0; overflow: hidden; }
         .progress-bar { height: 100%; transition: width 0.5s ease-in-out; }
 
+        /* LISTE SUCCINCTE */
         .reunion-item { 
-            background: #ffffff; padding: 6px; border-radius: 0.6rem; 
-            margin-bottom: 5px; 
+            background: #ffffff; padding: 4px 8px; border-radius: 0.4rem; 
+            margin-bottom: 3px; 
             border-left-width: 3px;
+            display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-size: 0.6rem;
+            cursor: pointer;
         }
 
         .quota-badge {
@@ -47,7 +49,6 @@
             background: #111827; color: #fff; white-space: nowrap;
         }
 
-        /* BOUTONS NAVIGATION */
         .bottom-nav { width: 100%; max-width: 500px; margin: 20px auto 0; padding-bottom: 40px; display: flex; flex-direction: column; gap: 8px; }
         .nav-group { display: flex; gap: 8px; width: 100%; }
         .nav-btn { font-weight: 900; border-radius: 50px; font-size: 9px; padding: 12px; border: none; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
@@ -64,7 +65,7 @@
     </style>
 </head>
 <body>
-    <div class="max-w-4xl mx-auto">
+    <div id="capture-area" class="max-w-4xl mx-auto">
         
         <div class="flex items-center justify-between py-4 mb-2">
             <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
@@ -76,13 +77,13 @@
             <div class="w-10"></div> 
         </div>
         
-        <div class="max-w-md mx-auto light-card p-4 mb-6 shadow-2xl">
+        <div id="form-container" class="max-w-md mx-auto light-card p-4 mb-6 shadow-2xl">
             <form id="heuresForm" class="flex flex-col gap-3">
                 <div class="grid grid-cols-4 gap-1.5">
                     <label><input type="radio" name="cat" value="APC" class="card-input" checked><div class="card-label">APC</div></label>
                     <label><input type="radio" name="cat" value="PEDAGO" class="card-input"><div class="card-label">Réunions</div></label>
                     <label><input type="radio" name="cat" value="FORM" class="card-input"><div class="card-label">Formation</div></label>
-                    <label><input type="radio" name="cat" value="CONSEIL" class="card-input"><div class="card-label">Conseil d'école</div></label>
+                    <label><input type="radio" name="cat" value="CONSEIL" class="card-input"><div class="card-label">Conseil</div></label>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <input type="date" id="dateReu" class="input-field" required>
@@ -120,8 +121,8 @@
                     <input type="file" id="importFile" class="hidden" accept=".txt">
                 </label>
                 <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white flex-1">👆exporter .txt👆</button>
+                <button onclick="exportPDF()" class="nav-btn bg-red-800 text-white flex-1">📄 PDF</button>
             </div>
-
             <button onclick="resetHeures()" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
                 ⚠️ effacer le suivi des 108 heures
             </button>
@@ -142,12 +143,8 @@
     window.addEventListener('DOMContentLoaded', () => {
         const titrePage = document.querySelector('h1');
         if (titrePage) titrePage.classList.add(`text-${couleurH108}-500`);
-
         const btnRetour = document.getElementById('btn-retour');
-        if (btnRetour) {
-            btnRetour.classList.add(`bg-${couleurH108}-600`, `border`, `border-${couleurH108}-400/30`);
-        }
-
+        if (btnRetour) btnRetour.classList.add(`bg-${couleurH108}-600`, `border`, `border-${couleurH108}-400/30`);
         updateSubmitButtonStyle();
     });
 
@@ -155,9 +152,7 @@
         const btnEnregistrer = document.getElementById('submitBtn');
         if (btnEnregistrer) {
             btnEnregistrer.className = `bg-${couleurH108}-600 text-white font-black py-2 rounded-full uppercase text-[10px] active:scale-95 transition-transform w-full`;
-            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurH108)) {
-                btnEnregistrer.classList.replace('text-white', 'text-black');
-            }
+            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurH108)) btnEnregistrer.classList.replace('text-white', 'text-black');
         }
     }
 
@@ -177,7 +172,6 @@
         } else {
             reunions.push({ id: Date.now(), cat, date, minutes, comm });
         }
-        
         sauvegarder(); 
         e.target.reset(); 
         initDate();
@@ -186,13 +180,11 @@
     function chargerPourEdition(id) {
         const r = reunions.find(item => item.id === id);
         if (!r) return;
-
         document.querySelector(`input[name="cat"][value="${r.cat}"]`).checked = true;
         document.getElementById('dateReu').value = r.date;
         document.getElementById('h').value = Math.floor(r.minutes / 60);
         document.getElementById('m').value = r.minutes % 60;
         document.getElementById('comm').value = r.comm;
-
         editId = id;
         document.getElementById('submitBtn').innerText = "Mettre à jour";
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -215,26 +207,15 @@
     }
 
     function resetHeures() {
-        if(confirm("Effacer toutes les réunions enregistrées ?")) {
-            reunions = [];
-            sauvegarder();
-            document.getElementById('heuresForm').reset();
-            initDate();
-            editId = null;
-            document.getElementById('submitBtn').innerText = "Enregistrer";
-        }
+        if(confirm("Effacer tout ?")) { reunions = []; sauvegarder(); document.getElementById('heuresForm').reset(); initDate(); editId = null; document.getElementById('submitBtn').innerText = "Enregistrer"; }
     }
 
     function toggleListe(catKey) {
         const listDiv = document.getElementById(`list-${catKey}`);
         const btn = document.getElementById(`btn-${catKey}`);
-        if (listDiv.style.display === "block") {
-            listDiv.style.display = "none";
-            btn.innerText = "Détails";
-        } else {
-            listDiv.style.display = "block";
-            btn.innerText = "Masquer";
-        }
+        const isHidden = listDiv.style.display === "none" || listDiv.style.display === "";
+        listDiv.style.display = isHidden ? "block" : "none";
+        btn.innerText = isHidden ? "Masquer" : "Détails";
     }
 
     function render() {
@@ -270,13 +251,13 @@
             reuCat.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
                 const dateFmt = new Date(r.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
                 listDiv.innerHTML += `
-                    <div class="reunion-item flex justify-between items-start border-${couleurH108}-600">
-                        <div class="flex-1 overflow-hidden cursor-pointer" onclick="chargerPourEdition(${r.id})">
-                            <span class="font-black text-${couleurH108}-700">${dateFmt}</span> - 
+                    <div class="reunion-item border-${couleurH108}-600" onclick="chargerPourEdition(${r.id})">
+                        <div class="flex gap-2 items-center overflow-hidden">
+                            <span class="font-black text-${couleurH108}-700">${dateFmt}</span>
                             <span class="font-bold text-gray-900">${formatDuree(r.minutes)}</span>
-                            <div class="text-gray-500 italic truncate">${r.comm || ''}</div>
+                            ${r.comm ? `<span class="text-gray-400 italic truncate text-[9px]">— ${r.comm}</span>` : ''}
                         </div>
-                        <button onclick="supprimer(${r.id}); event.stopPropagation();" class="text-gray-400 font-black ml-1 text-sm leading-none">&times;</button>
+                        <button onclick="supprimer(${r.id}); event.stopPropagation();" class="text-gray-300 font-black ml-2 text-lg leading-none">&times;</button>
                     </div>`;
             });
             container.appendChild(col);
@@ -284,14 +265,11 @@
 
         const globalReste = TOTAL_ANNUEL - minutesGlobales;
         const globalPercent = Math.min((minutesGlobales / TOTAL_ANNUEL) * 100, 100);
-        
         document.getElementById('globalReste').className = `text-[10px] font-black text-${couleurH108}-900`;
         document.getElementById('globalPercent').className = `text-${couleurH108}-700`;
-
         document.getElementById('globalFait').innerText = `Fait : ${formatDuree(minutesGlobales)}`;
         document.getElementById('globalReste').innerText = `Reste : ${formatDuree(globalReste)}`;
         document.getElementById('globalPercent').innerText = `${Math.round(globalPercent)}%`;
-        
         const bar = document.getElementById('globalBar');
         bar.style.width = globalPercent + "%";
         bar.className = `progress-bar ${globalPercent >= 100 ? 'bg-green-600' : `bg-${couleurH108}-600`}`;
@@ -303,23 +281,39 @@
         a.download = `108heures.txt`; a.click();
     }
 
+    function exportPDF() {
+        const element = document.getElementById('capture-area');
+        const opt = { margin: [10, 5, 10, 5], filename: 'Bilan_108_Heures.pdf', image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#000000' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+
+        const lists = document.querySelectorAll('.hidden-list');
+        const buttons = document.querySelectorAll('.toggle-list-btn');
+        lists.forEach(l => l.style.display = 'block');
+        buttons.forEach(b => b.style.display = 'none');
+
+        const nav = document.querySelector('.bottom-nav');
+        const form = document.getElementById('form-container');
+        const btnRetour = document.getElementById('btn-retour');
+        nav.style.display = 'none'; form.style.display = 'none'; btnRetour.style.visibility = 'hidden';
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            lists.forEach(l => l.style.display = 'none');
+            buttons.forEach(b => b.style.display = 'block');
+            nav.style.display = 'flex'; form.style.display = 'block'; btnRetour.style.visibility = 'visible';
+        });
+    }
+
     document.getElementById('importFile').addEventListener('change', function(e) {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (Array.isArray(data) && confirm("Importer les données ?")) { reunions = data; sauvegarder(); }
-            } catch (err) { alert("Erreur."); }
+            try { const data = JSON.parse(e.target.result); if (Array.isArray(data) && confirm("Importer ?")) { reunions = data; sauvegarder(); } } catch (err) { alert("Erreur."); }
         };
         reader.readAsText(file);
     });
 
-    function initDate() {
-        document.getElementById('dateReu').value = new Date().toISOString().split('T')[0];
-        document.getElementById('h').value = 1; document.getElementById('m').value = 0;
-    }
-
+    function initDate() { document.getElementById('dateReu').value = new Date().toISOString().split('T')[0]; document.getElementById('h').value = 1; document.getElementById('m').value = 0; }
     initDate(); render();
     </script>
 </body>
