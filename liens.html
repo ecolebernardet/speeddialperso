@@ -12,9 +12,9 @@
         body { 
             font-family: 'Inter', sans-serif; 
             background: #000; color: #eee; 
-            margin: 0; padding: 5px; /* Réduit pour mobile */
+            margin: 0; padding: 5px;
             display: flex; flex-direction: column; align-items: center; 
-            overflow-x: hidden; /* Empêche le scroll horizontal */
+            overflow-x: hidden;
         }
 
         .main-wrapper { width: 100%; max-width: 800px; display: flex; flex-direction: column; }
@@ -33,10 +33,9 @@
             width: 100%; margin-bottom: 5px; color: #111827;
         }
 
-        /* 2 COLONNES FORCÉES SANS DÉBORDEMENT */
         .columns-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Divise l'écran pile en deux */
+            grid-template-columns: repeat(2, 1fr);
             gap: 6px; 
             width: 100%;
             padding: 0 2px;
@@ -48,7 +47,7 @@
             padding: 6px;
             border: 1px solid #222;
             min-height: 100px;
-            min-width: 0; /* Important pour que la grille ne casse pas */
+            min-width: 0;
         }
 
         .column-header {
@@ -79,7 +78,7 @@
             padding: 3px 10px 3px 5px;
             display: grid;
             grid-template-columns: repeat(3, 3px); 
-            gap: 5px;
+            gap: 4px;
             flex-shrink: 0;
         }
         .drag-handle span { width:2px; height: 2px; background-color: #9ca3af; border-radius: 50%; }
@@ -96,7 +95,9 @@
         }
 
         .btn-add { width: 100%; padding: 8px; border-radius: 50px; font-weight: 900; font-size: 8px; text-transform: uppercase; }
-        .btn-del { color: #9ca3af; padding-left: 2px; flex-shrink: 0; cursor: pointer; }
+        /* CHANGEMENT ICI : Couleur grise pour la poubelle */
+        .btn-del { color: #9ca3af; padding-left: 2px; flex-shrink: 0; cursor: pointer; transition: color 0.2s; }
+        .btn-del:hover { color: #6b7280; }
 
         .sortable-ghost { opacity: 0.3; background: #d1d5db; }
         .bottom-nav { width: 100%; max-width: 400px; align-self: center; display: flex; flex-direction: column; gap: 6px; margin-top: 20px; padding-bottom: 20px; }
@@ -133,15 +134,15 @@
             <div class="links-list min-h-[40px]" id="list-École"></div>
         </div>
         <div class="column">
-            <div class="column-header text-purple-500 border-purple-500"><span>🧑🏻‍💼</span> Institutionnel</div>
+            <div class="column-header text-purple-500 border-purple-500"><span>🧑🏻‍💼</span> Inst.</div>
             <div class="links-list min-h-[40px]" id="list-Institutionnel"></div>
         </div>
         <div class="column">
-            <div class="column-header text-emerald-500 border-emerald-500"><span>🌍</span> Autres</div>
+            <div class="column-header text-emerald-500 border-emerald-500"><span>🌍</span> Autre</div>
             <div class="links-list min-h-[40px]" id="list-Autre"></div>
         </div>
         <div class="column">
-            <div class="column-header text-blue-500 border-blue-500"><span>🧰</span> Ressources</div>
+            <div class="column-header text-blue-500 border-blue-500"><span>🧰</span> Ress.</div>
             <div class="links-list min-h-[40px]" id="list-Ressources"></div>
         </div>
     </div>
@@ -149,7 +150,7 @@
     <footer class="bottom-nav px-2">
         <div class="nav-group">
             <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center">👇importer .txt👇<input type="file" id="importFile" class="hidden" accept=".txt"></label>
-            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆exporter .txt👆</button>
+            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆exporter .txt 👆</button>
         </div>
         <button onclick="resetLinks()" class="nav-btn bg-red-500 text-red-50">⚠️ effacer tous les liens</button>
     </footer>
@@ -215,7 +216,9 @@
                     <span class="link-url">${link.url}</span>
                 </div>
                 <div class="btn-del" onclick="event.stopPropagation(); deleteLink(${link.id})">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                 </div>`;
             listDiv.appendChild(item);
         });
@@ -254,9 +257,11 @@
     document.getElementById('importFile').addEventListener('change', (e) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
-            links = JSON.parse(ev.target.result);
-            localStorage.setItem('eduLinksList', JSON.stringify(links));
-            render();
+            try {
+                links = JSON.parse(ev.target.result);
+                localStorage.setItem('eduLinksList', JSON.stringify(links));
+                render();
+            } catch(err) { alert("Erreur de fichier."); }
         };
         reader.readAsText(e.target.files[0]);
     });
