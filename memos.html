@@ -18,7 +18,7 @@
         .header-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; }
         #btn-retour { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s ease; }
 
-        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.2); transition: all 0.2s; flex-shrink: 0; }
+        .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0, 0, 0, 0.2); transition: all 0.2s; flex-shrink: 0; }
         .color-dot.active { border: 2.5px solid white !important; box-shadow: 0 0 8px rgba(0,0,0,0.3); }
 
         .note-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -83,10 +83,10 @@
         </header>
 
         <div class="light-card p-4 mb-4 shadow-xl">
-            <textarea id="newNoteTitle" class="input-field mb-2 resize-none h-[45px]" placeholder="Titre (max 2 lignes)..."></textarea>
-            <textarea id="newNoteInput" class="input-field mb-3 min-h-[60px] resize-none" placeholder="Saisir une note..." oninput="autoExpand(this)"></textarea>
+            <textarea id="newNoteTitle" class="input-field mb-1 resize-none h-[45px]" placeholder="Titre (max 2 lignes)..."></textarea>
+            <textarea id="newNoteInput" class="input-field mb-1 min-h-[60px] resize-none" placeholder="Saisir une note..." oninput="autoExpand(this)"></textarea>
             <div class="flex justify-between items-end">
-                <div class="flex flex-wrap gap-2 max-w-[65%]" id="newColorPicker">
+                <div class="flex flex-wrap gap-1.5 max-w-[65%]" id="newColorPicker">
                     <div class="color-dot active" style="background-color: #fef08a;" data-color="#fef08a"></div>
                     <div class="color-dot" style="background-color: #fca5a5;" data-color="#fca5a5"></div>
                     <div class="color-dot" style="background-color: #fdba74;" data-color="#fdba74"></div>
