@@ -32,9 +32,10 @@
             width: 100%; margin-bottom: 6px; color: #111827;
         }
 
+        /* CHANGEMENT ICI : PASSAGE À 2 COLONNES */
         .columns-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             width: 100%;
             align-items: start;
@@ -70,7 +71,6 @@
             min-width: 0;
         }
 
-        /* POIGNÉE GRID 3x3 */
         .drag-handle {
             cursor: grab;
             padding: 5px 10px 5px 0;
@@ -129,23 +129,23 @@
             <option value="Autre">🌍 Autre</option>
             <option value="Ressources">🧰 Ressources</option>
         </select>
-        <button id="mainAddBtn" onclick="addLink()" class="btn-add mt-1">Ajouter aux colonnes</button>
+        <button id="mainAddBtn" onclick="addLink()" class="btn-add mt-1">Ajouter</button>
     </div>
 
     <div class="columns-container" id="columnsBoard">
-        <div class="column" id="col-ecole">
+        <div class="column">
             <div class="column-header text-rose-500 border-rose-500"><span>🏫</span> École</div>
             <div class="links-list min-h-[50px]" id="list-École"></div>
         </div>
-        <div class="column" id="col-inst">
+        <div class="column">
             <div class="column-header text-purple-500 border-purple-500"><span>🧑🏻‍💼</span> Institutionnel</div>
             <div class="links-list min-h-[50px]" id="list-Institutionnel"></div>
         </div>
-        <div class="column" id="col-autre">
+        <div class="column">
             <div class="column-header text-emerald-500 border-emerald-500"><span>🌍</span> Autre</div>
             <div class="links-list min-h-[50px]" id="list-Autre"></div>
         </div>
-        <div class="column" id="col-ress">
+        <div class="column">
             <div class="column-header text-blue-500 border-blue-500"><span>🧰</span> Ressources</div>
             <div class="links-list min-h-[50px]" id="list-Ressources"></div>
         </div>
@@ -154,10 +154,10 @@
     <footer class="bottom-nav px-2">
         <div class="nav-group">
             <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center">
-                👇 importer .txt
+                👇importer .txt👇
                 <input type="file" id="importFile" class="hidden" accept=".txt">
             </label>
-            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆 exporter .txt</button>
+            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆exporter .txt👆</button>
         </div>
         <button onclick="resetLinks()" class="nav-btn bg-red-500 text-red-50">⚠️ tout effacer</button>
     </footer>
@@ -185,13 +185,12 @@
         btn.style.color = 'white';
     }
 
-    // Initialisation du drag & drop pour chaque colonne
     function initSortables() {
         const categories = ['École', 'Institutionnel', 'Autre', 'Ressources'];
         categories.forEach(cat => {
             const el = document.getElementById(`list-${cat}`);
             new Sortable(el, {
-                group: 'sharedLinks', // Permet de déplacer entre colonnes si besoin
+                group: 'sharedLinks',
                 animation: 150,
                 handle: '.drag-handle',
                 ghostClass: 'sortable-ghost',
@@ -200,43 +199,32 @@
         });
     }
 
-    // Sauvegarde du nouvel ordre après déplacement
     function saveOrder() {
         const newLinksOrder = [];
         const categories = ['École', 'Institutionnel', 'Autre', 'Ressources'];
-        
         categories.forEach(cat => {
             const listEl = document.getElementById(`list-${cat}`);
             const items = listEl.querySelectorAll('.link-item');
             items.forEach(item => {
                 const id = parseInt(item.getAttribute('data-id'));
                 const originalLink = links.find(l => l.id === id);
-                if (originalLink) {
-                    // On met à jour la catégorie si le lien a changé de colonne
-                    newLinksOrder.push({ ...originalLink, cat: cat });
-                }
+                if (originalLink) newLinksOrder.push({ ...originalLink, cat: cat });
             });
         });
-        
         links = newLinksOrder;
         localStorage.setItem('eduLinksList', JSON.stringify(links));
     }
 
     function render() {
         document.querySelectorAll('.links-list').forEach(l => l.innerHTML = '');
-
         links.forEach((link, index) => {
-            if(!link.id) link.id = Date.now() + index; // Sécurité ID
-
+            if(!link.id) link.id = Date.now() + index;
             const listDiv = document.getElementById(`list-${link.cat}`);
             if (!listDiv) return;
-
             const styleCat = configCouleurs[link.cat];
-            
             const item = document.createElement('div');
             item.className = 'link-item';
             item.setAttribute('data-id', link.id);
-            
             item.innerHTML = `
                 <div class="drag-handle">
                     <span></span><span></span><span></span>
@@ -251,8 +239,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                </div>
-            `;
+                </div>`;
             listDiv.appendChild(item);
         });
     }
@@ -310,11 +297,7 @@
         reader.readAsText(file);
     });
 
-    window.onload = () => { 
-        appliquerTheme(); 
-        render(); 
-        initSortables(); 
-    };
+    window.onload = () => { appliquerTheme(); render(); initSortables(); };
 </script>
 </body>
 </html>
