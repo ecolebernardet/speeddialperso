@@ -9,22 +9,25 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background: #000; color: #eee; padding: 10px; margin: 0; }
         
-        .light-card { background: #e5e7eb; color: #111827; border-radius: 1.5rem; }
+        .form-tile { 
+            background: #111; 
+            border: 1px solid #2a2a2a; 
+            border-radius: 1.5rem; 
+            color: #eee;
+        }
 
         .card-input { display: none; }
         .card-label {
             display: flex; align-items: center; justify-content: center; text-align: center;
-            background: #d1d5db; border: 2px solid #9ca3af; color: #374151;
+            background: #1a1a1a; border: 1px solid #333; color: #9ca3af;
             padding: 8px 4px; border-radius: 0.75rem; cursor: pointer;
             font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
-            transition: all 0.2s;
+            transition: all 0.2s; 
         }
 
-        /* CHANGEMENT ICI : Couleurs de texte pour Garçon/Fille */
-        .input-garcon:checked + .card-label { color: #2563eb; border-color: #2563eb; font-weight: 900; } /* Bleu */
-        .input-fille:checked + .card-label { color: #db2777; border-color: #db2777; font-weight: 900; } /* Rose */
+        .input-garcon:checked + .card-label { color: #3b82f6; border-color: #3b82f6; font-weight: 900; background: rgba(59, 130, 246, 0.1); }
+        .input-fille:checked + .card-label { color: #ec4899; border-color: #ec4899; font-weight: 900; background: rgba(236, 72, 153, 0.1); }
 
-        /* Couleurs spécifiques demandées pour les niveaux (Formulaire) */
         .input-cp:checked + .card-label { background: #ec4899; border-color: #ec4899; color: #fff; } 
         .input-ce1:checked + .card-label { background: #3b82f6; border-color: #3b82f6; color: #fff; } 
         .input-ce2:checked + .card-label { background: #eab308; border-color: #eab308; color: #000; } 
@@ -32,17 +35,22 @@
         .input-cm2:checked + .card-label { background: #22c55e; border-color: #22c55e; color: #fff; } 
         .input-autre:checked + .card-label { background: #8b5cf6; border-color: #8b5cf6; color: #fff; } 
 
-        .card-input:checked + .card-label { transform: scale(0.95); box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .card-input:checked + .card-label { transform: scale(0.95); }
 
         .level-column { background: rgba(24, 24, 27, 0.6); border: none; border-radius: 1.25rem; padding: 10px; height: fit-content; }
 
-        .text-m { color: #2563eb; } 
-        .text-f { color: #db2777; } 
+        /* Couleurs pour les noms sur fond #555 (éclaircies pour lisibilité) */
+        .text-m { color: #93c5fd; } /* Bleu clair */
+        .text-f { color: #f9a8d4; } /* Rose clair */
         
-        .student-item { background: #fff; padding: 6px 10px; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        /* ÉTIQUETTES ÉLÈVES AVEC FOND #333 */
+        .student-item { background: #333; padding: 6px 10px; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border: 1px solid #666; }
+        
         .btn-nav { font-weight: 800; padding: 12px 4px; border-radius: 50px; font-size: 9px; text-align: center; width: 100%; }
+        .input-field { background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 0.75rem; padding: 10px; outline: none; font-size: 0.75rem; font-weight: 600; }
         
-        .input-field { background: #ffffff; border: 1px solid #9ca3af; color: #111827; border-radius: 0.75rem; padding: 10px; outline: none; font-size: 0.75rem; font-weight: 600; }
+        #btn-submit { background-color: #333; color: #fff; }
+        #label-import { color: #9ca3af !important; }
     </style>
 </head>
 <body class="pb-10">
@@ -54,11 +62,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
-            <h1 id="page-title" class="text-lg font-black tracking-tighter uppercase">Enregistrement des élèves</h1>
+            <h1 class="text-white text-lg font-black tracking-tighter uppercase">Enregistrement des élèves</h1>
             <div class="w-8"></div> 
         </div>
         
-        <div class="max-w-md mx-auto light-card p-4 mb-6 shadow-2xl">
+        <div class="max-w-md mx-auto form-tile p-4 mb-6 shadow-2xl">
             <form id="eleveForm" class="flex flex-col gap-3">
                 <input type="text" id="nomComplet" placeholder="Prénom NOM" class="input-field w-full" required>
                 
@@ -78,9 +86,9 @@
 
                 <button type="submit" id="btn-submit" class="font-black py-3 rounded-full uppercase text-xs active:scale-95 transition-transform mt-1">Enregistrer</button>
 
-                <div class="pt-3 border-t border-gray-300 text-center">
+                <div class="pt-3 border-t border-zinc-800 text-center">
                     <label id="label-import" class="text-[9px] font-bold block mb-1">Importer un fichier .txt (Prénom;NOM;Genre;Niveau)</label>
-                    <input type="file" id="fileInput" accept=".txt,.csv" class="text-[9px] text-gray-600">
+                    <input type="file" id="fileInput" accept=".txt,.csv" class="text-[9px] text-zinc-500">
                 </div>
             </form>
         </div>
@@ -88,8 +96,8 @@
         <div id="listeContainer"></div>
 
         <div class="max-w-md mx-auto flex flex-col gap-3 mt-6 mb-10">
-            <button onclick="exporterListe()" class="btn-nav bg-neutral-800 text-white">👆exporter la liste .txt👆 </button>
-            <button onclick="toutEffacer()" class="btn-nav bg-red-500 text-red-100">⚠️ effacer la liste</button>
+            <button onclick="exporterListe()" class="btn-nav bg-zinc-900 text-white border border-zinc-800">👆exporter la liste .txt👆 </button>
+            <button onclick="toutEffacer()" class="btn-nav bg-red-950 text-red-400 border border-red-900">⚠️ effacer la liste</button>
         </div>
     </div>
 
@@ -103,32 +111,16 @@
         };
 
         const couleurParNiveau = {
-            'CP': '#ec4899',
-            'CE1': '#3b82f6',
-            'CE2': '#eab308',
-            'CM1': '#ef4444',
-            'CM2': '#22c55e',
-            'AUTRE': '#8b5cf6'
+            'CP': '#ec4899', 'CE1': '#3b82f6', 'CE2': '#eab308',
+            'CM1': '#ef4444', 'CM2': '#22c55e', 'AUTRE': '#8b5cf6'
         };
 
         const ordreNiveaux = ['CP', 'CE1', 'CE2', 'CM1', 'CM2', 'AUTRE'];
-
         const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-        const couleurInscr = themePrefs.inscr || 'lime';
-        const hexaTheme = mapCouleurs[couleurInscr];
+        const hexaTheme = mapCouleurs[themePrefs.inscr || 'lime'];
 
         function appliquerCouleursTheme() {
-            document.getElementById('page-title').style.color = hexaTheme;
-            document.getElementById('label-import').style.color = hexaTheme;
             document.getElementById('btn-retour').style.backgroundColor = hexaTheme;
-            
-            const btnSubmit = document.getElementById('btn-submit');
-            btnSubmit.style.backgroundColor = hexaTheme;
-            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurInscr)) {
-                btnSubmit.style.color = '#000';
-            } else {
-                btnSubmit.style.color = '#fff';
-            }
         }
 
         let eleves = JSON.parse(localStorage.getItem('maListeEleves')) || [];
@@ -139,28 +131,17 @@
             return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() + " " + n;
         }
 
-        document.getElementById('eleveForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const saisie = document.getElementById('nomComplet').value.trim().split(" ");
-            const prenom = saisie[0] || "";
-            const nom = saisie.slice(1).join(" ") || "";
-            const sexe = document.querySelector('input[name="sexe"]:checked').value;
-            const niveau = document.querySelector('input[name="niveau"]:checked').value;
-            
-            eleves.push({ id: Date.now(), identite: formaterIdentite(prenom, nom), sexe, niveau });
-            sauvegarder();
-            e.target.reset();
-        });
-
+        // CORRECTION IMPORTATION
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const lignes = e.target.result.split(/\r?\n/);
+            reader.onload = function(event) {
+                const lignes = event.target.result.split(/\r?\n/);
                 lignes.forEach(l => {
                     const clean = l.trim();
-                    if (!clean) return;
+                    if (!clean || !clean.includes(';')) return;
+                    
                     const p = clean.split(';'); 
                     if(p.length >= 4) {
                         eleves.push({
@@ -172,8 +153,21 @@
                     }
                 });
                 sauvegarder();
+                e.target.value = ""; 
             };
             reader.readAsText(file);
+        });
+
+        document.getElementById('eleveForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const saisie = document.getElementById('nomComplet').value.trim().split(" ");
+            const prenom = saisie[0] || "";
+            const nom = saisie.slice(1).join(" ") || "";
+            const sexe = document.querySelector('input[name="sexe"]:checked').value;
+            const niveau = document.querySelector('input[name="niveau"]:checked').value;
+            eleves.push({ id: Date.now(), identite: formaterIdentite(prenom, nom), sexe, niveau });
+            sauvegarder();
+            e.target.reset();
         });
 
         function sauvegarder() {
@@ -196,27 +190,17 @@
                 groupes[niv].push(el);
             });
 
-            const nomsNiveauxPresents = Object.keys(groupes).sort((a, b) => {
-                return ordreNiveaux.indexOf(a) - ordreNiveaux.indexOf(b);
-            });
+            const nomsNiveauxPresents = Object.keys(groupes).sort((a, b) => ordreNiveaux.indexOf(a) - ordreNiveaux.indexOf(b));
             
-            if (nomsNiveauxPresents.length === 2) {
-                container.className = "grid grid-cols-2 gap-3 items-start";
-            } else if (nomsNiveauxPresents.length >= 3) {
-                container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start";
-            } else {
-                container.className = "flex flex-col gap-4 max-w-md mx-auto";
-            }
+            if (nomsNiveauxPresents.length === 2) container.className = "grid grid-cols-2 gap-3 items-start";
+            else if (nomsNiveauxPresents.length >= 3) container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start";
+            else container.className = "flex flex-col gap-4 max-w-md mx-auto";
 
             nomsNiveauxPresents.forEach(niv => {
                 const col = document.createElement('div');
                 col.className = "level-column";
                 const colColor = couleurParNiveau[niv] || hexaTheme;
-                
-                col.innerHTML = `
-                    <h3 class="text-[11px] font-black uppercase mb-1 text-center tracking-widest pb-1" style="color:${colColor}">
-                        ${niv} — ${groupes[niv].length}
-                    </h3>`;
+                col.innerHTML = `<h3 class="text-[11px] font-black uppercase mb-1 text-center tracking-widest pb-1" style="color:${colColor}">${niv} — ${groupes[niv].length}</h3>`;
                 
                 const list = document.createElement('div');
                 groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(el => {
@@ -224,7 +208,7 @@
                     item.className = 'student-item';
                     item.innerHTML = `
                         <span class="text-[9px] font-bold pr-2 text-${el.sexe} whitespace-normal break-words leading-tight">${el.identite}</span>
-                        <button onclick="supprimer(${el.id})" class="opacity-40 hover:opacity-100 transition-opacity p-1 text-zinc-400 flex-shrink-0">
+                        <button onclick="supprimer(${el.id})" class="opacity-60 hover:opacity-100 transition-opacity p-1 text-white flex-shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
