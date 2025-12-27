@@ -19,7 +19,6 @@
             align-items: center;
         }
 
-        /* STYLE ISSU DE 108H */
         .light-card { background: #e5e7eb; color: #111827; border-radius: 1.5rem; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; margin-top: 20px; margin-bottom: 20px; }
         
         .result-box { 
@@ -39,7 +38,16 @@
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
         .bg-f { background: #fce7f3; color: #831843; } 
         
-        .level-title { text-align: center; font-size: 9px; font-weight: 900; color: #555; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .level-title { 
+            text-align: center; 
+            font-size: 11px; 
+            font-weight: 900; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            display: block;
+            width: 100%;
+        }
 
         .student-grid {
             display: grid;
@@ -159,16 +167,41 @@
             const container = document.getElementById('listeContainer');
             container.innerHTML = "";
 
+            // Couleurs demandées
+            const couleursFixes = {
+                "CP": "#ec4899",    // Rose
+                "CE1": "#3b82f6",   // Bleu
+                "CE2": "#eab308",   // Jaune
+                "CM1": "#ef4444",   // Rouge
+                "CM2": "#22c55e",   // Vert
+                "AUTRE": "#a855f7"  // Violet
+            };
+
+            const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+            const ordreNiveaux = ["CP", "CE1", "CE2", "CM1", "CM2", "AUTRE"];
+
             const groupes = {};
             rawData.forEach(el => {
-                const niv = el.niveau.toUpperCase();
+                const niv = el.niveau.trim().toUpperCase();
                 if (!groupes[niv]) groupes[niv] = [];
                 groupes[niv].push(el);
             });
 
-            Object.keys(groupes).sort().forEach(niv => {
+            const niveauxTries = Object.keys(groupes).sort((a, b) => {
+                let indexA = ordreNiveaux.indexOf(a);
+                let indexB = ordreNiveaux.indexOf(b);
+                if (indexA === -1) indexA = 99;
+                if (indexB === -1) indexB = 99;
+                return indexA - indexB;
+            });
+
+            niveauxTries.forEach(niv => {
                 const levelSection = document.createElement('div');
-                levelSection.innerHTML = `<div class="level-title">${niv}</div>`;
+                
+                // On donne la priorité à la palette du localStorage, sinon aux couleurs fixes demandées
+                const couleurNiveau = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursFixes[niv] || '#9ca3af';
+
+                levelSection.innerHTML = `<div class="level-title" style="color: ${couleurNiveau} !important;">${niv}</div>`;
                 
                 const grid = document.createElement('div');
                 grid.className = "student-grid";
