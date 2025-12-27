@@ -34,14 +34,12 @@
         .progress-container { width: 100%; background: #d1d5db; height: 7px; border-radius: 10px; margin: 6px 0; overflow: hidden; }
         .progress-bar { height: 100%; transition: width 0.5s ease-in-out; }
 
-        /* LISTE SUCCINCTE */
+        /* LISTE AJUSTÉE : Verticale pour accueillir le commentaire dessous */
         .reunion-item { 
-            background: #ffffff; padding: 4px 8px; border-radius: 0.4rem; 
-            margin-bottom: 3px; 
-            border-left-width: 3px;
+            background: #ffffff; padding: 6px 8px; border-radius: 0.4rem; 
+            margin-bottom: 4px; border-left-width: 3px;
             display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-size: 0.6rem;
-            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer;
         }
 
         .quota-badge {
@@ -62,11 +60,18 @@
         }
 
         .hidden-list { display: none; margin-top: 8px; }
+
+        /* Styles spécifiques PDF (Tableau robuste) */
+        #pdf-template { display: none; color: #000; background: #fff; padding: 20px; font-family: Arial, sans-serif; }
+        .pdf-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
+        .pdf-table th { background: #f0f0f0; text-align: left; padding: 8px; font-size: 11px; border: 1px solid #ddd; }
+        .pdf-table td { padding: 8px; font-size: 10px; border: 1px solid #ddd; vertical-align: top; }
+        .pdf-cat-header { background: #e2e8f0; font-weight: bold; font-size: 12px; padding: 10px; margin-top: 20px; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div id="capture-area" class="max-w-4xl mx-auto">
-        
         <div class="flex items-center justify-between py-4 mb-2">
             <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,7 +126,7 @@
                     <input type="file" id="importFile" class="hidden" accept=".txt">
                 </label>
                 <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white flex-1">👆exporter .txt👆</button>
-                <button onclick="exportPDF()" class="nav-btn bg-red-800 text-white flex-1">📄 PDF</button>
+                <button onclick="exportPDF()" class="nav-btn bg-neutral-800 text-white flex-1">📄 PDF</button>
             </div>
             <button onclick="resetHeures()" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
                 ⚠️ effacer le suivi des 108 heures
@@ -129,13 +134,15 @@
         </footer>
     </div>
 
+    <div id="pdf-template"></div>
+
     <script>
     const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
     const couleurH108 = themePrefs.h108 || 'orange'; 
 
     const QUOTAS = { "APC": 36 * 60, "PEDAGO": 48 * 60, "FORM": 18 * 60, "CONSEIL": 6 * 60 };
     const TOTAL_ANNUEL = 108 * 60;
-    const LABELS = { "APC": "APC", "PEDAGO": "Réunions", "FORM": "Formation", "CONSEIL": "Conseils d'école" };
+    const LABELS = { "APC": "APC (36h)", "PEDAGO": "Réunions (48h)", "FORM": "Formation (18h)", "CONSEIL": "Conseils d'école (6h)" };
 
     let reunions = JSON.parse(localStorage.getItem('mesHeuresReu')) || [];
     let editId = null; 
@@ -172,9 +179,7 @@
         } else {
             reunions.push({ id: Date.now(), cat, date, minutes, comm });
         }
-        sauvegarder(); 
-        e.target.reset(); 
-        initDate();
+        sauvegarder(); e.target.reset(); initDate();
     });
 
     function chargerPourEdition(id) {
@@ -197,18 +202,8 @@
     }
 
     function sauvegarder() { localStorage.setItem('mesHeuresReu', JSON.stringify(reunions)); render(); }
-    
-    function supprimer(id) { 
-        if(confirm("Supprimer ?")) { 
-            reunions = reunions.filter(r => r.id !== id); 
-            if(editId === id) { editId = null; document.getElementById('heuresForm').reset(); document.getElementById('submitBtn').innerText = "Enregistrer"; }
-            sauvegarder(); 
-        } 
-    }
-
-    function resetHeures() {
-        if(confirm("Effacer tout ?")) { reunions = []; sauvegarder(); document.getElementById('heuresForm').reset(); initDate(); editId = null; document.getElementById('submitBtn').innerText = "Enregistrer"; }
-    }
+    function supprimer(id) { if(confirm("Supprimer ?")) { reunions = reunions.filter(r => r.id !== id); sauvegarder(); } }
+    function resetHeures() { if(confirm("Effacer tout ?")) { reunions = []; sauvegarder(); initDate(); } }
 
     function toggleListe(catKey) {
         const listDiv = document.getElementById(`list-${catKey}`);
@@ -225,39 +220,33 @@
 
         Object.keys(QUOTAS).forEach(catKey => {
             const reuCat = reunions.filter(r => r.cat === catKey);
-            const totalFait = reuCat.reduce((sum, r) => sum + r.minutes, 0);
-            minutesGlobales += totalFait;
-            const restant = QUOTAS[catKey] - totalFait;
-            const pourcentage = Math.min((totalFait / QUOTAS[catKey]) * 100, 100);
+            const fait = reuCat.reduce((sum, r) => sum + r.minutes, 0);
+            minutesGlobales += fait;
             
             const col = document.createElement('div');
             col.className = "level-column";
-            let colorBar = restant <= 0 ? "bg-green-600" : `bg-${couleurH108}-600`;
-
             col.innerHTML = `
                 <div class="mb-1">
-                    <div class="flex flex-wrap justify-between items-center gap-1 mb-1">
-                        <h3 class="text-[9px] font-black uppercase text-gray-900 leading-tight">${LABELS[catKey]}</h3>
-                        <span class="quota-badge">RESTE : ${formatDuree(restant)}</span>
-                    </div>
-                    <div class="progress-container"><div class="progress-bar ${colorBar}" style="width: ${pourcentage}%"></div></div>
-                    <p class="text-[8px] font-extrabold text-gray-500 uppercase">${formatDuree(totalFait)} / ${formatDuree(QUOTAS[catKey])}</p>
+                    <div class="flex justify-between items-center mb-1"><h3 class="text-[9px] font-black uppercase text-gray-900">${LABELS[catKey]}</h3></div>
+                    <div class="progress-container"><div class="progress-bar bg-${couleurH108}-600" style="width: ${Math.min((fait/QUOTAS[catKey])*100, 100)}%"></div></div>
+                    <p class="text-[8px] font-extrabold text-gray-500 uppercase">${formatDuree(fait)} / ${formatDuree(QUOTAS[catKey])}</p>
                 </div>
                 <button id="btn-${catKey}" onclick="toggleListe('${catKey}')" class="toggle-list-btn">Détails</button>
-                <div id="list-${catKey}" class="hidden-list"></div>
-            `;
+                <div id="list-${catKey}" class="hidden-list"></div>`;
 
             const listDiv = col.querySelector(`#list-${catKey}`);
             reuCat.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
                 const dateFmt = new Date(r.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
                 listDiv.innerHTML += `
                     <div class="reunion-item border-${couleurH108}-600" onclick="chargerPourEdition(${r.id})">
-                        <div class="flex gap-2 items-center overflow-hidden">
-                            <span class="font-black text-${couleurH108}-700">${dateFmt}</span>
-                            <span class="font-bold text-gray-900">${formatDuree(r.minutes)}</span>
-                            ${r.comm ? `<span class="text-gray-400 italic truncate text-[9px]">— ${r.comm}</span>` : ''}
+                        <div class="flex-1 overflow-hidden">
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-[10px] text-${couleurH108}-700">${dateFmt}</span>
+                                <span class="font-bold text-[10px] text-gray-900">${formatDuree(r.minutes)}</span>
+                            </div>
+                            ${r.comm ? `<div class="text-gray-400 italic text-[9px] truncate mt-0.5 leading-tight">${r.comm}</div>` : ''}
                         </div>
-                        <button onclick="supprimer(${r.id}); event.stopPropagation();" class="text-gray-300 font-black ml-2 text-lg leading-none">&times;</button>
+                        <button onclick="supprimer(${r.id}); event.stopPropagation();" class="text-gray-300 font-black ml-2 text-xl leading-none">&times;</button>
                     </div>`;
             });
             container.appendChild(col);
@@ -265,14 +254,11 @@
 
         const globalReste = TOTAL_ANNUEL - minutesGlobales;
         const globalPercent = Math.min((minutesGlobales / TOTAL_ANNUEL) * 100, 100);
-        document.getElementById('globalReste').className = `text-[10px] font-black text-${couleurH108}-900`;
-        document.getElementById('globalPercent').className = `text-${couleurH108}-700`;
         document.getElementById('globalFait').innerText = `Fait : ${formatDuree(minutesGlobales)}`;
         document.getElementById('globalReste').innerText = `Reste : ${formatDuree(globalReste)}`;
         document.getElementById('globalPercent').innerText = `${Math.round(globalPercent)}%`;
-        const bar = document.getElementById('globalBar');
-        bar.style.width = globalPercent + "%";
-        bar.className = `progress-bar ${globalPercent >= 100 ? 'bg-green-600' : `bg-${couleurH108}-600`}`;
+        document.getElementById('globalBar').style.width = globalPercent + "%";
+        document.getElementById('globalBar').className = `progress-bar bg-${couleurH108}-600`;
     }
 
     function exportData() {
@@ -282,33 +268,37 @@
     }
 
     function exportPDF() {
-        const element = document.getElementById('capture-area');
-        const opt = { margin: [10, 5, 10, 5], filename: 'Bilan_108_Heures.pdf', image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, backgroundColor: '#000000' },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        const pdfContainer = document.getElementById('pdf-template');
+        pdfContainer.style.display = 'block';
+        
+        let htmlContent = `<div class="pdf-header"><h1 style="margin:0; font-size:22px;">BILAN DES 108 HEURES</h1><p style="margin:5px 0; font-size:12px; color:#555;">Généré le ${new Date().toLocaleDateString('fr-FR')}</p></div>`;
 
-        const lists = document.querySelectorAll('.hidden-list');
-        const buttons = document.querySelectorAll('.toggle-list-btn');
-        lists.forEach(l => l.style.display = 'block');
-        buttons.forEach(b => b.style.display = 'none');
-
-        const nav = document.querySelector('.bottom-nav');
-        const form = document.getElementById('form-container');
-        const btnRetour = document.getElementById('btn-retour');
-        nav.style.display = 'none'; form.style.display = 'none'; btnRetour.style.visibility = 'hidden';
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            lists.forEach(l => l.style.display = 'none');
-            buttons.forEach(b => b.style.display = 'block');
-            nav.style.display = 'flex'; form.style.display = 'block'; btnRetour.style.visibility = 'visible';
+        Object.keys(QUOTAS).forEach(catKey => {
+            const reuCat = reunions.filter(r => r.cat === catKey).sort((a,b) => new Date(a.date) - new Date(b.date));
+            const totalCat = reuCat.reduce((sum, r) => sum + r.minutes, 0);
+            htmlContent += `
+                <div class="pdf-cat-header">${LABELS[catKey]} (Total : ${formatDuree(totalCat)} / ${formatDuree(QUOTAS[catKey])})</div>
+                <table class="pdf-table">
+                    <thead><tr><th style="width: 20%;">Date</th><th style="width: 15%;">Durée</th><th style="width: 65%;">Commentaire</th></tr></thead>
+                    <tbody>${reuCat.length === 0 ? '<tr><td colspan="3" style="text-align:center; color:#999;">Aucune donnée</td></tr>' : 
+                        reuCat.map(r => `<tr><td>${new Date(r.date).toLocaleDateString('fr-FR')}</td><td><b>${formatDuree(r.minutes)}</b></td><td>${r.comm || ""}</td></tr>`).join('')}
+                    </tbody>
+                </table>`;
         });
+
+        const totalGlobal = reunions.reduce((sum, r) => sum + r.minutes, 0);
+        htmlContent += `<div style="margin-top:30px; border-top:2px solid #000; padding-top:10px; text-align:right;"><span style="font-size:16px; font-weight:bold;">TOTAL GÉNÉRAL : ${formatDuree(totalGlobal)} / 108h</span></div>`;
+
+        pdfContainer.innerHTML = htmlContent;
+        const opt = { margin: 15, filename: 'Bilan_108_Heures.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(pdfContainer).save().then(() => { pdfContainer.style.display = 'none'; });
     }
 
     document.getElementById('importFile').addEventListener('change', function(e) {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
-            try { const data = JSON.parse(e.target.result); if (Array.isArray(data) && confirm("Importer ?")) { reunions = data; sauvegarder(); } } catch (err) { alert("Erreur."); }
+            try { const data = JSON.parse(e.target.result); if (Array.isArray(data)) { reunions = data; sauvegarder(); } } catch (err) { alert("Erreur."); }
         };
         reader.readAsText(file);
     });
