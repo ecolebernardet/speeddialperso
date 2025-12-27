@@ -19,20 +19,34 @@
             align-items: center;
         }
 
-        .light-card { background: #e5e7eb; color: #111827; border-radius: 1.5rem; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; margin-top: 20px; margin-bottom: 20px; }
+        /* Style harmonisé : Fond sombre #111 */
+        .form-tile { 
+            background: #111; 
+            border: 1px solid #2a2a2a; 
+            border-radius: 1.5rem; 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            text-align: center; 
+            margin-top: 10px; 
+            margin-bottom: 20px; 
+        }
         
+        /* Boite de résultat gris foncé pour le contraste */
         .result-box { 
-            background: #ffffff; 
-            border: 1px solid #9ca3af; 
-            color: #111827; 
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            color: #fff; 
             border-radius: 0.75rem; 
-            height: 60px;
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
-            font-size: 1.4rem;
-            font-weight: 800;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
         }
 
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
@@ -70,44 +84,47 @@
             overflow: hidden;
             text-overflow: ellipsis;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .drawn {
             background: #2a2a2a !important; 
             color: #777777 !important; 
             text-decoration: line-through;
-            opacity: 0.7;
+            opacity: 0.5;
             transform: scale(0.9);
-            border-color: #333;
         }
 
+        /* Bouton gris fixe #555 comme demandé pour memos */
         .main-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             font-size: 10px;
-            font-weight: 800;
+            font-weight: 900;
             border-radius: 50px;
             text-transform: uppercase;
             border: none;
             cursor: pointer;
+            background-color: #666;
+            color: white;
             transition: transform 0.1s;
         }
         .main-btn:active { transform: scale(0.95); }
 
         .btn-nav { width: 100%; max-width: 400px; font-weight: 800; padding: 14px; border-radius: 50px; font-size: 10px; cursor: pointer; border: none; }
-        .stats { margin-top: 8px; font-size: 0.6rem; color: #666; text-transform: uppercase; font-weight: 800; }
+        .stats { margin-top: 10px; font-size: 0.65rem; color: #555; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        
+        #btn-retour { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s ease; }
     </style>
 </head>
 <body>
 
     <div class="w-full max-w-md flex items-center justify-between py-4 mb-2 px-2">
-        <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+        <a href="index.html" id="btn-retour">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
             </svg>
         </a>
-        <h1 id="page-title" class="font-black text-xs tracking-widest uppercase">
+        <h1 id="page-title" class="font-black text-md tracking-widest uppercase text-white">
             Tirage au sort
         </h1>
         <div class="w-10"></div> 
@@ -115,40 +132,40 @@
 
     <div class="w-full max-w-md" id="listeContainer"></div>
 
-    <div class="light-card">
+    <div class="form-tile">
         <div class="result-box" id="result-display">PRÊT</div>
         <button id="draw-btn" class="main-btn" onclick="drawName()">Tirer un prénom</button>
         <div class="stats" id="counter">--</div>
     </div>
 
-    <div class="max-w-md mx-auto flex justify-center mt-4 mb-10 w-full px-4">
-        <button class="btn-nav bg-red-500 text-white" onclick="resetDrawing()">⚠️ RàZ du tirage</button>
+    <div class="max-w-md mx-auto flex justify-center mt-2 mb-10 w-full px-4">
+        <button class="btn-nav bg-red-950 text-red-400 border border-red-900/50" onclick="resetDrawing()">⚠️ RàZ du tirage</button>
     </div>
 
     <script>
-        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-        const couleurTirage = themePrefs.tirage || 'pink';
+        const mapCouleurs = {
+            'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+            'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+            'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+            'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+            'rose': '#f43f5e', 'gray': '#6b7280'
+        };
 
         function appliquerTheme() {
-            const title = document.getElementById('page-title');
-            const btn = document.getElementById('draw-btn');
-            const display = document.getElementById('result-display');
+            const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+            const nomCouleur = themePrefs.tirage || 'pink';
+            const hex = mapCouleurs[nomCouleur] || '#ec4899';
+            
             const btnRetour = document.getElementById('btn-retour');
+            const display = document.getElementById('result-display');
 
-            title.classList.add(`text-${couleurTirage}-500`);
-
+            // Couleur dynamique uniquement sur le retour
             if (btnRetour) {
-                btnRetour.classList.add(`bg-${couleurTirage}-600`, `border`, `border-${couleurTirage}-400/30`);
+                btnRetour.style.backgroundColor = hex;
             }
-
-            btn.classList.add(`bg-${couleurTirage}-600`);
-            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurTirage)) {
-                btn.classList.add('text-black');
-            } else {
-                btn.classList.add('text-white');
-            }
-
-            display.classList.add(`text-${couleurTirage}-600`);
+            
+            // On utilise la couleur du thème pour le texte du gagnant pour le faire ressortir
+            display.setAttribute('data-theme-color', hex);
         }
 
         function formatName(fullName) {
@@ -167,14 +184,9 @@
             const container = document.getElementById('listeContainer');
             container.innerHTML = "";
 
-            // Couleurs demandées
             const couleursFixes = {
-                "CP": "#ec4899",    // Rose
-                "CE1": "#3b82f6",   // Bleu
-                "CE2": "#eab308",   // Jaune
-                "CM1": "#ef4444",   // Rouge
-                "CM2": "#22c55e",   // Vert
-                "AUTRE": "#a855f7"  // Violet
+                "CP": "#ec4899", "CE1": "#3b82f6", "CE2": "#eab308",
+                "CM1": "#ef4444", "CM2": "#22c55e", "AUTRE": "#a855f7"
             };
 
             const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
@@ -197,8 +209,6 @@
 
             niveauxTries.forEach(niv => {
                 const levelSection = document.createElement('div');
-                
-                // On donne la priorité à la palette du localStorage, sinon aux couleurs fixes demandées
                 const couleurNiveau = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursFixes[niv] || '#9ca3af';
 
                 levelSection.innerHTML = `<div class="level-title" style="color: ${couleurNiveau} !important;">${niv}</div>`;
@@ -227,7 +237,7 @@
             if (restants === 0) {
                 btn.disabled = true;
                 btn.innerText = "Session terminée";
-                btn.style.opacity = "0.5";
+                btn.style.opacity = "0.3";
             } else {
                 btn.disabled = false;
                 btn.innerText = "Tirer un prénom";
@@ -249,9 +259,10 @@
             if (remaining.length === 0) return;
             const display = document.getElementById('result-display');
             const btn = document.getElementById('draw-btn');
+            const themeHex = display.getAttribute('data-theme-color');
             btn.disabled = true;
 
-            display.style.color = "#9ca3af";
+            display.style.color = "#555";
 
             let iterations = 0;
             const interval = setInterval(() => {
@@ -260,27 +271,29 @@
                 display.innerText = formatName(tempStudent.identite);
                 iterations++;
 
-                if (iterations > 12) {
+                if (iterations > 15) {
                     clearInterval(interval);
                     const finalIndex = Math.floor(Math.random() * remaining.length);
                     const winnerId = remaining.splice(finalIndex, 1)[0];
                     const winner = rawData.find(s => s.id === winnerId);
                     
                     display.innerText = formatName(winner.identite);
-                    display.style.color = ""; 
+                    display.style.color = themeHex; // Le gagnant prend la couleur du thème
                     
                     saveState();
                     renderList();
                     btn.disabled = (remaining.length === 0);
                 }
-            }, 60);
+            }, 50);
         }
 
         function resetDrawing() {
             if(confirm("Remettre tous les élèves en jeu ?")) {
                 remaining = rawData.map(el => el.id);
                 localStorage.removeItem('remainingStudents');
-                document.getElementById('result-display').innerText = "PRÊT";
+                const display = document.getElementById('result-display');
+                display.innerText = "PRÊT";
+                display.style.color = "#fff";
                 renderList();
             }
         }
