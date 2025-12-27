@@ -16,12 +16,13 @@
             display: flex; flex-direction: column; align-items: center; 
         }
 
-        .main-wrapper { width: 100%; max-width: 400px; display: flex; flex-direction: column; }
+        .main-wrapper { width: 100%; max-width: 800px; display: flex; flex-direction: column; }
 
         .light-card { 
             background: #e5e7eb; color: #111827; 
             border-radius: 1.2rem; padding: 12px; 
-            margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            max-width: 400px; align-self: center; width: 100%;
         }
 
         .input-field { 
@@ -31,35 +32,55 @@
             width: 100%; margin-bottom: 6px; color: #111827;
         }
 
-        .links-grid {
+        .columns-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             width: 100%;
+            align-items: start;
+        }
+
+        .column {
+            background: #111;
+            border-radius: 1rem;
+            padding: 10px;
+            border: 1px solid #222;
+            min-height: 100px;
+        }
+
+        .column-header {
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .link-item {
-            background: #f3f4f6; border-radius: 0.8rem; 
+            background: #f3f4f6; border-radius: 0.6rem; 
             padding: 8px; display: flex; 
             justify-content: space-between; align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 6px;
             min-width: 0;
-            border-left: 4px solid transparent;
         }
 
-        /* POIGNÉE À 9 POINTS (3x3) */
+        /* POIGNÉE GRID 3x3 */
         .drag-handle {
             cursor: grab;
             padding: 5px 10px 5px 0;
-            color: #9ca3af;
             display: grid;
             grid-template-columns: repeat(3, 2px); 
             gap: 3px;
             flex-shrink: 0;
         }
         .drag-handle span {
-            width: 2px;
-            height: 2px;
+            width: 2px; height: 2px;
             background-color: #9ca3af;
             border-radius: 50%;
         }
@@ -72,42 +93,30 @@
             text-overflow: ellipsis; white-space: nowrap; 
         }
         .link-url { 
-            font-size: 8px; color: #6b7280; display: block; 
+            font-size: 7px; color: #6b7280; display: block; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
         }
 
         .btn-add { width: 100%; padding: 10px; border-radius: 50px; font-weight: 900; font-size: 9px; text-transform: uppercase; }
         .btn-del { color: #9ca3af; padding-left: 5px; flex-shrink: 0; cursor: pointer; }
 
-        .tabs-container { 
-            display: flex; gap: 5px; overflow-x: auto; 
-            padding-bottom: 8px; margin-bottom: 12px;
-            scrollbar-width: none;
-            justify-content: center;
-        }
-        .tab-btn {
-            background: #282828; border: 1px solid #3a3a3a;
-            color: #888; padding: 6px 10px; border-radius: 20px;
-            font-size: 9px; font-weight: 800; white-space: nowrap; text-transform: uppercase;
-        }
+        .sortable-ghost { opacity: 0.3; background: #d1d5db; }
 
-        .bottom-nav { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 20px; padding-bottom: 30px; }
+        .bottom-nav { width: 100%; max-width: 400px; align-self: center; display: flex; flex-direction: column; gap: 8px; margin-top: 30px; padding-bottom: 30px; }
         .nav-group { display: flex; gap: 6px; width: 100%; }
         .nav-btn { font-weight: 900; border-radius: 50px; font-size: 10px; padding: 10px; flex: 1; text-align: center; background: #27272a; color: white; border: none; cursor: pointer; }
-        
-        .sortable-ghost { opacity: 0.1; background: #d1d5db; }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    <div class="flex items-center justify-between py-2 mb-1 px-1">
+    <div class="flex items-center justify-between py-2 mb-4 px-1">
         <a href="index.html" id="btn-retour" class="flex items-center justify-center w-8 h-8 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
             </svg>
         </a>
-        <h1 id="mainTitle" class="font-black text-xs tracking-widest uppercase">Liens</h1>
+        <h1 id="mainTitle" class="font-black text-xs tracking-widest uppercase">Gestion des Liens</h1>
         <div class="w-8"></div> 
     </div>
 
@@ -115,34 +124,42 @@
         <input type="text" id="linkName" class="input-field" placeholder="Nom du site...">
         <input type="text" id="linkUrl" class="input-field" placeholder="URL (https://...)">
         <select id="linkCat" class="input-field">
-            <option value="Ressources">📚 Ressources</option>
-            <option value="Institutionnel">🔢 Institutionnel</option>
+            <option value="École">🏫 École</option>
+            <option value="Institutionnel">🧑🏻‍💼 Institutionnel</option>
             <option value="Autre">🌍 Autre</option>
+            <option value="Ressources">🧰 Ressources</option>
         </select>
-        <button id="mainAddBtn" onclick="addLink()" class="btn-add mt-1">Ajouter</button>
+        <button id="mainAddBtn" onclick="addLink()" class="btn-add mt-1">Ajouter aux colonnes</button>
     </div>
 
-    <div class="tabs-container" id="tabs">
-        <button class="tab-btn active" onclick="filterCat('Tous')">Tous</button>
-        <button class="tab-btn" onclick="filterCat('Ressources')">Ressources</button>
-        <button class="tab-btn" onclick="filterCat('Institutionnel')">Institutionnel</button>
-        <button class="tab-btn" onclick="filterCat('Autre')">Autre</button>
+    <div class="columns-container" id="columnsBoard">
+        <div class="column" id="col-ecole">
+            <div class="column-header text-rose-500 border-rose-500"><span>🏫</span> École</div>
+            <div class="links-list min-h-[50px]" id="list-École"></div>
+        </div>
+        <div class="column" id="col-inst">
+            <div class="column-header text-purple-500 border-purple-500"><span>🧑🏻‍💼</span> Institutionnel</div>
+            <div class="links-list min-h-[50px]" id="list-Institutionnel"></div>
+        </div>
+        <div class="column" id="col-autre">
+            <div class="column-header text-emerald-500 border-emerald-500"><span>🌍</span> Autre</div>
+            <div class="links-list min-h-[50px]" id="list-Autre"></div>
+        </div>
+        <div class="column" id="col-ress">
+            <div class="column-header text-blue-500 border-blue-500"><span>🧰</span> Ressources</div>
+            <div class="links-list min-h-[50px]" id="list-Ressources"></div>
+        </div>
     </div>
-
-    <div id="linksList" class="links-grid"></div>
 
     <footer class="bottom-nav px-2">
         <div class="nav-group">
             <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center">
-                👇importer .txt👇
+                👇 importer .txt
                 <input type="file" id="importFile" class="hidden" accept=".txt">
             </label>
-            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆exporter .txt👆</button>
+            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆 exporter .txt</button>
         </div>
-
-        <button onclick="resetLinks()" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
-            ⚠️ effacer la liste des liens
-        </button>
+        <button onclick="resetLinks()" class="nav-btn bg-red-500 text-red-50">⚠️ tout effacer</button>
     </footer>
 </div>
 
@@ -150,70 +167,76 @@
     const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
     const couleurLiens = themePrefs.liens || 'green';
     let links = JSON.parse(localStorage.getItem('eduLinksList')) || [];
-    let currentFilter = 'Tous';
 
     const configCouleurs = {
-        'Ressources': { text: 'text-blue-600', border: '#2563eb' },
+        'École': { text: 'text-rose-500', border: '#ff2056' },
         'Institutionnel': { text: 'text-purple-600', border: '#9333ea' },
-        'Autre': { text: 'text-emerald-600', border: '#10b981' }
+        'Autre': { text: 'text-emerald-600', border: '#10b981' },
+        'Ressources': { text: 'text-blue-600', border: '#2563eb' }
     };
 
     function appliquerTheme() {
         const title = document.getElementById('mainTitle');
         const btn = document.getElementById('mainAddBtn');
         const btnRetour = document.getElementById('btn-retour');
-        title.classList.add(`text-${couleurLiens}-500`);
-        btnRetour.classList.add(`bg-${couleurLiens}-600`, `border`, `border-${couleurLiens}-400/30`);
-        btn.classList.add(`bg-${couleurLiens}-600`, `text-white`);
-        if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurLiens)) btn.classList.replace('text-white', 'text-black');
-        updateTabColors();
+        title.style.color = configCouleurs['Autre'].border;
+        btnRetour.style.backgroundColor = configCouleurs['Autre'].border;
+        btn.style.backgroundColor = configCouleurs['Autre'].border;
+        btn.style.color = 'white';
     }
 
-    function updateTabColors() {
-        const activeClass = `bg-${couleurLiens}-600`;
-        const activeText = ['yellow', 'lime', 'amber', 'cyan'].includes(couleurLiens) ? 'text-black' : 'text-white';
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.className = btn.classList.contains('active') ? `tab-btn active ${activeClass} ${activeText} border-none` : `tab-btn`;
+    // Initialisation du drag & drop pour chaque colonne
+    function initSortables() {
+        const categories = ['École', 'Institutionnel', 'Autre', 'Ressources'];
+        categories.forEach(cat => {
+            const el = document.getElementById(`list-${cat}`);
+            new Sortable(el, {
+                group: 'sharedLinks', // Permet de déplacer entre colonnes si besoin
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                onEnd: saveOrder
+            });
         });
     }
 
-    const el = document.getElementById('linksList');
-    const sortable = new Sortable(el, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        handle: '.drag-handle',
-        onEnd: function() {
-            if (currentFilter !== 'Tous') return;
-            const items = document.querySelectorAll('.link-item');
-            const newOrder = [];
+    // Sauvegarde du nouvel ordre après déplacement
+    function saveOrder() {
+        const newLinksOrder = [];
+        const categories = ['École', 'Institutionnel', 'Autre', 'Ressources'];
+        
+        categories.forEach(cat => {
+            const listEl = document.getElementById(`list-${cat}`);
+            const items = listEl.querySelectorAll('.link-item');
             items.forEach(item => {
-                const linkId = item.getAttribute('data-id');
-                const linkObj = links.find(l => l.id == linkId);
-                if(linkObj) newOrder.push(linkObj);
+                const id = parseInt(item.getAttribute('data-id'));
+                const originalLink = links.find(l => l.id === id);
+                if (originalLink) {
+                    // On met à jour la catégorie si le lien a changé de colonne
+                    newLinksOrder.push({ ...originalLink, cat: cat });
+                }
             });
-            links = newOrder;
-            localStorage.setItem('eduLinksList', JSON.stringify(links));
-        }
-    });
+        });
+        
+        links = newLinksOrder;
+        localStorage.setItem('eduLinksList', JSON.stringify(links));
+    }
 
     function render() {
-        const listDiv = document.getElementById('linksList');
-        listDiv.innerHTML = '';
-        
-        links.forEach((link, idx) => {
-            if(!link.id) link.id = Date.now() + idx;
-        });
+        document.querySelectorAll('.links-list').forEach(l => l.innerHTML = '');
 
-        links.forEach((link) => {
-            if (currentFilter !== 'Tous' && link.cat !== currentFilter) return;
-            
-            const styleCat = configCouleurs[link.cat] || { text: 'text-gray-600', border: '#9ca3af' };
+        links.forEach((link, index) => {
+            if(!link.id) link.id = Date.now() + index; // Sécurité ID
+
+            const listDiv = document.getElementById(`list-${link.cat}`);
+            if (!listDiv) return;
+
+            const styleCat = configCouleurs[link.cat];
             
             const item = document.createElement('div');
             item.className = 'link-item';
             item.setAttribute('data-id', link.id);
-            item.style.borderLeftColor = styleCat.border;
-
+            
             item.innerHTML = `
                 <div class="drag-handle">
                     <span></span><span></span><span></span>
@@ -241,7 +264,7 @@
         if (name && urlInput) {
             const url = urlInput.startsWith('http') ? urlInput : 'https://' + urlInput;
             const newLink = { id: Date.now(), name, url, cat };
-            links.unshift(newLink);
+            links.push(newLink);
             localStorage.setItem('eduLinksList', JSON.stringify(links));
             document.getElementById('linkName').value = '';
             document.getElementById('linkUrl').value = '';
@@ -250,7 +273,7 @@
     }
 
     function deleteLink(id) {
-        if(confirm("Supprimer ?")) {
+        if(confirm("Supprimer ce lien ?")) {
             links = links.filter(l => l.id !== id);
             localStorage.setItem('eduLinksList', JSON.stringify(links));
             render();
@@ -258,33 +281,18 @@
     }
 
     function resetLinks() {
-        if(confirm("Voulez-vous vraiment effacer TOUS les liens ?")) {
+        if(confirm("Effacer tous les liens ?")) {
             links = [];
             localStorage.setItem('eduLinksList', JSON.stringify(links));
             render();
         }
     }
 
-    function filterCat(cat) {
-        currentFilter = cat;
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-            const text = btn.innerText.toLowerCase();
-            if(cat === 'Tous' && text === 'tous') btn.classList.add('active');
-            else if(cat === 'Ressources' && text === 'ressources') btn.classList.add('active');
-            else if(cat === 'Institutionnel' && text === 'institutionnel') btn.classList.add('active');
-            else if(cat === 'Autre' && text === 'autre') btn.classList.add('active');
-        });
-        updateTabColors(); 
-        render();
-        sortable.option("disabled", currentFilter !== 'Tous');
-    }
-
     function exportData() {
         const blob = new Blob([JSON.stringify(links, null, 2)], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `liens.txt`;
+        a.download = `liens_ecole.txt`;
         a.click();
     }
 
@@ -297,12 +305,16 @@
                 links = JSON.parse(e.target.result);
                 localStorage.setItem('eduLinksList', JSON.stringify(links));
                 render();
-            } catch (err) { alert("Erreur."); }
+            } catch (err) { alert("Erreur d'importation."); }
         };
         reader.readAsText(file);
     });
 
-    window.onload = () => { appliquerTheme(); render(); };
+    window.onload = () => { 
+        appliquerTheme(); 
+        render(); 
+        initSortables(); 
+    };
 </script>
 </body>
 </html>
