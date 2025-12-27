@@ -46,17 +46,24 @@
             min-width: 0;
         }
 
-        /* Poignée de déplacement pour éviter le conflit tactile */
+        /* POIGNÉE À 6 POINTS */
         .drag-handle {
             cursor: grab;
-            padding-right: 8px;
+            padding-right: 10px;
             color: #9ca3af;
-            display: flex;
-            align-items: center;
+            display: grid;
+            grid-template-columns: repeat(2, 3px);
+            gap: 3px;
             flex-shrink: 0;
         }
+        .drag-handle span {
+            width: 3px;
+            height: 3px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+        }
 
-        .link-info { flex: 1; cursor: pointer; min-width: 0; text-decoration: none; }
+        .link-info { flex: 1; cursor: pointer; min-width: 0; }
         .link-name { 
             font-weight: 800; font-size: 10px; display: block; 
             color: #111827; text-transform: uppercase; 
@@ -86,7 +93,7 @@
         .bottom-nav { width: 100%; display: flex; gap: 6px; margin-top: 20px; padding-bottom: 30px; }
         .nav-btn { font-weight: 900; border-radius: 50px; font-size: 10px; padding: 10px; flex: 1; text-align: center; background: #27272a; color: white; }
         
-        .sortable-ghost { opacity: 0.4; background: #d1d5db; }
+        .sortable-ghost { opacity: 0.3; background: #d1d5db; }
     </style>
 </head>
 <body>
@@ -160,7 +167,7 @@
     const sortable = new Sortable(el, {
         animation: 150,
         ghostClass: 'sortable-ghost',
-        handle: '.drag-handle', // Correction : Seule la poignée permet de déplacer
+        handle: '.drag-handle',
         onEnd: function() {
             if (currentFilter !== 'Tous') return;
             const items = document.querySelectorAll('.link-item');
@@ -185,9 +192,9 @@
             item.setAttribute('data-index', idx);
             item.innerHTML = `
                 <div class="drag-handle">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-                    </svg>
+                    <span></span><span></span>
+                    <span></span><span></span>
+                    <span></span><span></span>
                 </div>
                 <div class="link-info" onclick="window.open('${link.url}', '_blank')">
                     <span class="link-name text-${couleurLiens}-700">${link.name}</span>
@@ -207,9 +214,7 @@
         const name = document.getElementById('linkName').value.trim();
         const urlInput = document.getElementById('linkUrl').value.trim();
         const cat = document.getElementById('linkCat').value;
-        
         if (name && urlInput) {
-            // S'assurer que l'URL commence par http
             const url = urlInput.startsWith('http') ? urlInput : 'https://' + urlInput;
             links.unshift({ name, url, cat });
             localStorage.setItem('eduLinksList', JSON.stringify(links));
@@ -255,7 +260,7 @@
                 links = JSON.parse(e.target.result);
                 localStorage.setItem('eduLinksList', JSON.stringify(links));
                 render();
-            } catch (err) { alert("Erreur de format."); }
+            } catch (err) { alert("Erreur."); }
         };
         reader.readAsText(file);
     });
