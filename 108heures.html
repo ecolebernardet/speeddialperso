@@ -38,7 +38,6 @@
         .reunion-item { 
             background: #ffffff; padding: 6px; border-radius: 0.6rem; 
             margin-bottom: 5px; 
-            /* La bordure gauche est maintenant gérée via JS pour la couleur */
             border-left-width: 3px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-size: 0.6rem;
         }
@@ -49,7 +48,8 @@
         }
 
         /* BOUTONS NAVIGATION */
-        .bottom-nav { width: 100%; max-width: 500px; margin: 20px auto 0; padding-bottom: 40px; display: flex; gap: 8px; }
+        .bottom-nav { width: 100%; max-width: 500px; margin: 20px auto 0; padding-bottom: 40px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-group { display: flex; gap: 8px; width: 100%; }
         .nav-btn { font-weight: 900; border-radius: 50px; font-size: 9px; padding: 12px; border: none; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
 
         .input-field { background: #ffffff; border: 1px solid #9ca3af; color: #111827; border-radius: 0.75rem; padding: 8px; outline: none; font-size: 0.75rem; font-weight: 600; }
@@ -114,16 +114,21 @@
         <div id="displayContainer" class="grid grid-cols-2 gap-3 items-start"></div>
 
         <footer class="bottom-nav">
-            <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center flex-1">
-                👇importer .txt👇
-                <input type="file" id="importFile" class="hidden" accept=".txt">
-            </label>
-            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white flex-1">👆exporter .txt👆</button>
+            <div class="nav-group">
+                <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center flex-1">
+                    👇importer .txt👇
+                    <input type="file" id="importFile" class="hidden" accept=".txt">
+                </label>
+                <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white flex-1">👆exporter .txt👆</button>
+            </div>
+
+            <button onclick="resetHeures()" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
+                ⚠️ effacer le suivi des 108 heures
+            </button>
         </footer>
     </div>
 
     <script>
-    
     const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
     const couleurH108 = themePrefs.h108 || 'orange'; 
 
@@ -207,6 +212,17 @@
             if(editId === id) { editId = null; document.getElementById('heuresForm').reset(); document.getElementById('submitBtn').innerText = "Enregistrer"; }
             sauvegarder(); 
         } 
+    }
+
+    function resetHeures() {
+        if(confirm("Effacer toutes les réunions enregistrées ?")) {
+            reunions = [];
+            sauvegarder();
+            document.getElementById('heuresForm').reset();
+            initDate();
+            editId = null;
+            document.getElementById('submitBtn').innerText = "Enregistrer";
+        }
     }
 
     function toggleListe(catKey) {
@@ -305,7 +321,6 @@
     }
 
     initDate(); render();
-    
     </script>
 </body>
 </html>
