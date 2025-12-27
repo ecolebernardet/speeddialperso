@@ -44,12 +44,12 @@
             justify-content: space-between; align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             min-width: 0;
-            border-left: 4px solid transparent; /* Changé dynamiquement en JS */
+            border-left: 4px solid transparent;
         }
 
         .drag-handle {
             cursor: grab;
-            padding-right: 10px;
+            padding: 5px 10px 5px 0;
             color: #9ca3af;
             display: grid;
             grid-template-columns: repeat(2, 3px);
@@ -93,7 +93,7 @@
         .bottom-nav { width: 100%; display: flex; gap: 6px; margin-top: 20px; padding-bottom: 30px; }
         .nav-btn { font-weight: 900; border-radius: 50px; font-size: 10px; padding: 10px; flex: 1; text-align: center; background: #27272a; color: white; }
         
-        .sortable-ghost { opacity: 0.3; background: #d1d5db; }
+        .sortable-ghost { opacity: 0.1; background: #d1d5db; }
     </style>
 </head>
 <body>
@@ -144,7 +144,6 @@
     let links = JSON.parse(localStorage.getItem('eduLinksList')) || [];
     let currentFilter = 'Tous';
 
-    // Configuration des couleurs par catégorie (Tailwind)
     const configCouleurs = {
         'Ressources': { text: 'text-blue-600', border: '#2563eb' },
         'Institutionnel': { text: 'text-purple-600', border: '#9333ea' },
@@ -176,31 +175,39 @@
         ghostClass: 'sortable-ghost',
         handle: '.drag-handle',
         onEnd: function() {
+            // Le tri manuel n'est possible qu'en mode "Tous"
             if (currentFilter !== 'Tous') return;
+            
             const items = document.querySelectorAll('.link-item');
             const newOrder = [];
             items.forEach(item => {
-                const idx = item.getAttribute('data-index');
-                newOrder.push(links[idx]);
+                const linkId = item.getAttribute('data-id');
+                const linkObj = links.find(l => l.id == linkId);
+                if(linkObj) newOrder.push(linkObj);
             });
             links = newOrder;
             localStorage.setItem('eduLinksList', JSON.stringify(links));
-            render();
+            // On ne fait pas de render() complet ici pour éviter de casser l'animation de Sortable
         }
     });
 
     function render() {
         const listDiv = document.getElementById('linksList');
         listDiv.innerHTML = '';
+        
+        // On s'assure que chaque lien a un ID unique pour le tri
         links.forEach((link, idx) => {
+            if(!link.id) link.id = Date.now() + idx;
+        });
+
+        links.forEach((link) => {
             if (currentFilter !== 'Tous' && link.cat !== currentFilter) return;
             
-            // Récupération du style spécifique à la catégorie
             const styleCat = configCouleurs[link.cat] || { text: 'text-gray-600', border: '#9ca3af' };
             
             const item = document.createElement('div');
             item.className = 'link-item';
-            item.setAttribute('data-index', idx);
+            item.setAttribute('data-id', link.id); // Utilisation d'un ID stable
             item.style.borderLeftColor = styleCat.border;
 
             item.innerHTML = `
@@ -213,7 +220,7 @@
                     <span class="link-name ${styleCat.text}">${link.name}</span>
                     <span class="link-url">${link.url}</span>
                 </div>
-                <div class="btn-del" onclick="event.stopPropagation(); deleteLink(${idx})">
+                <div class="btn-del" onclick="event.stopPropagation(); deleteLink(${link.id})">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -229,7 +236,8 @@
         const cat = document.getElementById('linkCat').value;
         if (name && urlInput) {
             const url = urlInput.startsWith('http') ? urlInput : 'https://' + urlInput;
-            links.unshift({ name, url, cat });
+            const newLink = { id: Date.now(), name, url, cat };
+            links.unshift(newLink);
             localStorage.setItem('eduLinksList', JSON.stringify(links));
             document.getElementById('linkName').value = '';
             document.getElementById('linkUrl').value = '';
@@ -237,9 +245,9 @@
         }
     }
 
-    function deleteLink(idx) {
+    function deleteLink(id) {
         if(confirm("Supprimer ?")) {
-            links.splice(idx, 1);
+            links = links.filter(l => l.id !== id);
             localStorage.setItem('eduLinksList', JSON.stringify(links));
             render();
         }
@@ -249,15 +257,15 @@
         currentFilter = cat;
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('active');
-            // On compare avec le texte du bouton (Instit. correspond à Institutionnel)
             const text = btn.innerText.toLowerCase();
             if(cat === 'Tous' && text === 'tous') btn.classList.add('active');
             else if(cat === 'Ressources' && text === 'ressources') btn.classList.add('active');
-            else if(cat === 'Institutionnel' && text === 'institutionnel') btn.classList.add('active');
+            else if(cat === 'Institutionnel' && text === 'instit.') btn.classList.add('active');
             else if(cat === 'Autre' && text === 'autre') btn.classList.add('active');
         });
         updateTabColors(); 
         render();
+        // Désactiver le tri si on filtre
         sortable.option("disabled", currentFilter !== 'Tous');
     }
 
