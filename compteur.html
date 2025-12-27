@@ -12,34 +12,37 @@
 
         .header-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 500px; margin: 10px auto 20px auto; padding: 0 10px; }
         #btn-retour { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s ease; }
-        #mainTitle { text-align: center; font-weight: 800; font-size: 0.9rem; letter-spacing: 1.5px; margin: 0; flex-grow: 1; text-transform: uppercase;}
+        #mainTitle { text-align: center; font-weight: 800; font-size: 0.9rem; letter-spacing: 1.5px; margin: 0; flex-grow: 1; text-transform: uppercase; color: white !important;}
 
         .columns-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 600px; margin: 0 auto; align-items: start; }
         .level-group { margin-bottom: 1px; }
 
+        /* 1) Harmonisation des tuiles élèves avec inscriptions.html */
         .student-item { 
-            background-color: #ffffff; 
+            background: #333; 
             padding: 6px 10px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             cursor: pointer; 
-            border-radius: 50px; 
-            margin-bottom: 3px; 
-            transition: all 0.1s;
+            border-radius: 0.75rem; 
+            margin-bottom: 4px; 
+            border: 1px solid #666;
+            transition: transform 0.1s;
         }
-
-        .text-girl { color: #db2777; } 
-        .text-boy { color: #2563eb; } 
+  
+        .text-girl { color: #f9a8d4; } /* Rose clair identique */
+        .text-boy { color: #93c5fd; }  /* Bleu clair identique */
         
         .student-name { font-weight: 800; font-size: 0.65rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+        /* Style des pastilles de comptage */
         .counter-badge {
             width: 1.1rem; height: 1.1rem; min-width: 1.1rem;
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%; font-weight: 800; font-size: 0.75rem;
-            transition: all 0.1s ease; border: 1px solid rgba(0,0,0,0.1);
-            background-color: #f3f4f6; color: #9ca3af;
+            transition: all 0.1s ease; border: 1px solid rgba(0,0,0,0.2);
+            background-color: #1a1a1a; color: #4b5563;
         }
         .count-1 { color: #000; background-color: #aee386; }
         .count-2 { color: #000; background-color: #fcff21; }
@@ -54,8 +57,10 @@
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
         .no-select { -webkit-tap-highlight-color: transparent; user-select: none; }
 
+        /* 2) Harmonisation du bouton bas avec inscriptions.html */
         .bottom-nav { width: 100%; max-width: 350px; margin: 25px auto 0 auto; padding-bottom: 60px; }
         .nav-btn { font-weight: 800; border-radius: 50px; font-size: 9px; padding: 12px; border: none; width: 100%; display: flex; align-items: center; justify-content: center; }
+        .btn-danger-static { background-color: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
     </style>
 </head>
 <body>
@@ -73,7 +78,7 @@
     <div id="mainContent" class="columns-container"></div>
 
     <div class="bottom-nav">
-        <button id="reset-button" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
+        <button id="reset-button" class="nav-btn btn-danger-static shadow-lg active:scale-95">
             ⚠️ RàZ des données
         </button>
     </div>
@@ -90,17 +95,15 @@
 
         const couleursDecidees = {
             "CP": "#ec4899", "CE1": "#3b82f6", "CE2": "#eab308", 
-            "CM1": "#ef4444", "CM2": "#22c55e", "AUTRE": "#a855f7"
+            "CM1": "#ef4444", "CM2": "#22c55e", "AUTRE": "#8b5cf6"
         };
 
         function appliquerTheme() {
             const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
             const nomCouleur = prefs['compt'] || 'sky';
-            const couleurHexa = mapCouleurs[nomCouleur] || '#0ea5e9';
-            const titre = document.getElementById('mainTitle');
+            const hex = mapCouleurs[nomCouleur] || '#0ea5e9';
             const btnRetour = document.getElementById('btn-retour');
-            if (titre) titre.style.color = couleurHexa;
-            if (btnRetour) btnRetour.style.backgroundColor = couleurHexa;
+            if (btnRetour) btnRetour.style.backgroundColor = hex;
         }
 
         function formatNameDisplay(fullName) {
@@ -202,7 +205,6 @@
             appliquerTheme();
             const mainContent = document.getElementById('mainContent');
             const allStudents = JSON.parse(localStorage.getItem('maListeEleves')) || [];
-            const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
             
             const groupes = {};
             allStudents.forEach(s => {
@@ -223,9 +225,8 @@
             niveauxTries.forEach(niv => {
                 const levelWrapper = document.createElement('div');
                 levelWrapper.className = "level-group";
-                const couleurNiveau = paletteNiveaux[niv] || couleursDecidees[niv] || '#ffffff';
+                const couleurNiveau = couleursDecidees[niv] || '#ffffff';
                 
-                // MODIFICATION ICI : Retrait des classes border-b et padding
                 levelWrapper.innerHTML = `<h2 style="color:${couleurNiveau}" class="text-[11px] font-black uppercase tracking-widest text-center mb-2">${niv}</h2>`;
                 
                 const list = document.createElement('div');
