@@ -7,57 +7,64 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        :root { --primary: #ff637e; --bg-dark: #000000; }
+        :root { --primary: #555; --bg-dark: #000000; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-dark); margin: 0; padding: 10px; min-height: 100vh; color: white; }
         
         .header-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 500px; margin: 10px auto 20px auto; padding: 0 10px; }
         #btn-retour { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s ease; }
-        #mainTitle { text-align: center; font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; margin: 0; flex-grow: 1; text-transform: uppercase;}
+        #mainTitle { text-align: center; font-weight: 800; font-size: 1rem; letter-spacing: 1.5px; margin: 0; flex-grow: 1; text-transform: uppercase; color: white !important;}
 
         .columns-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 600px; margin: 0 auto; align-items: start; }
-        
         .level-group { margin-bottom: 1px; }
 
+        /* 1) Harmonisation des tuiles élèves avec inscriptions.html */
         .student-item { 
-            background-color: #ffffff; 
+            background: #333; 
             padding: 6px 10px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             cursor: pointer; 
-            border-radius: 50px; 
-            margin-bottom: 3px; 
-            transition: all 0.1s;
+            border-radius: 0.75rem; 
+            margin-bottom: 4px; 
+            border: 1px solid #666;
+            transition: transform 0.1s;
         }
+        .student-item:active { transform: scale(0.98); }
 
-        .text-girl { color: #db2777; } 
-        .text-boy { color: #2563eb; } 
+        .text-girl { color: #f9a8d4; } /* Rose clair identique */
+        .text-boy { color: #93c5fd; }  /* Bleu clair identique */
         
         .student-name { font-weight: 800; font-size: 0.65rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .status-icon { font-size: 0.65rem; opacity: 0.8; }
+        .status-icon { font-size: 0.65rem; opacity: 0.8; color: white; }
 
+        /* Modal */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
-        .modal-content { background: #1a1a1a; padding: 20px; border-radius: 20px; width: 92%; max-width: 400px; border: 1px solid #333; }
+        .modal-content { background: #111; padding: 20px; border-radius: 20px; width: 92%; max-width: 400px; border: 1px solid #2a2a2a; }
         textarea { width: 100%; margin: 10px 0; padding: 12px; border-radius: 12px; border: 1px solid #333; font-size: 0.8rem; background: #000; color: #fff; outline: none; }
         .btns { display: flex; gap: 10px; }
         .modal-btn { flex: 1; padding: 14px; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 10px; }
-        .btn-save { background: var(--primary); color: white; }
-        .btn-cancel { background: #333; color: #ccc; }
+        .btn-action { background: #666; color: white; }
+        .btn-cancel { background: #222; color: #777; }
 
+        /* 2) Harmonisation des boutons bas avec inscriptions.html */
         .bottom-nav { width: 100%; max-width: 500px; margin: 25px auto 0; padding-bottom: 40px; }
         .nav-btn { font-weight: 800; border-radius: 50px; font-size: 9px; padding: 12px; border: none; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-gray-static { background-color: #18181b; color: white; border: 1px solid #27272a; }
+        .btn-danger-static { background-color: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
+        
         .no-select { -webkit-tap-highlight-color: transparent; user-select: none; }
     </style>
 </head>
 <body>
 
     <header class="header-nav">
-        <a href="index.html" id="btn-retour">
+        <a href="index_sombre.html" id="btn-retour">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
             </svg>
         </a>
-        <h1 id="mainTitle">OBSERVATIONS</h1>
+        <h1 id="mainTitle">infos élèves</h1>
         <div style="width: 40px;"></div>
     </header>
 
@@ -65,13 +72,13 @@
 
     <footer class="bottom-nav flex flex-col gap-3 px-2">
         <div class="flex gap-2">
-            <label class="nav-btn bg-zinc-800 text-white cursor-pointer text-center">
+            <label class="nav-btn btn-gray-static cursor-pointer text-center">
                 👇importer .txt👇
                 <input type="file" id="importFile" class="hidden" accept=".txt">
             </label>
-            <button onclick="exportToFile()" class="nav-btn bg-zinc-800 text-white ">👆exporter .txt👆</button>
+            <button onclick="exportToFile()" class="nav-btn btn-gray-static">👆exporter .txt👆</button>
         </div>
-        <button onclick="toutEffacer()" class="nav-btn bg-red-500 text-red-100">⚠️ effacer les données</button>
+        <button onclick="toutEffacer()" class="nav-btn btn-danger-static">⚠️ effacer les données</button>
     </footer>
 
     <div id="modal" class="modal-overlay">
@@ -80,7 +87,7 @@
             <textarea id="commentInput" rows="8" placeholder="Écrire une observation..."></textarea>
             <div class="btns">
                 <button class="modal-btn btn-cancel" onclick="closeAllModals()">Fermer</button>
-                <button class="modal-btn btn-save" onclick="saveData()">Enregistrer</button>
+                <button class="modal-btn btn-action" onclick="saveData()">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -91,15 +98,7 @@
         let currentStudentId = "";
 
         const ordreNiveaux = ['CP', 'CE1', 'CE2', 'CM1', 'CM2', 'AUTRE'];
-
-        const couleurParNiveau = {
-            'CP': '#ec4899',
-            'CE1': '#3b82f6',
-            'CE2': '#eab308',
-            'CM1': '#ef4444',
-            'CM2': '#22c55e',
-            'AUTRE': '#8b5cf6'
-        };
+        const couleurParNiveau = { 'CP': '#ec4899', 'CE1': '#3b82f6', 'CE2': '#eab308', 'CM1': '#ef4444', 'CM2': '#22c55e', 'AUTRE': '#8b5cf6' };
 
         const mapCouleurs = {
             'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
@@ -112,19 +111,9 @@
         function appliquerTheme() {
             const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
             const nomCouleur = prefs['obs'] || 'green';
-            const couleurHexa = mapCouleurs[nomCouleur] || '#22c55e';
-            
-            const mainTitle = document.getElementById('mainTitle');
+            const hex = mapCouleurs[nomCouleur] || '#22c55e';
             const btnRetour = document.getElementById('btn-retour');
-            const btnSave = document.querySelector('.btn-save');
-
-            if(mainTitle) mainTitle.style.color = couleurHexa;
-            if(btnRetour) btnRetour.style.backgroundColor = couleurHexa;
-            if(btnSave) {
-                btnSave.style.backgroundColor = couleurHexa;
-                btnSave.style.color = ['yellow', 'lime', 'amber', 'cyan'].includes(nomCouleur) ? 'black' : 'white';
-            }
-            document.documentElement.style.setProperty('--primary', couleurHexa);
+            if(btnRetour) btnRetour.style.backgroundColor = hex;
         }
 
         function formatName(str) {
@@ -140,7 +129,7 @@
             container.innerHTML = "";
             
             if (elevesInscrits.length === 0) {
-                container.innerHTML = `<div class="col-span-2 text-center p-10 text-zinc-500 text-[10px] font-bold uppercase">Aucun élève inscrit.</div>`;
+                container.innerHTML = `<div class="col-span-2 text-center p-10 text-zinc-600 text-[10px] font-bold uppercase italic">Aucun élève inscrit.</div>`;
                 return;
             }
 
@@ -151,15 +140,12 @@
                 groupes[niv].push(el);
             });
 
-            const niveauxPresents = Object.keys(groupes).sort((a, b) => {
-                return ordreNiveaux.indexOf(a) - ordreNiveaux.indexOf(b);
-            });
+            const niveauxPresents = Object.keys(groupes).sort((a, b) => ordreNiveaux.indexOf(a) - ordreNiveaux.indexOf(b));
 
             niveauxPresents.forEach(niv => {
                 const levelWrapper = document.createElement('div');
                 levelWrapper.className = "level-group";
                 const colorTitle = couleurParNiveau[niv] || '#ffffff';
-                
                 levelWrapper.innerHTML = `<h2 style="color:${colorTitle}" class="text-[11px] font-black uppercase tracking-widest text-center mb-2">${niv}</h2>`;
                 
                 const list = document.createElement('div');
@@ -167,26 +153,23 @@
                     const genderClass = (el.sexe.toLowerCase() === 'f') ? 'text-girl' : 'text-boy';
                     const item = document.createElement('div');
                     item.className = `student-item no-select ${genderClass}`;
-                    
-                    // On s'assure de chercher l'ID en format String
-                    const hasNote = (savedComments[String(el.id)] || "").trim().length > 0;
+                    const hasNote = (savedComments[el.id] || "").trim().length > 0;
                     item.innerHTML = `
                         <span class="student-name">${formatName(el.identite)}</span>
                         <span class="status-icon">${hasNote ? '🔎' : '＋'}</span>
                     `;
-                    item.onclick = () => openCommentModal(String(el.id), formatName(el.identite));
+                    item.onclick = () => openCommentModal(el.id, formatName(el.identite));
                     list.appendChild(item);
                 });
-                
                 levelWrapper.appendChild(list);
                 container.appendChild(levelWrapper);
             });
         }
 
         function openCommentModal(id, nom) {
-            currentStudentId = String(id);
+            currentStudentId = id;
             document.getElementById('modalTitle').innerText = nom;
-            document.getElementById('commentInput').value = savedComments[currentStudentId] || "";
+            document.getElementById('commentInput').value = savedComments[id] || "";
             document.getElementById('modal').style.display = 'flex';
             setTimeout(() => document.getElementById('commentInput').focus(), 100);
         }
@@ -202,10 +185,8 @@
         }
 
         function toutEffacer() {
-            if(confirm("Attention : Supprimer tous les élèves et toutes les observations ?")) {
-                localStorage.removeItem('maListeEleves');
+            if(confirm("Attention : Supprimer toutes les observations ?")) {
                 localStorage.removeItem('studentObservations');
-                elevesInscrits = [];
                 savedComments = {};
                 renderList();
             }
@@ -213,22 +194,13 @@
 
         function exportToFile() {
             let cleanedComments = {};
-            elevesInscrits.forEach(s => { 
-                const sId = String(s.id);
-                if(savedComments[sId]) cleanedComments[sId] = savedComments[sId]; 
-            });
-            const bundle = {
-                eleves: elevesInscrits,
-                observations: cleanedComments,
-                date: new Date().toLocaleDateString()
-            };
+            elevesInscrits.forEach(s => { if(savedComments[s.id]) cleanedComments[s.id] = savedComments[s.id]; });
+            const bundle = { eleves: elevesInscrits, observations: cleanedComments, date: new Date().toLocaleDateString() };
             const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `observations_${new Date().toISOString().split('T')[0]}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
+            a.href = url; a.download = `observations_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click(); URL.revokeObjectURL(url);
         }
 
         document.getElementById('importFile').addEventListener('change', function(e) {
@@ -238,17 +210,8 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (data.eleves && confirm("Importer les données du fichier ?")) {
-                        // On normalise les IDs des observations en Strings pour éviter les bugs de type
-                        let normalizedObs = {};
-                        if(data.observations) {
-                            Object.keys(data.observations).forEach(key => {
-                                normalizedObs[String(key)] = data.observations[key];
-                            });
-                        }
-                        
-                        localStorage.setItem('maListeEleves', JSON.stringify(data.eleves));
-                        localStorage.setItem('studentObservations', JSON.stringify(normalizedObs));
+                    if (data.eleves && confirm("Importer les observations du fichier ?")) {
+                        localStorage.setItem('studentObservations', JSON.stringify(data.observations || {}));
                         window.location.reload();
                     }
                 } catch (err) { alert("Fichier invalide."); }
@@ -256,10 +219,7 @@
             reader.readAsText(file);
         });
 
-        window.onload = () => {
-            appliquerTheme();
-            renderList();
-        };
+        window.onload = () => { appliquerTheme(); renderList(); };
     </script>
 </body>
 </html>

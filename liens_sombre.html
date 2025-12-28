@@ -19,20 +19,30 @@
 
         .main-wrapper { width: 100%; max-width: 800px; display: flex; flex-direction: column; }
 
-        .light-card { 
-            background: #e5e7eb; color: #ffffff; 
-            border-radius: 1.2rem; padding: 10px; 
-            margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            max-width: 100%; align-self: center; width: 95%;
+        .form-tile { 
+            background: #111; 
+            border: 1px solid #2a2a2a; 
+            border-radius: 1.5rem; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 95%; align-self: center;
         }
 
         .input-field { 
-            background: #ffffff; border: 1px solid #9ca3af; 
-            border-radius: 0.6rem; padding: 6px; 
-            font-size: 0.75rem; font-weight: 600; 
-            width: 100%; margin-bottom: 5px; color: #111827;
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            color: #fff; 
+            border-radius: 0.75rem; 
+            padding: 10px; 
+            outline: none; 
+            font-size: 0.75rem; 
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 8px;
         }
 
+        /* CONFIGURATION 2 COLONNES COMME LIENS2.HTML */
         .columns-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -42,12 +52,11 @@
         }
 
         .column {
-            background: #111;
-            border-radius: 0.8rem;
-            padding: 6px;
-            border: 1px solid #222;
+            background: rgba(24, 24, 27, 0.6);
+            border-radius: 1rem;
+            padding: 8px;
             min-height: 100px;
-            min-width: 0;
+            min-width: 0; /* Évite les débordements */
         }
 
         .column-header {
@@ -65,71 +74,78 @@
         }
 
         .link-item {
-            background: #f3f4f6; border-radius: 0.5rem; 
-            padding: 5px; display: flex; 
+            background: #333; 
+            border-radius: 0.75rem; 
+            padding: 5px; 
+            display: flex; 
             justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 5px;
+            border: 1px solid #444;
             min-width: 0;
         }
 
         .drag-handle {
-            cursor: grab;
-            padding: 3px 10px 3px 5px;
-            display: grid;
-            grid-template-columns: repeat(3, 3px); 
-            gap: 4px;
+            cursor: grab; padding: 3px 10px 3px 5px;
+            display: grid; grid-template-columns: repeat(3, 3px); gap: 4px;
             flex-shrink: 0;
         }
-        .drag-handle span { width:2px; height: 2px; background-color: #9ca3af; border-radius: 50%; }
+        .drag-handle span { width: 2px; height: 2px; background-color: #aaa; border-radius: 50%; }
 
-        .link-info { flex: 1; cursor: pointer; min-width: 0; overflow: hidden; }
+        .link-info { flex: 1; cursor: pointer; min-width: 0; padding: 0 5px; overflow: hidden; }
         .link-name { 
             font-weight: 800; font-size: 9px; display: block; 
             text-transform: uppercase; line-height: 1; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
         }
-        .link-url { 
-            font-size: 6px; color: #6b7280; display: block; 
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
+        
+        .name-école { color: #f9a8d4; }
+        .name-institutionnel { color: #d8b4fe; }
+        .name-autre { color: #6ee7b7; }
+        .name-ressources { color: #93c5fd; }
+
+        .link-url { font-size: 6px; color: #ccc; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .btn-add { 
+            width: 100%; padding: 12px; border-radius: 50px; 
+            font-weight: 900; font-size: 10px; text-transform: uppercase; 
+            transition: all 0.2s; border: none;
+            background-color: #666; color: #fff;
         }
+        .btn-add:active { transform: scale(0.95); background-color: #444; }
 
-        .btn-add { width: 100%; padding: 10px; border-radius: 50px; font-weight: 900; font-size: 12px; text-transform: uppercase; color: white; }
-        .btn-del { color: #9ca3af; padding-left: 2px; flex-shrink: 0; cursor: pointer; transition: color 0.2s; }
-        .btn-del:hover { color: #6b7280; }
+        .btn-del { color: #aaa; opacity: 0.5; padding-left: 2px; cursor: pointer; flex-shrink: 0; }
+        .btn-del:hover { opacity: 1; }
 
-        .sortable-ghost { opacity: 0.3; background: #d1d5db; }
-        .bottom-nav { width: 100%; max-width: 400px; align-self: center; display: flex; flex-direction: column; gap: 6px; margin-top: 20px; padding-bottom: 20px; }
-        .nav-group { display: flex; gap: 5px; width: 100%; }
-        .nav-btn { font-weight: 900; border-radius: 50px; font-size: 9px; padding: 8px; flex: 1; text-align: center; background: #27272a; color: white; border: none; }
+        .bottom-nav { width: 100%; max-width: 400px; align-self: center; display: flex; flex-direction: column; gap: 8px; margin-top: 25px; padding-bottom: 30px; }
+        .nav-btn { font-weight: 900; border-radius: 50px; font-size: 10px; padding: 12px; flex: 1; text-align: center; background: #1a1a1a; color: white; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
     <div class="flex items-center justify-between py-2 mb-2 px-1">
-        <a href="index.html" id="btn-retour" class="flex items-center justify-center w-7 h-7 rounded-full">
+        <a href="index_sombre.html" id="btn-retour" class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg transition-transform active:scale-90">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
         </a>
-        <h1 id="mainTitle" class="font-black text-[16px] tracking-normal uppercase">Gestion des Liens</h1>
-        <div class="w-7"></div> 
+        <h1 id="mainTitle" class="font-black text-lg tracking-widest uppercase text-white">Gestion des Liens</h1>
+        <div class="w-8"></div> 
     </div>
 
-    <div class="light-card">
-        <input type="text" id="linkName" class="input-field" placeholder="Nom...">
-        <input type="text" id="linkUrl" class="input-field" placeholder="URL">
+    <div class="form-tile">
+        <input type="text" id="linkName" class="input-field" placeholder="Nom du raccourci...">
+        <input type="text" id="linkUrl" class="input-field" placeholder="URL (ex: google.com)">
         <select id="linkCat" class="input-field">
             <option value="École">🏫 École</option>
             <option value="Institutionnel">🧑🏻‍💼 Institutionnel</option>
-            <option value="Autre">🌍 Autres</option>
+            <option value="Autre" selected>🌍 Autres</option>
             <option value="Ressources">🧰 Ressources</option>
         </select>
-        <button id="mainAddBtn" onclick="addLink()" class="btn-add mt-1">Ajouter</button>
+        <button id="mainAddBtn" onclick="addLink()" class="btn-add mt-1">Ajouter le lien</button>
     </div>
 
     <div class="columns-container" id="columnsBoard">
         <div class="column">
-            <div class="column-header text-rose-500 border-rose-500"><span>🏫</span> École</div>
+            <div class="column-header text-pink-500 border-pink-500"><span>🏫</span> École</div>
             <div class="links-list min-h-[40px]" id="list-École"></div>
         </div>
         <div class="column">
@@ -147,11 +163,11 @@
     </div>
 
     <footer class="bottom-nav px-2">
-        <div class="nav-group">
-            <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center">👇importer .txt👇<input type="file" id="importFile" class="hidden" accept=".txt"></label>
-            <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white">👆exporter .txt 👆</button>
+        <div class="flex gap-2">
+            <label class="nav-btn cursor-pointer">👇 importer .txt 👇<input type="file" id="importFile" class="hidden" accept=".txt"></label>
+            <button onclick="exportData()" class="nav-btn">👆 exporter .txt 👆</button>
         </div>
-        <button onclick="resetLinks()" class="nav-btn bg-red-500 text-red-50">⚠️ effacer tous les liens</button>
+        <button onclick="resetLinks()" class="nav-btn bg-red-950 text-red-400 border-red-900 mt-2">⚠️ effacer tous les liens</button>
     </footer>
 </div>
 
@@ -164,41 +180,24 @@
         'rose': '#f43f5e', 'gray': '#6b7280'
     };
 
+    const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+    const hexaTheme = mapCouleurs[themePrefs.liens || 'emerald'];
+
     let links = JSON.parse(localStorage.getItem('eduLinksList')) || [];
 
-    const configCouleurs = {
-        'École': { text: 'text-rose-500', hex: '#ff2056' },
-        'Institutionnel': { text: 'text-purple-600', hex: '#9333ea' },
-        'Autre': { text: 'text-emerald-600', hex: '#10b981' },
-        'Ressources': { text: 'text-blue-600', hex: '#2563eb' }
-    };
-
     function appliquerTheme() {
-        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-        const nomCouleur = themePrefs['liens'] || 'emerald'; 
-        const couleurHexa = mapCouleurs[nomCouleur] || '#10b981';
-
-        const title = document.getElementById('mainTitle');
-        const btn = document.getElementById('mainAddBtn');
         const btnRetour = document.getElementById('btn-retour');
-
-        if(title) title.style.color = couleurHexa;
-        if(btnRetour) btnRetour.style.backgroundColor = couleurHexa;
-        if(btn) {
-            btn.style.backgroundColor = couleurHexa;
-            // Optionnel : ajuste la couleur du texte si la couleur est trop claire
-            btn.style.color = ['yellow', 'lime', 'amber', 'cyan'].includes(nomCouleur) ? 'black' : 'white';
-        }
+        if(btnRetour) btnRetour.style.backgroundColor = hexaTheme;
     }
 
     function initSortables() {
         ['École', 'Institutionnel', 'Autre', 'Ressources'].forEach(cat => {
-            new Sortable(document.getElementById(`list-${cat}`), {
-                group: 'sharedLinks',
-                animation: 150,
-                handle: '.drag-handle',
-                onEnd: saveOrder
-            });
+            const el = document.getElementById(`list-${cat}`);
+            if(el) {
+                new Sortable(el, {
+                    group: 'sharedLinks', animation: 150, handle: '.drag-handle', onEnd: saveOrder
+                });
+            }
         });
     }
 
@@ -220,20 +219,18 @@
         links.forEach((link, index) => {
             const listDiv = document.getElementById(`list-${link.cat}`);
             if (!listDiv) return;
-            const styleCat = configCouleurs[link.cat];
             const item = document.createElement('div');
             item.className = 'link-item';
             item.setAttribute('data-id', link.id || Date.now() + index);
+            const catClass = `name-${link.cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}`;
             item.innerHTML = `
                 <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
                 <div class="link-info" onclick="window.open('${link.url}', '_blank')">
-                    <span class="link-name ${styleCat.text}">${link.name}</span>
+                    <span class="link-name ${catClass}">${link.name}</span>
                     <span class="link-url">${link.url}</span>
                 </div>
                 <div class="btn-del" onclick="event.stopPropagation(); deleteLink(${link.id})">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </div>`;
             listDiv.appendChild(item);
         });
@@ -254,7 +251,7 @@
     }
 
     function deleteLink(id) {
-        if(confirm("Supprimer ?")) {
+        if(confirm("Supprimer ce lien ?")) {
             links = links.filter(l => l.id !== id);
             localStorage.setItem('eduLinksList', JSON.stringify(links));
             render();
@@ -262,16 +259,11 @@
     }
 
     function exportData() {
-        const contenu = JSON.stringify(links, null, 2);
-        if (navigator.share) {
-            navigator.share({ title: 'liens.txt', text: contenu });
-        } else {
-            const blob = new Blob([contenu], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `liens.txt`;
-            a.click();
-        }
+        const blob = new Blob([JSON.stringify(links, null, 2)], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `liens_sauvegarde.txt`;
+        a.click();
     }
 
     document.getElementById('importFile').addEventListener('change', (e) => {
@@ -281,12 +273,12 @@
                 links = JSON.parse(ev.target.result);
                 localStorage.setItem('eduLinksList', JSON.stringify(links));
                 render();
-            } catch(err) { alert("Erreur de fichier."); }
+            } catch(err) { alert("Erreur : format de fichier invalide."); }
         };
         reader.readAsText(e.target.files[0]);
     });
 
-    function resetLinks() { if(confirm("Tout effacer ?")) { links = []; localStorage.setItem('eduLinksList', JSON.stringify(links)); render(); } }
+    function resetLinks() { if(confirm("Effacer tout ?")) { links = []; localStorage.setItem('eduLinksList', JSON.stringify(links)); render(); } }
 
     window.onload = () => { appliquerTheme(); render(); initSortables(); };
 </script>

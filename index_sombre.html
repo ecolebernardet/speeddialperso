@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Outils pour les profs d'école</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: black; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-card { 
+            position: relative;
+            transition: transform 0.1s; 
+            border-radius: 12% 0 12% 0; 
+            border-width: 2px;
+            overflow: hidden;
+            background-color: #333333; 
+            border-color: #666666;
+        }
+        .menu-card:active { transform: scale(0.96); }
+        
+        .drag-handle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 2px);
+            gap: 3px;
+            opacity: 0.2;
+            cursor: grab;
+            z-index: 30;
+            padding: 4px;
+        }
+        .drag-handle span {
+            width: 2px;
+            height: 2px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+
+        .icon-bg {
+            background-color: black;
+            border: 0px solid #444;
+            box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .sortable-ghost { opacity: 0.1; }
+
+        /* Styles Liste Élèves */
+        .student-tag {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .tag-m { color: #60a5fa; }
+        .tag-f { color: #f472b6; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4 text-white">
+  
+    <div class="w-full max-w-[320px]">
+        <header class="flex items-center justify-between mb-8 px-1">
+            <h1 class="text-white text-xl font-bold tracking-tight">Outils pour les profs</h1>
+            <a href="parametres_sombre.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-neutral-900 border border-neutral-800 text-xl">⚙️</a>
+        </header>
+
+        <nav id="grid-menu" class="grid grid-cols-2 gap-4 mb-6">
+            <div data-id="inscr" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="inscriptions_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">📝</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Inscriptions</h2>
+                    <h3 class="text-gray-400 text-[9px]">Enregistrement des élèves</h3>
+                </a>
+            </div>
+
+            <div data-id="liens" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="liens_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">🔗</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Liens</h2>
+                    <h3 class="text-gray-400 text-[9px]">Bibliothèque de liens</h3>
+                </a>
+            </div>
+
+            <div data-id="h108" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="108heures_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">⏲️</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">108 heures</h2>
+                    <h3 class="text-gray-400 text-[9px]">Suivi des réunions</h3>
+                </a>
+            </div>
+
+            <div data-id="memos" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="memos_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">📒</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Mémos</h2>
+                    <h3 class="text-gray-400 text-[9px]">Pense-bêtes</h3>
+                </a>
+            </div>
+
+            <div data-id="tirage" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="tirage_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">🎲</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Tirage</h2>
+                    <h3 class="text-gray-400 text-[9px]">Prénom au hasard</h3>
+                </a>
+            </div>
+
+            <div data-id="equipes" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="equipes_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">👥</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Équipes</h2>
+                    <h3 class="text-gray-400 text-[9px]">Groupes mixtes</h3>
+                </a>
+            </div>
+
+            <div data-id="obs" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="observations_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">✏️</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Observations</h2>
+                    <h3 class="text-gray-400 text-[9px]">Infos élèves</h3>
+                </a>
+            </div>
+
+            <div data-id="compt" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="compteur_sombre.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1">
+                        <span class="text-2xl">🚥</span>
+                    </div>
+                    <h2 class="font-bold text-[12px] mt-1 tracking-wide">Compteur</h2>
+                    <h3 class="text-gray-400 text-[9px]">Suivi du comportement</h3>
+                </a>
+            </div>
+        </nav>
+
+        <div id="listeContainer" class="pb-20"></div>
+    </div>
+
+<script>
+    const defaultColors = {
+        inscr: 'lime', h108: 'orange', liens: 'indigo', tirage: 'yellow', 
+        equipes: 'rose', memos: 'purple', obs: 'green', compt: 'sky'
+    };
+
+    const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || defaultColors;
+
+    document.querySelectorAll('.menu-card').forEach(el => {
+        const id = el.getAttribute('data-id');
+        const colorName = prefs[id] || 'indigo';
+        const title = el.querySelector('h2');
+        if (title) title.classList.add(`text-${colorName}-400`);
+    });
+
+    const gridMenu = document.getElementById('grid-menu');
+    const savedOrder = JSON.parse(localStorage.getItem('menu_order'));
+    if (savedOrder) {
+        savedOrder.forEach(id => {
+            const tile = document.querySelector(`[data-id="${id}"]`);
+            if (tile) gridMenu.appendChild(tile);
+        });
+    }
+
+    new Sortable(gridMenu, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function() {
+            const order = Array.from(gridMenu.children).map(child => child.getAttribute('data-id'));
+            localStorage.setItem('menu_order', JSON.stringify(order));
+        }
+    });
+
+    function renderSummary() {
+        const container = document.getElementById('listeContainer');
+        const rawData = JSON.parse(localStorage.getItem('maListeEleves')) || [];
+        if (rawData.length === 0) return;
+        const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+        const groupes = {};
+        rawData.forEach(el => {
+            const niv = el.niveau.toUpperCase();
+            if (!groupes[niv]) groupes[niv] = [];
+            groupes[niv].push(el);
+        });
+        const html = Object.keys(groupes).sort().map(niv => {
+            const couleurNiveau = paletteNiveaux[niv] || '#666';
+            const eleves = groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).map(el => {
+                const genreClass = el.sexe.toLowerCase().startsWith('f') ? 'tag-f' : 'tag-m';
+                return `<span class="student-tag ${genreClass}">${el.identite.split(' ')[0]}</span>`;
+            }).join('');
+            return `
+                <div class="mb-6 text-center">
+                    <div class="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style="color: ${couleurNiveau}">${niv} (${groupes[niv].length})</div>
+                    <div class="flex flex-wrap justify-center gap-2">${eleves}</div>
+                </div>`;
+        }).join('');
+        container.innerHTML = `<div class="w-full border-t border-zinc-800 pt-8 mt-4"><h4 class="text-center text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-8">Ma Classe</h4>${html}</div>`;
+    }
+    renderSummary();
+</script>
+</body>
+</html>

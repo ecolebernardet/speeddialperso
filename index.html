@@ -22,7 +22,6 @@
         }
         .menu-card:active { transform: scale(0.98); }
         
-        /* Poignée à 9 points fins en gris */
         .drag-handle {
             position: absolute;
             top: 8px;
@@ -30,7 +29,7 @@
             display: grid;
             grid-template-columns: repeat(3, 2px);
             gap: 3px;
-            opacity: 0.3; /* Gris discret */
+            opacity: 0.3;
             cursor: grab;
             z-index: 30;
             padding: 4px;
@@ -38,15 +37,14 @@
         .drag-handle span {
             width: 2px;
             height: 2px;
-            background-color: #000; /* Retour au noir avec opacité pour l'effet gris */
+            background-color: #000;
             border-radius: 50%;
         }
         .drag-handle:active { cursor: grabbing; opacity: 0.8; }
-
         .sortable-ghost { opacity: 0.1; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4">
+<body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4 text-white">
   
     <div class="w-full max-w-[320px]">
         <header class="flex items-center justify-between mb-6 px-1">
