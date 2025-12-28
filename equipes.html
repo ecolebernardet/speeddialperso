@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Générateur Équilibre Absolu</title>
+    <title>Générateur d'Équipes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        :root { --primary: #ff637e; --bg: #000000; --text: #ffffff; --card-bg: #1a1a1a; --blue-light: #40c4ff; --pink: #ff80ab; }
         
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #eee; margin: 0; padding: 10px; min-height: 100vh; }
         
-        .section-title { font-size: 10px; color: #555; margin: 15px 0 5px 0; font-weight: 900; letter-spacing: 1px; text-align: center; text-transform: uppercase; }
+        .section-title { font-size: 10px; color: #555; margin: 15px 0 8px 0; font-weight: 900; letter-spacing: 1px; text-align: center; text-transform: uppercase; }
         
         #attendance-container { width: 100%; max-width: 600px; margin: 0 auto; }
         
@@ -38,36 +37,53 @@
         .bg-f { background: #fce7f3; color: #831843; } 
         .bg-m { background: #dbeafe; color: #1e3a8a; } 
         
-        .absent { background: #2a2a2a !important; color: #777777 !important; text-decoration: line-through; opacity: 0.7; transform: scale(0.9); border-color: #333; }
+        .absent { background: #2a2a2a !important; color: #777777 !important; text-decoration: line-through; opacity: 0.5; transform: scale(0.9); }
         
-        .num-btn { background: #222; color: #fff; border: 1px solid #444; width: 34px; height: 34px; border-radius: 50%; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .num-btn { background: #1a1a1a; color: #fff; border: 1px solid #333; width: 34px; height: 34px; border-radius: 50%; font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 12px; }
         
-        .generate-btn { width: 100%; max-width: 300px; color: white; padding: 14px; font-size: 10px; font-weight: 900; border-radius: 50px; text-transform: uppercase; margin: 20px 0; border: none; cursor: pointer; }
+        .generate-btn { 
+            width: 100%; 
+            max-width: 300px; 
+            background-color: #666;
+            color: white; 
+            padding: 14px; 
+            font-size: 11px; 
+            font-weight: 900; 
+            border-radius: 50px; 
+            text-transform: uppercase; 
+            margin: 20px 0; 
+            border: none; 
+            cursor: pointer; 
+            transition: transform 0.1s;
+        }
+        .generate-btn:active { transform: scale(0.95); }
         
         .grid-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; margin: 0 auto; }
-        .team-card { border-radius: 1.2rem; padding: 12px; background: var(--card-bg); border: 1px solid #333; }
-        .team-header { border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 4px; }
+        .team-card { border-radius: 1.2rem; padding: 12px; background: #111; border: 1px solid #2a2a2a; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .team-header { border-bottom: 1px solid #2a2a2a; margin-bottom: 8px; padding-bottom: 4px; }
         .team-title { font-weight: 900; font-size: 0.65rem; color: #fff; text-transform: uppercase; }
-        .team-stats { font-size: 0.45rem; color: #aaa; display: block; line-height: 1.4; }
+        .team-stats { font-size: 0.45rem; color: #666; display: block; line-height: 1.4; }
         
-        .tag { font-size: 0.45rem; font-weight: 900; margin-right: 5px; padding: 2px 4px; border-radius: 3px; color: #000; min-width: 25px; text-align: center; }
+        .tag { font-size: 0.45rem; font-weight: 900; margin-right: 5px; padding: 2px 4px; border-radius: 3px; color: #000; }
         
-        .name-f { color: var(--pink); } 
-        .name-g { color: var(--blue-light); }
+        .name-f { color: #ff80ab; } 
+        .name-g { color: #40c4ff; }
         
         .bottom-nav { width: 100%; max-width: 400px; margin: 20px 0 40px 0; }
         .btn-nav { font-weight: 800; padding: 12px; border-radius: 50px; font-size: 10px; text-align: center; cursor: pointer; width: 100%; border: none; }
+        
+        #btn-retour { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s ease; }
     </style>
 </head>
 <body class="flex flex-col items-center">
 
     <div class="w-full max-w-md flex items-center justify-between py-4 mb-2 px-2">
-        <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+        <a href="index.html" id="btn-retour">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
             </svg>
         </a>
-        <h1 id="mainTitle" class="font-black text-lg tracking-normal uppercase">Générer des équipes</h1>
+        <h1 id="mainTitle" class="font-black text-lg tracking-widest uppercase text-white">Générer des équipes</h1>
         <div class="w-10"></div> 
     </div>
 
@@ -81,7 +97,7 @@
     <div id="results" class="grid-teams"></div>
 
     <div class="bottom-nav">
-        <button onclick="resetTeams()" class="btn-nav bg-red-500 text-rose-100">Effacer les équipes</button>
+        <button onclick="resetTeams()" class="btn-nav bg-red-950 text-red-400 border border-red-900/50">⚠️ effacer les équipes</button>
     </div>
 
 <script>
@@ -93,7 +109,7 @@
         'rose': '#f43f5e', 'gray': '#6b7280'
     };
 
-    const couleursDecidees = {
+    const couleursDecideesGlobal = {
         "CP": "#ec4899", "CE1": "#3b82f6", "CE2": "#eab308", 
         "CM1": "#ef4444", "CM2": "#22c55e", "AUTRE": "#a855f7"
     };
@@ -106,35 +122,13 @@
         const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
         const couleurNom = themePrefs.equipes || 'pink';
         const couleurHex = mapCouleurs[couleurNom] || '#ec4899';
-        const title = document.getElementById('mainTitle');
-        const genBtn = document.getElementById('main-generate-btn');
         const btnRetour = document.getElementById('btn-retour');
-        
-        if(title) title.style.color = couleurHex;
         if(btnRetour) btnRetour.style.backgroundColor = couleurHex;
-        if(genBtn) {
-            genBtn.style.backgroundColor = couleurHex;
-            genBtn.style.color = ['yellow', 'lime', 'amber', 'cyan'].includes(couleurNom) ? 'black' : 'white';
-        }
-    }
-
-    // Nouvelle fonction pour gérer les doublons de prénoms
-    function getDisplayName(eleve, allStudents) {
-        const parts = eleve.identite.trim().split(" ");
-        const prenom = parts[0];
-        const nom = parts.slice(1).join(" ");
-        
-        // On vérifie s'il existe un autre élève avec le même prénom (insensible à la casse)
-        const aUnDoublon = allStudents.some(s => 
-            s.id !== eleve.id && 
-            s.identite.trim().split(" ")[0].toLowerCase() === prenom.toLowerCase()
-        );
-
-        return aUnDoublon && nom ? `${prenom} ${nom.charAt(0)}.` : prenom;
+        document.documentElement.style.setProperty('--theme-color', couleurHex);
+        selectNum(selectedNumTeams);
     }
 
     function init() {
-        appliquerTheme();
         const sel = document.getElementById('selector');
         sel.innerHTML = '';
         for(let i=2; i<=8; i++) {
@@ -145,7 +139,7 @@
             btn.onclick = () => selectNum(i);
             sel.appendChild(btn);
         }
-        selectNum(selectedNumTeams);
+        appliquerTheme();
         renderAttendance();
         const saved = localStorage.getItem('savedTeams');
         if (saved) renderTeams(JSON.parse(saved));
@@ -153,17 +147,34 @@
 
     function selectNum(n) {
         selectedNumTeams = n;
-        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
-        const activeColor = mapCouleurs[themePrefs.equipes || 'pink'] || '#ec4899';
         document.querySelectorAll('.num-btn').forEach(b => {
-            b.style.backgroundColor = "#222";
-            b.style.borderColor = "#444";
+            b.style.backgroundColor = "#1a1a1a";
+            b.style.borderColor = "#333";
+            b.style.color = "#fff";
         });
         const activeBtn = document.getElementById('btn-' + n);
         if (activeBtn) {
-            activeBtn.style.backgroundColor = activeColor;
-            activeBtn.style.borderColor = activeColor;
+            activeBtn.style.backgroundColor = "#fff";
+            activeBtn.style.borderColor = "#888";
+            activeBtn.style.color = "black";
         }
+    }
+
+    // Nouvelle fonction pour obtenir le nom d'affichage (Prénom + Initiale si doublon)
+    function getDisplayName(student, allList) {
+        const parts = student.identite.split(" ");
+        const firstName = parts[0];
+        const lastName = parts.slice(1).join(" ");
+        
+        const isDuplicate = allList.some(s => 
+            s.id !== student.id && 
+            s.identite.split(" ")[0].toLowerCase() === firstName.toLowerCase()
+        );
+
+        if (isDuplicate && lastName) {
+            return `${firstName} ${lastName.charAt(0)}.`;
+        }
+        return firstName;
     }
 
     function renderAttendance() {
@@ -188,16 +199,14 @@
 
         niveauxTries.forEach(niv => {
             const levelSection = document.createElement('div');
-            const couleurNiveau = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursDecidees[niv] || '#555';
+            const couleurNiveau = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursDecideesGlobal[niv] || '#555';
             levelSection.innerHTML = `<div class="level-label" style="color: ${couleurNiveau} !important;">${niv}</div>`;
             const grid = document.createElement('div');
             grid.className = "attendance-grid";
-
             groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(s => {
                 const isAbs = absents.has(String(s.id));
                 const div = document.createElement('div');
                 div.className = `student-item bg-${s.sexe.toLowerCase().startsWith('f') ? 'f' : 'm'} ${isAbs ? 'absent' : ''}`;
-                // Utilisation de la nouvelle fonction pour le nom
                 div.innerText = getDisplayName(s, ALL_STUDENTS);
                 div.onclick = () => {
                     const sid = String(s.id);
@@ -214,12 +223,11 @@
     }
 
     const getStats = (team) => {
-        const stats = { f: 0, total: team.length };
-        Object.keys(couleursDecidees).forEach(n => stats[n.toLowerCase()] = 0);
+        const stats = { f: 0, total: team.length, counts: {} };
         team.forEach(s => {
-            if(s.sexe.toLowerCase().startsWith('f')) stats.f++;
+            if (s.sexe.toLowerCase().startsWith('f')) stats.f++;
             const niv = s.niveau.toUpperCase();
-            if(stats[niv.toLowerCase()] !== undefined) stats[niv.toLowerCase()]++;
+            stats.counts[niv] = (stats.counts[niv] || 0) + 1;
         });
         return stats;
     };
@@ -227,78 +235,38 @@
     function generateAndFix() {
         let presents = ALL_STUDENTS.filter(s => !absents.has(String(s.id)));
         if (presents.length < selectedNumTeams) return alert("Effectif insuffisant.");
-
         let teams = Array.from({ length: selectedNumTeams }, () => []);
         presents.sort(() => Math.random() - 0.5);
         presents.forEach((s, idx) => teams[idx % selectedNumTeams].push(s));
-
-        let improved = true;
-        let count = 0;
-        while(improved && count < 100) {
-            improved = false; count++;
-            for(let i=0; i < teams.length; i++) {
-                for(let j=0; j < teams.length; j++) {
-                    if(i === j) continue;
-                    let sI = getStats(teams[i]), sJ = getStats(teams[j]);
-                    let needsFix = Math.abs(sI.f - sJ.f) > 1;
-                    if(!needsFix) {
-                        for(let n in couleursDecidees) {
-                            if(Math.abs(sI[n.toLowerCase()] - sJ[n.toLowerCase()]) > 1) { needsFix = true; break; }
-                        }
-                    }
-
-                    if (needsFix) {
-                        for(let x=0; x<teams[i].length; x++) {
-                            for(let y=0; y<teams[j].length; y++) {
-                                let oldDiff = Math.abs(sI.f-sJ.f);
-                                for(let n in couleursDecidees) oldDiff += Math.abs(sI[n.toLowerCase()] - sJ[n.toLowerCase()]);
-                                
-                                [teams[i][x], teams[j][y]] = [teams[j][y], teams[i][x]];
-                                let nI = getStats(teams[i]), nJ = getStats(teams[j]);
-                                let newDiff = Math.abs(nI.f-nJ.f);
-                                for(let n in couleursDecidees) newDiff += Math.abs(nI[n.toLowerCase()] - nJ[n.toLowerCase()]);
-
-                                if(newDiff < oldDiff) { improved = true; break; }
-                                else { [teams[i][x], teams[j][y]] = [teams[j][y], teams[i][x]]; }
-                            }
-                            if(improved) break;
-                        }
-                    }
-                }
-            }
-        }
         localStorage.setItem('savedTeams', JSON.stringify(teams));
         renderTeams(teams);
     }
 
     function renderTeams(teams) {
         const results = document.getElementById('results');
-        const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
         results.innerHTML = '';
-        
+        const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+
         teams.forEach((team, i) => {
             team.sort((a, b) => a.niveau.localeCompare(b.niveau));
             const s = getStats(team);
             
-            let statsText = `${s.f}F/${s.total-s.f}G`;
-            Object.keys(couleursDecidees).forEach(n => {
-                if(s[n.toLowerCase()] > 0) statsText += ` • ${s[n.toLowerCase()]}${n}`;
-            });
+            const detailNiveaux = Object.entries(s.counts)
+                .map(([niv, count]) => `${count}${niv}`)
+                .join('/');
 
             let html = `<div class="team-card">
                 <div class="team-header">
                     <span class="team-title">Équipe ${i+1}</span>
-                    <span class="team-stats">${statsText}</span>
+                    <span class="team-stats">${s.f}F/${s.total-s.f}G • ${detailNiveaux}</span>
                 </div>`;
-            
+                
             team.forEach(eleve => {
                 const niv = eleve.niveau.toUpperCase();
-                // Utilisation de la nouvelle fonction pour le nom
+                const tagColor = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursDecideesGlobal[niv] || '#555';
                 const displayName = getDisplayName(eleve, ALL_STUDENTS);
-                const bgTag = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursDecidees[niv] || '#555';
-                
                 html += `<div class="flex items-center mb-1 text-[0.65rem] font-bold">
-                    <span class="tag" style="background-color: ${bgTag}">${niv}</span>
+                    <span class="tag" style="background:${tagColor}">${niv}</span>
                     <span class="${eleve.sexe.toLowerCase().startsWith('f')?'name-f':'name-g'}">${displayName}</span>
                 </div>`;
             });
