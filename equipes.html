@@ -77,7 +77,7 @@
     <p class="section-title">Nombre d'équipes</p>
     <div class="flex gap-2 mb-4" id="selector"></div>
 
-    <button id="main-generate-btn" class="generate-btn" onclick="generateAndFix()">Générer les équipes</button>
+    <button id="main-generate-btn" class="generate-btn !text-white" onclick="generateAndFix()">Générer les équipes</button>
 
     <div id="results" class="grid-teams"></div>
 
@@ -115,7 +115,7 @@
         if(btnRetour) btnRetour.style.backgroundColor = couleurHex;
         if(genBtn) {
             genBtn.style.backgroundColor = couleurHex;
-            genBtn.style.color = ['yellow', 'lime', 'amber', 'cyan'].includes(couleurNom) ? 'black' : 'white';
+            // On retire la logique de couleur de texte dynamique pour laisser le CSS forcer le blanc
         }
     }
 
