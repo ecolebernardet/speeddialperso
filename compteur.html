@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Compteur Élèves</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        :root { --primary: #0ea5e9; --bg-dark: #000000; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); margin: 0; padding: 10px; min-height: 100vh; color: white; touch-action: manipulation; }
+
+        .header-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 500px; margin: 10px auto 20px auto; padding: 0 10px; }
+        #btn-retour { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s ease; }
+        #mainTitle { text-align: center; font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; margin: 0; flex-grow: 1; text-transform: uppercase;}
+
+        .columns-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 600px; margin: 0 auto; align-items: start; }
+        .level-group { margin-bottom: 1px; }
+
+        .student-item { 
+            background-color: #ffffff; 
+            padding: 6px 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer; 
+            border-radius: 50px; 
+            margin-bottom: 3px; 
+            transition: all 0.1s;
+        }
+
+        .text-girl { color: #db2777; } 
+        .text-boy { color: #2563eb; } 
+        
+        .student-name { font-weight: 800; font-size: 0.65rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .counter-badge {
+            width: 1.1rem; height: 1.1rem; min-width: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-weight: 800; font-size: 0.75rem;
+            transition: all 0.1s ease; border: 1px solid rgba(0,0,0,0.1);
+            background-color: #f3f4f6; color: #9ca3af;
+        }
+        .count-1 { color: #000; background-color: #aee386; }
+        .count-2 { color: #000; background-color: #fcff21; }
+        .count-3 { color: #000; background-color: #ffc20a; }
+        .count-4 { color: #000; background-color: #ff7328; }
+        .count-5 { 
+            color: #fff; background-color: #dc2626; 
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.6);
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        .no-select { -webkit-tap-highlight-color: transparent; user-select: none; }
+
+        .bottom-nav { width: 100%; max-width: 350px; margin: 25px auto 0 auto; padding-bottom: 60px; }
+        .nav-btn { font-weight: 800; border-radius: 50px; font-size: 9px; padding: 12px; border: none; width: 100%; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <header class="header-nav">
+        <a href="index.html" id="btn-retour">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 id="mainTitle">Suivi du comportement</h1>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <div id="mainContent" class="columns-container"></div>
+
+    <div class="bottom-nav">
+        <button id="reset-button" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
+            ⚠️ RàZ des données
+        </button>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'studentCounterState';
+        const mapCouleurs = {
+            'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+            'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+            'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+            'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+            'rose': '#f43f5e', 'gray': '#6b7280'
+        };
+
+        const couleursDecidees = {
+            "CP": "#ec4899", "CE1": "#3b82f6", "CE2": "#eab308", 
+            "CM1": "#ef4444", "CM2": "#22c55e", "AUTRE": "#a855f7"
+        };
+
+        function appliquerTheme() {
+            const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+            const nomCouleur = prefs['compt'] || 'sky';
+            const couleurHexa = mapCouleurs[nomCouleur] || '#0ea5e9';
+            const titre = document.getElementById('mainTitle');
+            const btnRetour = document.getElementById('btn-retour');
+            if (titre) titre.style.color = couleurHexa;
+            if (btnRetour) btnRetour.style.backgroundColor = couleurHexa;
+        }
+
+        function formatNameDisplay(fullName) {
+            const parts = fullName.trim().split(' ');
+            if (parts.length === 0) return "";
+            const first = parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase();
+            const last = parts.slice(1).join(' ').toUpperCase();
+            return (first + ' ' + last).trim();
+        }
+
+        const saveState = () => {
+            const state = {};
+            document.querySelectorAll('.counter-val').forEach(span => {
+                state[span.getAttribute('data-name')] = span.innerText;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        };
+
+        const loadState = () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const state = JSON.parse(saved);
+                Object.keys(state).forEach(name => {
+                    const span = document.querySelector(`[data-name="${name}"]`);
+                    if (span) {
+                        const val = parseInt(state[name]);
+                        span.innerText = val;
+                        updateBadgeStyle(span.parentElement, val);
+                    }
+                });
+            }
+        };
+
+        function updateBadgeStyle(badge, val) {
+            badge.classList.remove('count-1', 'count-2', 'count-3', 'count-4', 'count-5');
+            if (val > 0) {
+                const safeVal = Math.min(val, 5);
+                badge.classList.add(`count-${safeVal}`);
+            }
+        }
+
+        function createRow(name, sexe) {
+            const card = document.createElement('div');
+            const genderClass = (sexe && sexe.toLowerCase() === 'f') ? 'text-girl' : 'text-boy';
+            card.className = `student-item no-select ${genderClass}`;
+
+            const nameEl = document.createElement('span');
+            nameEl.className = 'student-name';
+            nameEl.innerText = formatNameDisplay(name);
+
+            const badge = document.createElement('div');
+            badge.className = 'counter-badge';
+            
+            const counterSpan = document.createElement('span');
+            counterSpan.setAttribute('data-name', name);
+            counterSpan.className = 'counter-val';
+            counterSpan.innerText = '0';
+            
+            badge.appendChild(counterSpan);
+
+            let clickCount = 0;
+            let clickTimer;
+
+            card.addEventListener('click', () => {
+                clickCount++;
+                if (clickCount === 1) {
+                    clickTimer = setTimeout(() => {
+                        if (clickCount === 1) {
+                            let val = parseInt(counterSpan.innerText);
+                            if (val < 5) {
+                                val++;
+                                counterSpan.innerText = val;
+                                updateBadgeStyle(badge, val);
+                                saveState();
+                            }
+                        }
+                        clickCount = 0;
+                    }, 250);
+                } else if (clickCount === 2) {
+                    clearTimeout(clickTimer);
+                    let val = parseInt(counterSpan.innerText);
+                    if (val > 0) {
+                        val--;
+                        counterSpan.innerText = val;
+                        updateBadgeStyle(badge, val);
+                        saveState();
+                    }
+                    clickCount = 0;
+                }
+            });
+
+            card.oncontextmenu = (e) => { e.preventDefault(); };
+            card.appendChild(nameEl);
+            card.appendChild(badge);
+            return card;
+        }
+
+        function initApp() {
+            appliquerTheme();
+            const mainContent = document.getElementById('mainContent');
+            const allStudents = JSON.parse(localStorage.getItem('maListeEleves')) || [];
+            const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+            
+            const groupes = {};
+            allStudents.forEach(s => {
+                const niv = s.niveau.trim().toUpperCase();
+                if (!groupes[niv]) groupes[niv] = [];
+                groupes[niv].push(s);
+            });
+
+            const ordreNiveaux = ["CP", "CE1", "CE2", "CM1", "CM2", "AUTRE"];
+            const niveauxTries = Object.keys(groupes).sort((a, b) => {
+                let indexA = ordreNiveaux.indexOf(a);
+                let indexB = ordreNiveaux.indexOf(b);
+                if (indexA === -1) indexA = 99;
+                if (indexB === -1) indexB = 99;
+                return indexA - indexB;
+            });
+
+            niveauxTries.forEach(niv => {
+                const levelWrapper = document.createElement('div');
+                levelWrapper.className = "level-group";
+                const couleurNiveau = paletteNiveaux[niv] || couleursDecidees[niv] || '#ffffff';
+                
+                // MODIFICATION ICI : Retrait des classes border-b et padding
+                levelWrapper.innerHTML = `<h2 style="color:${couleurNiveau}" class="text-[11px] font-black uppercase tracking-widest text-center mb-2">${niv}</h2>`;
+                
+                const list = document.createElement('div');
+                groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(student => {
+                    list.appendChild(createRow(student.identite, student.sexe));
+                });
+
+                levelWrapper.appendChild(list);
+                mainContent.appendChild(levelWrapper);
+            });
+
+            loadState();
+        }
+
+        document.getElementById('reset-button').onclick = () => {
+            if(confirm("Remettre tous les compteurs à zéro ?")) {
+                document.querySelectorAll('.counter-val').forEach(span => {
+                    span.innerText = '0';
+                    updateBadgeStyle(span.parentElement, 0);
+                });
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        };
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>

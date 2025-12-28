@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Outils pour les profs d'école</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: black; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-card { 
+            position: relative;
+            transition: transform 0.1s; 
+            border-radius: 30% 0% 30% 0%; 
+            border-width: 2px;
+            overflow: hidden;
+        }
+        .menu-card:active { transform: scale(0.98); }
+        
+        /* Poignée à 9 points fins en gris */
+        .drag-handle {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, 2px);
+            gap: 3px;
+            opacity: 0.3; /* Gris discret */
+            cursor: grab;
+            z-index: 30;
+            padding: 4px;
+        }
+        .drag-handle span {
+            width: 2px;
+            height: 2px;
+            background-color: #000; /* Retour au noir avec opacité pour l'effet gris */
+            border-radius: 50%;
+        }
+        .drag-handle:active { cursor: grabbing; opacity: 0.8; }
+
+        .sortable-ghost { opacity: 0.1; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start min-h-screen p-2 pt-4">
+  
+    <div class="w-full max-w-[320px]">
+        <header class="flex items-center justify-between mb-6 px-1">
+            <h1 class="text-white text-xl font-bold tracking-tight">Outils profs d'école</h1>
+            <a href="parametres.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-900 border border-zinc-700 text-xl">⚙️</a>
+        </header>
+
+        <nav id="grid-menu" class="grid grid-cols-2 gap-4 mb-6">
+            <div data-id="inscr" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="inscriptions.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">📝</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Inscriptions</h2>
+                    <h3 class="text-gray-600 text-[9px]">Gestion de la liste</h3>
+                </a>
+            </div>
+
+            <div data-id="liens" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="liens.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">🔗</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Liens</h2>
+                    <h3 class="text-gray-600 text-[9px]">Bibliothèque</h3>
+                </a>
+            </div>
+
+            <div data-id="h108" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="108heures.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">⏲️</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">108 heures</h2>
+                    <h3 class="text-gray-600 text-[9px]">Suivi des réunions</h3>
+                </a>
+            </div>
+
+            <div data-id="memos" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="memos.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">📒</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Mémos</h2>
+                    <h3 class="text-gray-600 text-[9px]">Pense-bête</h3>
+                </a>
+            </div>
+
+            <div data-id="tirage" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="tirage.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">🎲</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Tirage</h2>
+                    <h3 class="text-gray-600 text-[9px]">Prénom au hasard</h3>
+                </a>
+            </div>
+
+            <div data-id="equipes" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="equipes.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">👥</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Équipes</h2>
+                    <h3 class="text-gray-600 text-[9px]">Groupes mixtes</h3>
+                </a>
+            </div>
+
+            <div data-id="obs" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="observations.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">✏️</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Observations</h2>
+                    <h3 class="text-gray-600 text-[9px]">Infos élèves</h3>
+                </a>
+            </div>
+
+            <div data-id="compt" class="menu-card flex flex-col items-center justify-center text-center p-3 pt-5">
+                <div class="drag-handle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <a href="compteur.html" class="w-full h-full flex flex-col items-center">
+                    <div class="icon-bg w-12 h-12 flex items-center justify-center rounded-full mb-1 border shadow-inner">
+                        <span class="text-2xl">🚥</span>
+                    </div>
+                    <h2 class="text-black font-semibold text-[11px]">Compteur</h2>
+                    <h3 class="text-gray-600 text-[9px]">Comportement</h3>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+<script>
+    const defaultColors = {
+        inscr: 'lime', h108: 'orange', liens: 'indigo', tirage: 'yellow', 
+        equipes: 'rose', memos: 'purple', obs: 'green', compt: 'sky'
+    };
+
+    const prefs = JSON.parse(localStorage.getItem('theme_tuiles')) || defaultColors;
+
+    document.querySelectorAll('.menu-card').forEach(el => {
+        const id = el.getAttribute('data-id');
+        const colorName = prefs[id] || 'gray';
+        el.classList.add(`bg-${colorName}-200`, `border-${colorName}-900`);
+        const iconCircle = el.querySelector('.icon-bg');
+        if (iconCircle) iconCircle.classList.add(`bg-${colorName}-500`, `border-${colorName}-900`);
+    });
+
+    const gridMenu = document.getElementById('grid-menu');
+    const savedOrder = JSON.parse(localStorage.getItem('menu_order'));
+    if (savedOrder) {
+        savedOrder.forEach(id => {
+            const tile = document.querySelector(`[data-id="${id}"]`);
+            if (tile) gridMenu.appendChild(tile);
+        });
+    }
+
+    new Sortable(gridMenu, {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function() {
+            const order = Array.from(gridMenu.children).map(child => child.getAttribute('data-id'));
+            localStorage.setItem('menu_order', JSON.stringify(order));
+        }
+    });
+</script>
+</body>
+</html>

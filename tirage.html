@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tirage au Sort</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #eee;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .light-card { background: #e5e7eb; color: #111827; border-radius: 1.5rem; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; margin-top: 20px; margin-bottom: 20px; }
+        
+        .result-box { 
+            background: #ffffff; 
+            border: 1px solid #9ca3af; 
+            color: #111827; 
+            border-radius: 0.75rem; 
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .bg-m { background: #dbeafe; color: #1e3a8a; } 
+        .bg-f { background: #fce7f3; color: #831843; } 
+        
+        .level-title { 
+            text-align: center; 
+            font-size: 11px; 
+            font-weight: 900; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            display: block;
+            width: 100%;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .student-item {
+            padding: 8px 2px;
+            border-radius: 10px;
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .drawn {
+            background: #2a2a2a !important; 
+            color: #777777 !important; 
+            text-decoration: line-through;
+            opacity: 0.7;
+            transform: scale(0.9);
+            border-color: #333;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            border-radius: 50px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .main-btn:active { transform: scale(0.95); }
+
+        .btn-nav { width: 100%; max-width: 400px; font-weight: 800; padding: 14px; border-radius: 50px; font-size: 10px; cursor: pointer; border: none; }
+        .stats { margin-top: 8px; font-size: 0.6rem; color: #666; text-transform: uppercase; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-md flex items-center justify-between py-4 mb-2 px-2">
+        <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 id="page-title" class="font-black text-lg tracking-normal uppercase">
+            Tirage au sort
+        </h1>
+        <div class="w-10"></div> 
+    </div>
+
+    <div class="w-full max-w-md" id="listeContainer"></div>
+
+    <div class="light-card">
+        <div class="result-box" id="result-display">PRÊT</div>
+        <button id="draw-btn" class="main-btn" onclick="drawName()">Tirer un prénom</button>
+        <div class="stats" id="counter">--</div>
+    </div>
+
+    <div class="max-w-md mx-auto flex justify-center mt-4 mb-10 w-full px-4">
+        <button class="btn-nav bg-red-500 text-white" onclick="resetDrawing()">⚠️ RàZ du tirage</button>
+    </div>
+
+    <script>
+        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+        const couleurTirage = themePrefs.tirage || 'pink';
+
+        function appliquerTheme() {
+            const title = document.getElementById('page-title');
+            const btn = document.getElementById('draw-btn');
+            const display = document.getElementById('result-display');
+            const btnRetour = document.getElementById('btn-retour');
+
+            title.classList.add(`text-${couleurTirage}-500`);
+
+            if (btnRetour) {
+                btnRetour.classList.add(`bg-${couleurTirage}-600`, `border`, `border-${couleurTirage}-400/30`);
+            }
+
+            btn.classList.add(`bg-${couleurTirage}-600`);
+            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurTirage)) {
+                btn.classList.add('text-black');
+            } else {
+                btn.classList.add('text-white');
+            }
+
+            display.classList.add(`text-${couleurTirage}-600`);
+        }
+
+        function formatName(fullName) {
+            const parts = fullName.trim().split(" ");
+            return parts[0];
+        }
+
+        let rawData = JSON.parse(localStorage.getItem('maListeEleves')) || [];
+        let remaining = JSON.parse(localStorage.getItem('remainingStudents')) || rawData.map(el => el.id);
+
+        function saveState() {
+            localStorage.setItem('remainingStudents', JSON.stringify(remaining));
+        }
+
+        function renderList() {
+            const container = document.getElementById('listeContainer');
+            container.innerHTML = "";
+
+            // Couleurs demandées
+            const couleursFixes = {
+                "CP": "#ec4899",    // Rose
+                "CE1": "#3b82f6",   // Bleu
+                "CE2": "#eab308",   // Jaune
+                "CM1": "#ef4444",   // Rouge
+                "CM2": "#22c55e",   // Vert
+                "AUTRE": "#a855f7"  // Violet
+            };
+
+            const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+            const ordreNiveaux = ["CP", "CE1", "CE2", "CM1", "CM2", "AUTRE"];
+
+            const groupes = {};
+            rawData.forEach(el => {
+                const niv = el.niveau.trim().toUpperCase();
+                if (!groupes[niv]) groupes[niv] = [];
+                groupes[niv].push(el);
+            });
+
+            const niveauxTries = Object.keys(groupes).sort((a, b) => {
+                let indexA = ordreNiveaux.indexOf(a);
+                let indexB = ordreNiveaux.indexOf(b);
+                if (indexA === -1) indexA = 99;
+                if (indexB === -1) indexB = 99;
+                return indexA - indexB;
+            });
+
+            niveauxTries.forEach(niv => {
+                const levelSection = document.createElement('div');
+                
+                // On donne la priorité à la palette du localStorage, sinon aux couleurs fixes demandées
+                const couleurNiveau = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursFixes[niv] || '#9ca3af';
+
+                levelSection.innerHTML = `<div class="level-title" style="color: ${couleurNiveau} !important;">${niv}</div>`;
+                
+                const grid = document.createElement('div');
+                grid.className = "student-grid";
+
+                groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(el => {
+                    const isDrawn = !remaining.includes(el.id);
+                    const item = document.createElement('div');
+                    item.className = `student-item bg-${el.sexe.toLowerCase().startsWith('f') ? 'f' : 'm'} ${isDrawn ? 'drawn' : ''}`;
+                    item.innerText = formatName(el.identite);
+                    item.onclick = () => toggleStudent(el.id);
+                    grid.appendChild(item);
+                });
+                
+                levelSection.appendChild(grid);
+                container.appendChild(levelSection);
+            });
+
+            const total = rawData.length;
+            const restants = remaining.length;
+            document.getElementById('counter').innerText = `${restants} restant${restants > 1 ? 's' : ''} / ${total}`;
+            
+            const btn = document.getElementById('draw-btn');
+            if (restants === 0) {
+                btn.disabled = true;
+                btn.innerText = "Session terminée";
+                btn.style.opacity = "0.5";
+            } else {
+                btn.disabled = false;
+                btn.innerText = "Tirer un prénom";
+                btn.style.opacity = "1";
+            }
+        }
+
+        function toggleStudent(id) {
+            if (remaining.includes(id)) {
+                remaining = remaining.filter(item => item !== id);
+            } else {
+                remaining.push(id);
+            }
+            saveState();
+            renderList();
+        }
+
+        function drawName() {
+            if (remaining.length === 0) return;
+            const display = document.getElementById('result-display');
+            const btn = document.getElementById('draw-btn');
+            btn.disabled = true;
+
+            display.style.color = "#9ca3af";
+
+            let iterations = 0;
+            const interval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * remaining.length);
+                const tempStudent = rawData.find(s => s.id === remaining[randomIndex]);
+                display.innerText = formatName(tempStudent.identite);
+                iterations++;
+
+                if (iterations > 12) {
+                    clearInterval(interval);
+                    const finalIndex = Math.floor(Math.random() * remaining.length);
+                    const winnerId = remaining.splice(finalIndex, 1)[0];
+                    const winner = rawData.find(s => s.id === winnerId);
+                    
+                    display.innerText = formatName(winner.identite);
+                    display.style.color = ""; 
+                    
+                    saveState();
+                    renderList();
+                    btn.disabled = (remaining.length === 0);
+                }
+            }, 60);
+        }
+
+        function resetDrawing() {
+            if(confirm("Remettre tous les élèves en jeu ?")) {
+                remaining = rawData.map(el => el.id);
+                localStorage.removeItem('remainingStudents');
+                document.getElementById('result-display').innerText = "PRÊT";
+                renderList();
+            }
+        }
+
+        window.onload = () => {
+            appliquerTheme();
+            renderList();
+        };
+    </script>
+</body>
+</html>

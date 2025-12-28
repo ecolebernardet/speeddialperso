@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>108 heures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background: #000; color: #eee; padding: 10px; margin: 0; }
+        
+        .light-card { background: #e5e7eb; color: #111827; border-radius: 1.5rem; }
+
+        .card-input { display: none; }
+        .card-label {
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            background: #d1d5db; border: 2px solid #9ca3af; color: #374151;
+            padding: 6px 4px; border-radius: 0.75rem; cursor: pointer;
+            font-size: 0.6rem; font-weight: 800;
+            transition: all 0.2s; height: 100%;
+        }
+        .card-input:checked + .card-label { background: #111827; border-color: #111827; color: #fff; transform: scale(0.98); }
+
+        .level-column { 
+            background: #f3f4f6; color: #111827; border-radius: 1.2rem; 
+            padding: 10px; border: 1px solid #ffffff; 
+            display: flex; flex-direction: column; 
+            justify-content: flex-start;
+            align-self: start;
+        }
+        
+        .progress-container { width: 100%; background: #d1d5db; height: 7px; border-radius: 10px; margin: 6px 0; overflow: hidden; }
+        .progress-bar { height: 100%; transition: width 0.5s ease-in-out; }
+
+        .reunion-item { 
+            background: #ffffff; padding: 6px 8px; border-radius: 0.4rem; 
+            margin-bottom: 4px; border-left-width: 3px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer;
+        }
+
+        .quota-badge {
+            font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 50px;
+            background: #111827; color: #fff; white-space: nowrap;
+        }
+
+        .bottom-nav { width: 100%; max-width: 500px; margin: 20px auto 0; padding-bottom: 40px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-group { display: flex; gap: 8px; width: 100%; }
+        .nav-btn { font-weight: 900; border-radius: 50px; font-size: 9px; padding: 12px; border: none; flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
+
+        .input-field { background: #ffffff; border: 1px solid #9ca3af; color: #111827; border-radius: 0.75rem; padding: 8px; outline: none; font-size: 0.75rem; font-weight: 600; }
+        
+        .toggle-list-btn {
+            width: 100%; font-size: 7px; font-weight: 800; text-transform: uppercase;
+            color: #4b5563; padding: 5px; border: 1px dashed #9ca3af;
+            border-radius: 0.5rem; margin-top: 4px;
+        }
+
+        .hidden-list { display: none; margin-top: 8px; }
+
+        #pdf-template { display: none; color: #000; background: #fff; padding: 20px; font-family: Arial, sans-serif; }
+        .pdf-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
+        .pdf-table th { background: #f0f0f0; text-align: left; padding: 8px; font-size: 11px; border: 1px solid #ddd; }
+        .pdf-table td { padding: 8px; font-size: 10px; border: 1px solid #ddd; vertical-align: top; }
+        .pdf-cat-header { background: #e2e8f0; font-weight: bold; font-size: 12px; padding: 10px; margin-top: 20px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="capture-area" class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between py-4 mb-2">
+            <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 class="text-lg font-black uppercase tracking-normal text-white">108 heures</h1>
+            <div class="w-10"></div> 
+        </div>
+        
+        <div id="form-container" class="max-w-md mx-auto light-card p-4 mb-6 shadow-2xl">
+            <form id="heuresForm" class="flex flex-col gap-3">
+                <div class="grid grid-cols-4 gap-1.5">
+                    <label><input type="radio" name="cat" value="APC" class="card-input" checked><div class="card-label">APC</div></label>
+                    <label><input type="radio" name="cat" value="PEDAGO" class="card-input"><div class="card-label">Réunions</div></label>
+                    <label><input type="radio" name="cat" value="FORM" class="card-input"><div class="card-label">Formation</div></label>
+                    <label><input type="radio" name="cat" value="CONSEIL" class="card-input"><div class="card-label">Conseil</div></label>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="date" id="dateReu" class="input-field" required>
+                    <div class="flex items-center gap-1 bg-white border border-gray-400 rounded-lg px-2 h-full">
+                        <input type="number" id="h" class="bg-transparent w-full outline-none text-center text-gray-900 font-bold text-xs" min="0" value="1">
+                        <span class="text-gray-400 font-bold">:</span>
+                        <input type="number" id="m" class="bg-transparent w-full outline-none text-center text-gray-900 font-bold text-xs" min="0" max="59" value="0">
+                    </div>
+                </div>
+                <input type="text" id="comm" placeholder="Commentaire..." class="input-field">
+                <button type="submit" id="submitBtn" class="bg-indigo-600 text-white font-black py-2 rounded-full uppercase text-[10px] active:scale-95 transition-transform">Enregistrer</button>
+            </form>
+        </div>
+
+        <div id="globalStats" class="max-w-md mx-auto light-card p-3 mb-5 shadow-xl">
+            <div class="flex justify-between items-end mb-1">
+                <span class="text-[10px] font-black uppercase tracking-widest text-indigo-700">Total Annuel (108h)</span>
+                <span id="globalReste" class="text-[10px] font-black text-indigo-900"></span>
+            </div>
+            <div class="progress-container !h-3">
+                <div id="globalBar" class="progress-bar"></div>
+            </div>
+            <div class="flex justify-between text-[9px] font-bold text-gray-600 uppercase">
+                <span id="globalFait">Fait : 0h</span>
+                <span id="globalPercent" class="text-indigo-700">0%</span>
+            </div>
+        </div>
+
+        <div id="displayContainer" class="grid grid-cols-2 gap-3 items-start"></div>
+
+        <footer class="bottom-nav">
+            <div class="nav-group">
+                <label class="nav-btn bg-neutral-800 text-white cursor-pointer text-center flex-1">
+                    👇importer .txt👇
+                    <input type="file" id="importFile" class="hidden" accept=".txt">
+                </label>
+                <button onclick="exportData()" class="nav-btn bg-neutral-800 text-white flex-1">👆exporter .txt👆</button>
+                <button onclick="exportPDF()" class="nav-btn bg-neutral-800 text-white flex-1">📄 PDF</button>
+            </div>
+            <button onclick="resetHeures()" class="nav-btn bg-red-500 text-red-50 shadow-lg active:scale-95">
+                ⚠️ effacer le suivi des 108 heures
+            </button>
+        </footer>
+    </div>
+
+    <div id="pdf-template"></div>
+
+    <script>
+    const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+    const couleurH108 = themePrefs.h108 || 'orange'; 
+
+    const QUOTAS = { "APC": 36 * 60, "PEDAGO": 48 * 60, "FORM": 18 * 60, "CONSEIL": 6 * 60 };
+    const TOTAL_ANNUEL = 108 * 60;
+    const LABELS = { "APC": "APC (36h)", "PEDAGO": "Réunions (48h)", "FORM": "Formation (18h)", "CONSEIL": "Conseils d'école (6h)" };
+
+    let reunions = JSON.parse(localStorage.getItem('mesHeuresReu')) || [];
+    let editId = null; 
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const titrePage = document.querySelector('h1');
+        if (titrePage) titrePage.classList.add(`text-${couleurH108}-500`);
+        const btnRetour = document.getElementById('btn-retour');
+        if (btnRetour) btnRetour.classList.add(`bg-${couleurH108}-600`, `border`, `border-${couleurH108}-400/30`);
+        updateSubmitButtonStyle();
+    });
+
+    function updateSubmitButtonStyle() {
+        const btnEnregistrer = document.getElementById('submitBtn');
+        if (btnEnregistrer) {
+            btnEnregistrer.className = `bg-${couleurH108}-600 text-white font-black py-2 rounded-full uppercase text-[10px] active:scale-95 transition-transform w-full`;
+            if(['yellow', 'lime', 'amber', 'cyan'].includes(couleurH108)) btnEnregistrer.classList.replace('text-white', 'text-black');
+        }
+    }
+
+    document.getElementById('heuresForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const cat = document.querySelector('input[name="cat"]:checked').value;
+        const date = document.getElementById('dateReu').value;
+        const h = parseInt(document.getElementById('h').value) || 0;
+        const m = parseInt(document.getElementById('m').value) || 0;
+        const comm = document.getElementById('comm').value.trim();
+        const minutes = (h * 60) + m;
+
+        if (editId) {
+            reunions = reunions.map(r => r.id === editId ? { ...r, cat, date, minutes, comm } : r);
+            editId = null;
+            document.getElementById('submitBtn').innerText = "Enregistrer";
+        } else {
+            reunions.push({ id: Date.now(), cat, date, minutes, comm });
+        }
+        sauvegarder(); e.target.reset(); initDate();
+    });
+
+    function chargerPourEdition(id) {
+        const r = reunions.find(item => item.id === id);
+        if (!r) return;
+        document.querySelector(`input[name="cat"][value="${r.cat}"]`).checked = true;
+        document.getElementById('dateReu').value = r.date;
+        document.getElementById('h').value = Math.floor(r.minutes / 60);
+        document.getElementById('m').value = r.minutes % 60;
+        document.getElementById('comm').value = r.comm;
+        editId = id;
+        document.getElementById('submitBtn').innerText = "Mettre à jour";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function formatDuree(totalMinutes) {
+        const h = Math.floor(Math.abs(totalMinutes) / 60);
+        const m = Math.abs(totalMinutes) % 60;
+        return `${totalMinutes < 0 ? "-" : ""}${h}h${m > 0 ? m.toString().padStart(2, '0') : ''}`;
+    }
+
+    function sauvegarder() { localStorage.setItem('mesHeuresReu', JSON.stringify(reunions)); render(); }
+    function supprimer(id) { if(confirm("Supprimer ?")) { reunions = reunions.filter(r => r.id !== id); sauvegarder(); } }
+    function resetHeures() { if(confirm("Effacer tout ?")) { reunions = []; sauvegarder(); initDate(); } }
+
+    function toggleListe(catKey) {
+        const listDiv = document.getElementById(`list-${catKey}`);
+        const btn = document.getElementById(`btn-${catKey}`);
+        const isHidden = listDiv.style.display === "none" || listDiv.style.display === "";
+        listDiv.style.display = isHidden ? "block" : "none";
+        btn.innerText = isHidden ? "Masquer" : "Détails";
+    }
+
+    function render() {
+        const container = document.getElementById('displayContainer');
+        container.innerHTML = "";
+        let minutesGlobales = 0;
+
+        Object.keys(QUOTAS).forEach(catKey => {
+            const reuCat = reunions.filter(r => r.cat === catKey);
+            const fait = reuCat.reduce((sum, r) => sum + r.minutes, 0);
+            minutesGlobales += fait;
+            
+            const col = document.createElement('div');
+            col.className = "level-column";
+            col.innerHTML = `
+                <div class="mb-1">
+                    <div class="flex justify-between items-center mb-1"><h3 class="text-[9px] font-black uppercase text-gray-900">${LABELS[catKey]}</h3></div>
+                    <div class="progress-container"><div class="progress-bar bg-${couleurH108}-600" style="width: ${Math.min((fait/QUOTAS[catKey])*100, 100)}%"></div></div>
+                    <p class="text-[8px] font-extrabold text-gray-500 uppercase">${formatDuree(fait)} / ${formatDuree(QUOTAS[catKey])}</p>
+                </div>
+                <button id="btn-${catKey}" onclick="toggleListe('${catKey}')" class="toggle-list-btn">Détails</button>
+                <div id="list-${catKey}" class="hidden-list"></div>`;
+
+            const listDiv = col.querySelector(`#list-${catKey}`);
+            reuCat.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(r => {
+                const dateFmt = new Date(r.date).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+                listDiv.innerHTML += `
+                    <div class="reunion-item border-${couleurH108}-600" onclick="chargerPourEdition(${r.id})">
+                        <div class="flex-1 overflow-hidden">
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-[10px] text-${couleurH108}-700">${dateFmt}</span>
+                                <span class="font-bold text-[10px] text-gray-900">${formatDuree(r.minutes)}</span>
+                            </div>
+                            ${r.comm ? `<div class="text-gray-400 italic text-[9px] truncate mt-0.5 leading-tight">${r.comm}</div>` : ''}
+                        </div>
+                        <button onclick="supprimer(${r.id}); event.stopPropagation();" class="text-gray-300 ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>`;
+            });
+            container.appendChild(col);
+        });
+
+        const globalReste = TOTAL_ANNUEL - minutesGlobales;
+        const globalPercent = Math.min((minutesGlobales / TOTAL_ANNUEL) * 100, 100);
+        document.getElementById('globalFait').innerText = `Fait : ${formatDuree(minutesGlobales)}`;
+        document.getElementById('globalReste').innerText = `Reste : ${formatDuree(globalReste)}`;
+        document.getElementById('globalPercent').innerText = `${Math.round(globalPercent)}%`;
+        document.getElementById('globalBar').style.width = globalPercent + "%";
+        document.getElementById('globalBar').className = `progress-bar bg-${couleurH108}-600`;
+    }
+
+    function exportData() {
+        const blob = new Blob([JSON.stringify(reunions, null, 2)], { type: 'text/plain' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `108heures.txt`; a.click();
+    }
+
+    function exportPDF() {
+        const pdfContainer = document.getElementById('pdf-template');
+        pdfContainer.style.display = 'block';
+        
+        let htmlContent = `<div class="pdf-header"><h1 style="margin:0; font-size:22px;">BILAN DES 108 HEURES</h1><p style="margin:5px 0; font-size:12px; color:#555;">Généré le ${new Date().toLocaleDateString('fr-FR')}</p></div>`;
+
+        Object.keys(QUOTAS).forEach(catKey => {
+            const reuCat = reunions.filter(r => r.cat === catKey).sort((a,b) => new Date(a.date) - new Date(b.date));
+            const totalCat = reuCat.reduce((sum, r) => sum + r.minutes, 0);
+            htmlContent += `
+                <div class="pdf-cat-header">${LABELS[catKey]} (Total : ${formatDuree(totalCat)} / ${formatDuree(QUOTAS[catKey])})</div>
+                <table class="pdf-table">
+                    <thead><tr><th style="width: 20%;">Date</th><th style="width: 15%;">Durée</th><th style="width: 65%;">Commentaire</th></tr></thead>
+                    <tbody>${reuCat.length === 0 ? '<tr><td colspan="3" style="text-align:center; color:#999;">Aucune donnée</td></tr>' : 
+                        reuCat.map(r => `<tr><td>${new Date(r.date).toLocaleDateString('fr-FR')}</td><td><b>${formatDuree(r.minutes)}</b></td><td>${r.comm || ""}</td></tr>`).join('')}
+                    </tbody>
+                </table>`;
+        });
+
+        const totalGlobal = reunions.reduce((sum, r) => sum + r.minutes, 0);
+        htmlContent += `<div style="margin-top:30px; border-top:2px solid #000; padding-top:10px; text-align:right;"><span style="font-size:16px; font-weight:bold;">TOTAL GÉNÉRAL : ${formatDuree(totalGlobal)} / 108h</span></div>`;
+
+        pdfContainer.innerHTML = htmlContent;
+        const opt = { margin: 15, filename: 'Bilan_108_Heures.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+        html2pdf().set(opt).from(pdfContainer).save().then(() => { pdfContainer.style.display = 'none'; });
+    }
+
+    document.getElementById('importFile').addEventListener('change', function(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try { const data = JSON.parse(e.target.result); if (Array.isArray(data)) { reunions = data; sauvegarder(); } } catch (err) { alert("Erreur."); }
+        };
+        reader.readAsText(file);
+    });
+
+    function initDate() { document.getElementById('dateReu').value = new Date().toISOString().split('T')[0]; document.getElementById('h').value = 1; document.getElementById('m').value = 0; }
+    initDate(); render();
+    </script>
+</body>
+</html>

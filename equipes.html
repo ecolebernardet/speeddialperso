@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Générateur Équilibre Absolu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        :root { --primary: #ff637e; --bg: #000000; --text: #ffffff; --card-bg: #1a1a1a; --blue-light: #40c4ff; --pink: #ff80ab; }
+        
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; min-height: 100vh; }
+        
+        .section-title { font-size: 10px; color: #555; margin: 15px 0 5px 0; font-weight: 900; letter-spacing: 1px; text-align: center; text-transform: uppercase; }
+        
+        #attendance-container { width: 100%; max-width: 600px; margin: 0 auto; }
+        
+        .attendance-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 20px; width: 100%; }
+        
+        .level-label { text-align: center; font-size: 10px; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .student-item { 
+            padding: 8px 2px; 
+            border-radius: 10px; 
+            font-size: 0.55rem; 
+            font-weight: 800; 
+            text-align: center; 
+            cursor: pointer; 
+            border: 1px solid transparent; 
+            transition: all 0.2s; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .bg-f { background: #fce7f3; color: #831843; } 
+        .bg-m { background: #dbeafe; color: #1e3a8a; } 
+        
+        .absent { background: #2a2a2a !important; color: #777777 !important; text-decoration: line-through; opacity: 0.7; transform: scale(0.9); border-color: #333; }
+        
+        .num-btn { background: #222; color: #fff; border: 1px solid #444; width: 34px; height: 34px; border-radius: 50%; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        
+        .generate-btn { width: 100%; max-width: 300px; color: white; padding: 14px; font-size: 10px; font-weight: 900; border-radius: 50px; text-transform: uppercase; margin: 20px 0; border: none; cursor: pointer; }
+        
+        .grid-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; margin: 0 auto; }
+        .team-card { border-radius: 1.2rem; padding: 12px; background: var(--card-bg); border: 1px solid #333; }
+        .team-header { border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 4px; }
+        .team-title { font-weight: 900; font-size: 0.65rem; color: #fff; text-transform: uppercase; }
+        .team-stats { font-size: 0.45rem; color: #aaa; display: block; line-height: 1.4; }
+        
+        .tag { font-size: 0.45rem; font-weight: 900; margin-right: 5px; padding: 2px 4px; border-radius: 3px; color: #000; min-width: 25px; text-align: center; }
+        
+        .name-f { color: var(--pink); } 
+        .name-g { color: var(--blue-light); }
+        
+        .bottom-nav { width: 100%; max-width: 400px; margin: 20px 0 40px 0; }
+        .btn-nav { font-weight: 800; padding: 12px; border-radius: 50px; font-size: 10px; text-align: center; cursor: pointer; width: 100%; border: none; }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+
+    <div class="w-full max-w-md flex items-center justify-between py-4 mb-2 px-2">
+        <a href="index.html" id="btn-retour" class="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h1 id="mainTitle" class="font-black text-lg tracking-normal uppercase">Générer des équipes</h1>
+        <div class="w-10"></div> 
+    </div>
+
+    <div id="attendance-container"></div>
+
+    <p class="section-title">Nombre d'équipes</p>
+    <div class="flex gap-2 mb-4" id="selector"></div>
+
+    <button id="main-generate-btn" class="generate-btn" onclick="generateAndFix()">Générer les équipes</button>
+
+    <div id="results" class="grid-teams"></div>
+
+    <div class="bottom-nav">
+        <button onclick="resetTeams()" class="btn-nav bg-red-500 text-rose-100">Effacer les équipes</button>
+    </div>
+
+<script>
+    const mapCouleurs = {
+        'red': '#ef4444', 'orange': '#f97316', 'amber': '#f59e0b', 'yellow': '#eab308',
+        'lime': '#84cc16', 'green': '#22c55e', 'emerald': '#10b981', 'teal': '#14b8a6',
+        'cyan': '#06b6d4', 'sky': '#0ea5e9', 'blue': '#3b82f6', 'indigo': '#6366f1',
+        'violet': '#8b5cf6', 'purple': '#a855f7', 'fuchsia': '#d946ef', 'pink': '#ec4899',
+        'rose': '#f43f5e', 'gray': '#6b7280'
+    };
+
+    const couleursDecidees = {
+        "CP": "#ec4899", "CE1": "#3b82f6", "CE2": "#eab308", 
+        "CM1": "#ef4444", "CM2": "#22c55e", "AUTRE": "#a855f7"
+    };
+
+    let selectedNumTeams = 4;
+    let ALL_STUDENTS = JSON.parse(localStorage.getItem('maListeEleves')) || [];
+    let absents = new Set(JSON.parse(localStorage.getItem('absents_session_equipes')) || []);
+
+    function appliquerTheme() {
+        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+        const couleurNom = themePrefs.equipes || 'pink';
+        const couleurHex = mapCouleurs[couleurNom] || '#ec4899';
+        const title = document.getElementById('mainTitle');
+        const genBtn = document.getElementById('main-generate-btn');
+        const btnRetour = document.getElementById('btn-retour');
+        
+        if(title) title.style.color = couleurHex;
+        if(btnRetour) btnRetour.style.backgroundColor = couleurHex;
+        if(genBtn) {
+            genBtn.style.backgroundColor = couleurHex;
+            genBtn.style.color = ['yellow', 'lime', 'amber', 'cyan'].includes(couleurNom) ? 'black' : 'white';
+        }
+    }
+
+    // Nouvelle fonction pour gérer les doublons de prénoms
+    function getDisplayName(eleve, allStudents) {
+        const parts = eleve.identite.trim().split(" ");
+        const prenom = parts[0];
+        const nom = parts.slice(1).join(" ");
+        
+        // On vérifie s'il existe un autre élève avec le même prénom (insensible à la casse)
+        const aUnDoublon = allStudents.some(s => 
+            s.id !== eleve.id && 
+            s.identite.trim().split(" ")[0].toLowerCase() === prenom.toLowerCase()
+        );
+
+        return aUnDoublon && nom ? `${prenom} ${nom.charAt(0)}.` : prenom;
+    }
+
+    function init() {
+        appliquerTheme();
+        const sel = document.getElementById('selector');
+        sel.innerHTML = '';
+        for(let i=2; i<=8; i++) {
+            const btn = document.createElement('button');
+            btn.className = `num-btn`;
+            btn.id = `btn-${i}`;
+            btn.innerText = i;
+            btn.onclick = () => selectNum(i);
+            sel.appendChild(btn);
+        }
+        selectNum(selectedNumTeams);
+        renderAttendance();
+        const saved = localStorage.getItem('savedTeams');
+        if (saved) renderTeams(JSON.parse(saved));
+    }
+
+    function selectNum(n) {
+        selectedNumTeams = n;
+        const themePrefs = JSON.parse(localStorage.getItem('theme_tuiles')) || {};
+        const activeColor = mapCouleurs[themePrefs.equipes || 'pink'] || '#ec4899';
+        document.querySelectorAll('.num-btn').forEach(b => {
+            b.style.backgroundColor = "#222";
+            b.style.borderColor = "#444";
+        });
+        const activeBtn = document.getElementById('btn-' + n);
+        if (activeBtn) {
+            activeBtn.style.backgroundColor = activeColor;
+            activeBtn.style.borderColor = activeColor;
+        }
+    }
+
+    function renderAttendance() {
+        const container = document.getElementById('attendance-container');
+        container.innerHTML = '';
+        const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+        const groupes = {};
+        ALL_STUDENTS.forEach(s => {
+            const niv = s.niveau.trim().toUpperCase();
+            if (!groupes[niv]) groupes[niv] = [];
+            groupes[niv].push(s);
+        });
+
+        const ordreNiveaux = ["CP", "CE1", "CE2", "CM1", "CM2", "AUTRE"];
+        const niveauxTries = Object.keys(groupes).sort((a, b) => {
+            let indexA = ordreNiveaux.indexOf(a);
+            let indexB = ordreNiveaux.indexOf(b);
+            if (indexA === -1) indexA = 99;
+            if (indexB === -1) indexB = 99;
+            return indexA - indexB;
+        });
+
+        niveauxTries.forEach(niv => {
+            const levelSection = document.createElement('div');
+            const couleurNiveau = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursDecidees[niv] || '#555';
+            levelSection.innerHTML = `<div class="level-label" style="color: ${couleurNiveau} !important;">${niv}</div>`;
+            const grid = document.createElement('div');
+            grid.className = "attendance-grid";
+
+            groupes[niv].sort((a,b) => a.identite.localeCompare(b.identite)).forEach(s => {
+                const isAbs = absents.has(String(s.id));
+                const div = document.createElement('div');
+                div.className = `student-item bg-${s.sexe.toLowerCase().startsWith('f') ? 'f' : 'm'} ${isAbs ? 'absent' : ''}`;
+                // Utilisation de la nouvelle fonction pour le nom
+                div.innerText = getDisplayName(s, ALL_STUDENTS);
+                div.onclick = () => {
+                    const sid = String(s.id);
+                    if(absents.has(sid)) absents.delete(sid);
+                    else absents.add(sid);
+                    localStorage.setItem('absents_session_equipes', JSON.stringify(Array.from(absents)));
+                    renderAttendance();
+                };
+                grid.appendChild(div);
+            });
+            levelSection.appendChild(grid);
+            container.appendChild(levelSection);
+        });
+    }
+
+    const getStats = (team) => {
+        const stats = { f: 0, total: team.length };
+        Object.keys(couleursDecidees).forEach(n => stats[n.toLowerCase()] = 0);
+        team.forEach(s => {
+            if(s.sexe.toLowerCase().startsWith('f')) stats.f++;
+            const niv = s.niveau.toUpperCase();
+            if(stats[niv.toLowerCase()] !== undefined) stats[niv.toLowerCase()]++;
+        });
+        return stats;
+    };
+
+    function generateAndFix() {
+        let presents = ALL_STUDENTS.filter(s => !absents.has(String(s.id)));
+        if (presents.length < selectedNumTeams) return alert("Effectif insuffisant.");
+
+        let teams = Array.from({ length: selectedNumTeams }, () => []);
+        presents.sort(() => Math.random() - 0.5);
+        presents.forEach((s, idx) => teams[idx % selectedNumTeams].push(s));
+
+        let improved = true;
+        let count = 0;
+        while(improved && count < 100) {
+            improved = false; count++;
+            for(let i=0; i < teams.length; i++) {
+                for(let j=0; j < teams.length; j++) {
+                    if(i === j) continue;
+                    let sI = getStats(teams[i]), sJ = getStats(teams[j]);
+                    let needsFix = Math.abs(sI.f - sJ.f) > 1;
+                    if(!needsFix) {
+                        for(let n in couleursDecidees) {
+                            if(Math.abs(sI[n.toLowerCase()] - sJ[n.toLowerCase()]) > 1) { needsFix = true; break; }
+                        }
+                    }
+
+                    if (needsFix) {
+                        for(let x=0; x<teams[i].length; x++) {
+                            for(let y=0; y<teams[j].length; y++) {
+                                let oldDiff = Math.abs(sI.f-sJ.f);
+                                for(let n in couleursDecidees) oldDiff += Math.abs(sI[n.toLowerCase()] - sJ[n.toLowerCase()]);
+                                
+                                [teams[i][x], teams[j][y]] = [teams[j][y], teams[i][x]];
+                                let nI = getStats(teams[i]), nJ = getStats(teams[j]);
+                                let newDiff = Math.abs(nI.f-nJ.f);
+                                for(let n in couleursDecidees) newDiff += Math.abs(nI[n.toLowerCase()] - nJ[n.toLowerCase()]);
+
+                                if(newDiff < oldDiff) { improved = true; break; }
+                                else { [teams[i][x], teams[j][y]] = [teams[j][y], teams[i][x]]; }
+                            }
+                            if(improved) break;
+                        }
+                    }
+                }
+            }
+        }
+        localStorage.setItem('savedTeams', JSON.stringify(teams));
+        renderTeams(teams);
+    }
+
+    function renderTeams(teams) {
+        const results = document.getElementById('results');
+        const paletteNiveaux = JSON.parse(localStorage.getItem('palette_niveaux')) || {};
+        results.innerHTML = '';
+        
+        teams.forEach((team, i) => {
+            team.sort((a, b) => a.niveau.localeCompare(b.niveau));
+            const s = getStats(team);
+            
+            let statsText = `${s.f}F/${s.total-s.f}G`;
+            Object.keys(couleursDecidees).forEach(n => {
+                if(s[n.toLowerCase()] > 0) statsText += ` • ${s[n.toLowerCase()]}${n}`;
+            });
+
+            let html = `<div class="team-card">
+                <div class="team-header">
+                    <span class="team-title">Équipe ${i+1}</span>
+                    <span class="team-stats">${statsText}</span>
+                </div>`;
+            
+            team.forEach(eleve => {
+                const niv = eleve.niveau.toUpperCase();
+                // Utilisation de la nouvelle fonction pour le nom
+                const displayName = getDisplayName(eleve, ALL_STUDENTS);
+                const bgTag = paletteNiveaux[niv] || paletteNiveaux[niv.toLowerCase()] || couleursDecidees[niv] || '#555';
+                
+                html += `<div class="flex items-center mb-1 text-[0.65rem] font-bold">
+                    <span class="tag" style="background-color: ${bgTag}">${niv}</span>
+                    <span class="${eleve.sexe.toLowerCase().startsWith('f')?'name-f':'name-g'}">${displayName}</span>
+                </div>`;
+            });
+            results.innerHTML += html + `</div>`;
+        });
+    }
+
+    function resetTeams() {
+        if(confirm("Effacer les résultats ?")) {
+            localStorage.removeItem('savedTeams');
+            document.getElementById('results').innerHTML = '';
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
