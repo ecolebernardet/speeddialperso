@@ -95,7 +95,7 @@
                     <div class="color-dot" style="background-color: #ffffff;" data-color="#ffffff"></div>
                     <div class="color-dot" style="background-color: #4b5563;" data-color="#4b5563"></div>
                 </div>
-                <button id="addBtn" onclick="addNote()" class="px-5 py-2.5 rounded-full text-[10px] font-black uppercase shadow-md active:scale-90 transition-transform">Ajouter</button>
+                <button id="addBtn" onclick="addNote()" class="px-5 py-2.5 rounded-full text-[10px] font-black uppercase shadow-md active:scale-90 transition-transform !text-white">Ajouter</button>
             </div>
         </div>
 
@@ -155,7 +155,11 @@
                 btnRetour.style.color = isLight ? 'black' : 'white';
             }
             [btn, modalBtn].forEach(el => {
-                if(el) { el.style.backgroundColor = hex; el.style.color = isLight ? 'black' : 'white'; }
+                if(el) { 
+                    el.style.backgroundColor = hex; 
+                    // Seul le bouton modal suit encore la logique de contraste automatique
+                    if (el.id !== 'addBtn') el.style.color = isLight ? 'black' : 'white'; 
+                }
             });
         }
 
