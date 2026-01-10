@@ -15,15 +15,72 @@
     body { margin: 0; background-color: var(--bg-main); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; transition: background-color 0.3s; }
 
     /* --- STRUCTURE --- */
-    .hamburger { z-index: 1001; cursor: pointer; background: var(--sidebar-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
-    .hamburger div { width: 25px; height: 3px; background-color: var(--accent); border-radius: 2px; }
     
-    .sidebar { position: fixed; top: 0; left: -320px; width: 300px; height: 100%; background: var(--sidebar-bg); box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 1000; padding: 60px 25px; box-sizing: border-box; overflow-y: auto; }
+    
+    .sidebar { display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
+    box-sizing: border-box; position: fixed; top: 0; left: -320px; width: 300px; background: var(--sidebar-bg); box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 1000; padding: 60px 25px; box-sizing: border-box; overflow-y: auto; }
+	.sidebar-content {
+    flex: 1; overflow-y: auto; padding-right: 10px;
+	}
+
+/* Le bouton reste fixe en bas */
+.sidebar-footer {
+    padding: 20px 0;
+	border-top: 1px solid #333; /* Petite ligne de séparation discrète */
+    flex-shrink: 0;                 /* Empêche le bouton de s'écraser */
+    display: flex;
+    justify-content: center;
+}
+
     .sidebar.open { left: 0; }
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
     .overlay.active { display: block; }
 
+/* Configuration de la sidebar pour placer le bouton en bas */
+.sidebar {
+    justify-content: space-between; /* Espace entre le contenu et le footer */
+    padding: 20px;
+    /* Tes autres propriétés existantes (position, width, etc.) */
+}
+
+.sidebar-content {
+    flex-grow: 1; /* Prend tout l'espace disponible */
+    overflow-y: auto; /* Permet de scroller si les réglages sont nombreux */
+}
+
+
+/* Ton style personnalisé appliqué au bouton */
+.menu-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text);
+    background: #222;
+    padding: 5px 20px; /* Un peu plus de padding horizontal pour le look */
+    border-radius: 20px;
+    border: 1px solid #38bdf8;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: all 0.2s ease;
+    user-select: none;
+    text-align: center;
+}
+
+.menu-text:hover {
+    color: #38bdf8;
+    background: #2a2a2a;
+    transform: scale(1.05);
+}
     /* --- GRILLE & TUILES --- */
+	#grid {
+		transition: filter 0.3s ease; /* Pour que le flou apparaisse/disparaisse doucement */
+		will-change: filter;
+	}
+
+	/* Optionnel : assombrir un peu plus le fond du dossier pour le contraste */
+	#folderOverlay {
+		background: rgba(0, 0, 0, 0.4); /* Moins opaque puisque le flou fait le travail */
+	}
+
     .grid-container { 
         display: grid; 
         grid-template-columns: repeat(var(--cols), 1fr); 
@@ -53,13 +110,28 @@
 
     .tile-label { 
         position: absolute; bottom: 0; width: 100%; 
-        background: rgba(0,0,0,0.7); padding: 5px 0; 
+        background: rgba(0,0,0,0); padding: 5px 0; 
         text-align: center; font-size: var(--font-size); 
         pointer-events: none; white-space: nowrap; 
         overflow: hidden; text-overflow: ellipsis; z-index: 0;
     }
 
     .tile.folder { background: var(--folder-tile-bg); }
+
+/* Style lorsqu'une tuile est survolée pendant un Drag */
+.tile.drag-over {
+    border: 2px solid var(--accent) !important;
+    background: rgba(56, 189, 248, 0.2) !important; /* Un bleu léger transparent */
+    transform: scale(1.05);
+    transition: transform 0.1s ease;
+    z-index: 10;
+}
+
+/* Style spécifique pour les dossiers qui vont fusionner ou recevoir */
+.tile.folder.drag-over {
+    border-color: #ffd43b !important;
+    background: rgba(255, 212, 59, 0.2) !important;
+}
 
     .folder-icon-bg { 
         position: absolute; width: 100%; height: 100%; 
@@ -70,63 +142,146 @@
     .tile.folder .folder-thumb {
         position: absolute;
         z-index: 2;
-        width: 35%; height: 35%;
+        width: 50%; height: 50%;
         object-fit: contain;
-        top: 50%; 
+        top: 45%; 
         left: 50%;
         transform: translate(-50%, -50%);
-        border-radius: 4px;
+        border-radius: 0px;
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
     /* --- RECHERCHE FOOTER --- */
-    .search-footer {
-        position: fixed;
-        bottom: 0; left: 0;
-        width: 100vw; height: 90px;
-        background: #111111;
-        backdrop-filter: blur(10px);
-        border-top: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 20px;
-        box-sizing: border-box;
-        z-index: 100;
-    }
+.search-footer {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100vw; height: 90px;
+    background: #111111;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Aligne Gauche, Milieu, Droite */
+    padding: 0 25px;
+    box-sizing: border-box;
+    z-index: 100;
+}
 
-    .search-group {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-grow: 1;
-    }
+/* Style du bloc horloge à droite */
+#footerClock {
+    text-align: right;
+    line-height: 1.2;
+    margin-left: auto; /* Force le bloc à rester à droite */
+}
 
-    .search-box {
-        display: flex;
-        align-items: center;
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid var(--border);
-        border-radius: 50px;
-        padding: 5px 15px;
-        transition: 0.3s;
-        width: 100%;
-        max-width: 350px;
-    }
+#footerTime {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--accent);
+    line-height: 1;
+}
+
+#footerDate {
+    font-size: 0.8rem;
+    color: var(--text);
+    text-transform: capitalize;
+}
+
+.footer-left {
+    min-width: 150px; /* Garde l'équilibre avec l'horloge à droite */
+    display: flex;
+    align-items: center;
+}
+
+.menu-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text);
+	background: #222;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #38bdf8;
+    cursor: pointer;
+    letter-spacing: 2px; /* Un peu d'espace entre les lettres pour le style */
+    transition: color 0.2s, transform 0.2s;
+    user-select: none;
+}
+
+.menu-text:hover {
+    color: var(--accent); /* Change de couleur au survol selon tes réglages */
+    transform: translateX(0px); /* Petit effet de mouvement vers la droite */
+}
+
+/* Bloc milieu : aligne les barres horizontalement */
+.search-group {
+    display: flex;
+    gap: 15px; /* Espace entre les 3 barres */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); /* Centre parfaitement les barres */
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #222;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #444;
+}
 
     .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
     .search-box img { width: 20px; height: 20px; margin-right: 12px; }
-    .search-box input { background: transparent; border: none; outline: none; padding: 8px 0; width: 100%; color: white; font-size: 14px; }
+	.search-box input {background: transparent; border: none; color: white; margin-left: 8px; outline: none;
+    width: 140px; /* Ajuste selon tes besoins */
+}
 
     /* --- INTERFACE DOSSIER --- */
     #folderOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(2px); display: none; z-index: 2500; align-items: center; justify-content: center; }
-    #folderPopup { background: var(--sidebar-bg); border-radius: 20px; border: 2px solid var(--accent); padding: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.5); position: relative; }
+    #folderPopup {
+		background: var(--sidebar-bg);
+		border-radius: 20px;
+		border: 2px solid var(--accent);
+		padding: 20px;
+		box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+		/* Retirez toute ligne 'animation:' ou 'transition:' ici */
+		will-change: transform, opacity; /* Optimise la fluidité */
+	}
     .folder-content { display: grid; gap: 10px; }
     .folder-toolbar { display: flex; gap: 10px; padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 15px; align-items: center; opacity: 0.3; transition: 0.3s; }
     .folder-toolbar:hover { opacity: 1; }
     .folder-toolbar label { font-size: 9px; color: var(--accent); text-transform: uppercase; }
     .folder-toolbar input { width: 45px; padding: 3px; font-size: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 3px; }
     .folder-toolbar input[type="color"] { width: 40px; height: 25px; padding: 0; cursor: pointer; }
+
+#folderPopup {
+    position: relative; /* Indispensable pour le positionnement du bouton */
+}
+
+#closeFolderBtn {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 26px;
+    height: 26px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    z-index: 3000;
+    transition: transform 0.2s ease;
+}
+
+#closeFolderBtn:hover {
+    transform: scale(1.1);
+    background: #dc2626;
+}
 
     /* --- MODALES ÉDITION --- */
     .control-group { margin-bottom: 12px; }
@@ -137,13 +292,16 @@
     .btn:hover { filter: brightness(1.1); }
     .img-suggestions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
     .suggestion-item { width: 100%; aspect-ratio: 1; object-fit: contain; cursor: pointer; background: white; border-radius: 6px; padding: 2px; }
+
+
 </style>
 </head>
 <body>
 
     <div class="overlay" id="overlay"></div>
 
-    <nav class="sidebar" id="sidebar">
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-content" style="flex-grow: 1; overflow-y: auto;">
         <h2 style="color:var(--accent); margin-top:0">Paramètres</h2>
         <div class="control-group"><label>Couleur de fond globale</label><input type="color" id="bgInput"></div>
         <div class="control-group"><label>Couleur des tuiles (Lien)</label><input type="color" id="tileColorInput"></div>
@@ -152,40 +310,54 @@
         <div class="control-group"><label>Lignes</label><input type="number" id="rowsInput" min="1"></div>
         <div class="control-group"><label>Espacement (px)</label><input type="number" id="gapInput" min="0"></div>
         <div class="control-group"><label>Taille police (px)</label><input type="number" id="fontInput" min="6"></div>
+        
         <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
-        <button class="btn" style="background:#3b82f6; margin-bottom:10px" id="btn-undo">↩ ANNULER</button>
-        <button class="btn" style="background:#8b5cf6" id="btn-export">📤 EXPORTER CONFIG</button>
-        <button class="btn" style="background:#f59e0b; margin-top:10px" id="btn-trigger-import">📥 IMPORTER CONFIG</button>
+        
+        <button class="btn" style="background:#5D9948; margin-top:20px" id="btn-export">📤 EXPORTER CONFIG (fichier.json)</button>
+        <button class="btn" style="background:#f59e0b; margin-top:20px" id="btn-trigger-import">📥 IMPORTER CONFIG  (fichier.json)</button>
+        <button class="btn" style="background:#D14747; margin-top:40px" id="btn-undo">↩ ANNULER</button>
         <input type="file" id="importFile" style="display:none">
-    </nav>
+    </div>
+
+    <div class="sidebar-footer" style="margin-top: 30px; display: flex; justify-content: center; padding-bottom: 10px;">
+        <div id="btn-close-sidebar" class="menu-text">FERMER</div>
+    </div>
+</nav>
 
     <main class="grid-container" id="grid"></main>
 
-    <footer class="search-footer" id="search-footer">
-        <div class="hamburger" id="btn-hamburger"><div></div><div></div><div></div></div>
+<footer class="search-footer" id="search-footer">
+    <div class="footer-left">
+    <div id="btn-menu" class="menu-text" onclick="toggleSidebar()">Paramètres</div>
+</div>
 
-        <div class="search-group">
-            <div class="search-box">
-                <img src="https://www.google.com/favicon.ico" alt="G">
-                <input type="text" placeholder="Google..." onkeypress="if(event.key==='Enter') window.open('https://www.google.com/search?q='+encodeURIComponent(this.value), '_blank')">
-            </div>
-            <div class="search-box">
-                <img src="https://www.gstatic.com/images/branding/product/1x/photos_96dp.png" alt="GI" style="width:16px; height:16px;">
-                <input type="text" placeholder="Google Images..." onkeypress="if(event.key==='Enter') window.open('https://www.google.com/search?tbm=isch&q='+encodeURIComponent(this.value), '_blank')">
-            </div>
-            <div class="search-box">
-                <img src="https://icons.duckduckgo.com/ip3/duckduckgo.com.ico" alt="D">
-                <input type="text" placeholder="DuckDuckGo..." onkeypress="if(event.key==='Enter') window.open('https://duckduckgo.com/?q='+encodeURIComponent(this.value), '_blank')">
-            </div>
+    <div class="search-group">
+        <div class="search-box">
+            <img src="https://www.google.com/favicon.ico" alt="G">
+            <input type="text" placeholder="Google..." onkeypress="if(event.key==='Enter') window.open('https://www.google.com/search?q='+encodeURIComponent(this.value), '_blank')">
         </div>
-        
-        <div style="width: 47px;"></div>
-    </footer>
+        <div class="search-box">
+            <img src="https://www.gstatic.com/images/branding/product/1x/photos_96dp.png" alt="GI" style="width:16px; height:16px;">
+            <input type="text" placeholder="Google Images..." onkeypress="if(event.key==='Enter') window.open('https://www.google.com/search?tbm=isch&q='+encodeURIComponent(this.value), '_blank')">
+        </div>
+        <div class="search-box">
+            <img src="https://icons.duckduckgo.com/ip3/duckduckgo.com.ico" alt="D">
+            <input type="text" placeholder="DuckDuckGo..." onkeypress="if(event.key==='Enter') window.open('https://duckduckgo.com/?q='+encodeURIComponent(this.value), '_blank')">
+        </div>
+    </div>
+    
+    <div id="footerClock">
+        <div id="footerTime"></div>
+        <div id="footerDate"></div>
+    </div>
+</footer>
 
     <div id="folderOverlay">
         <div id="folderPopup">
+            <div id="closeFolderBtn" onclick="closeFolder()">&times;</div>
+
             <div class="folder-toolbar">
-                <label>Cols</label><input type="number" id="fCols" min="1">
+                <label>Colonnes</label><input type="number" id="fCols" min="1">
                 <label>Lignes</label><input type="number" id="fRows" min="1">
                 <label>Espace</label><input type="number" id="fGap" min="0">
                 <label>Fond</label><input type="color" id="fPopBg">
