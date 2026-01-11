@@ -19,31 +19,31 @@
 /* Configuration de la sidebar pour placer le bouton en bas */
 
     .sidebar { display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
-	justify-content: space-between;
+    justify-content: space-between;
     box-sizing: border-box; position: fixed; top: 0; left: -250px; width: 250px; background: var(--sidebar-bg);
-	box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 1000; padding: 10px 25px;
-	box-sizing: border-box; overflow-y: auto; }
-	.sidebar-content {
+    box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 1000; padding: 10px 25px;
+    box-sizing: border-box; overflow-y: auto; }
+    .sidebar-content {
     flex: 1; overflow-y: auto; padding-right: 10px;
-	}
+    }
 
 /* Le bouton reste fixe en bas */
-	.sidebar-footer {
-		padding: 20px 0;
-		border-top: 1px solid #333; /* Petite ligne de séparation discrète */
-		flex-shrink: 0;                 /* Empêche le bouton de s'écraser */
-		display: flex;
-		justify-content: center;
-	}
+    .sidebar-footer {
+        padding: 20px 0;
+        border-top: 1px solid #333; /* Petite ligne de séparation discrète */
+        flex-shrink: 0;                 /* Empêche le bouton de s'écraser */
+        display: flex;
+        justify-content: center;
+    }
 
     .sidebar.open { left: 0; }
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
     .overlay.active { display: block; }
 
-	.sidebar-content {
-		flex-grow: 1; /* Prend tout l'espace disponible */
-		overflow-y: auto; /* Permet de scroller si les réglages sont nombreux */
-	}
+    .sidebar-content {
+        flex-grow: 1; /* Prend tout l'espace disponible */
+        overflow-y: auto; /* Permet de scroller si les réglages sont nombreux */
+    }
 
 
 /* Ton style personnalisé appliqué au bouton */
@@ -64,20 +64,20 @@
 
 .menu-text:hover {
     color: var(--accent);
-	box-shadow: 0px 0px 10px rgba(200,200,200,1);
-	transform: translateX(0px); /* Petit effet de mouvement vers la droite */
+    box-shadow: 0px 0px 10px rgba(200,200,200,1);
+    transform: translateX(0px); /* Petit effet de mouvement vers la droite */
 }
 
     /* --- GRILLE & TUILES --- */
-	#grid {
-		transition: filter 0.3s ease; /* Pour que le flou apparaisse/disparaisse doucement */
-		will-change: filter;
-	}
+    #grid {
+        transition: filter 0.3s ease; /* Pour que le flou apparaisse/disparaisse doucement */
+        will-change: filter;
+    }
 
-	/* Optionnel : assombrir un peu plus le fond du dossier pour le contraste */
-	#folderOverlay {
-		background: rgba(0, 0, 0, 0.4); /* Moins opaque puisque le flou fait le travail */
-	}
+    /* Optionnel : assombrir un peu plus le fond du dossier pour le contraste */
+    #folderOverlay {
+        background: rgba(0, 0, 0, 0.4); /* Moins opaque puisque le flou fait le travail */
+    }
 
     .grid-container { 
         display: grid; 
@@ -192,57 +192,57 @@
 }
 
 /* Bloc milieu : aligne les barres horizontalement */
-	.search-group {
-		display: flex;
-		gap: 15px; /* Espace entre les 3 barres */
-		position: absolute;
-		left: 50%;
-		transform: translateX(-50%); /* Centre parfaitement les barres */
-	}
+    .search-group {
+        display: flex;
+        gap: 15px; /* Espace entre les 3 barres */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%); /* Centre parfaitement les barres */
+    }
 
-	.search-box {
-		display: flex;
-		align-items: center;
-		background: #222;
-		padding: 5px 12px;
-		border-radius: 20px;
-		border: 1px solid #444;
-	}
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: #222;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #444;
+    }
 
     .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
     .search-box img { width: 20px; height: 20px; margin-right: 12px; }
-	
+    
 /* Style de base des inputs */
-	.search-box input {
-		background: transparent; 
-		border: none; 
-		color: white; 
-		margin-left: 8px; 
-		outline: none;
-		width: 150px; /* Taille compacte par défaut */
-		transition: width 0.3s ease; /* Animation fluide de l'élargissement */
-	}
+    .search-box input {
+        background: transparent; 
+        border: none; 
+        color: white; 
+        margin-left: 8px; 
+        outline: none;
+        width: 150px; /* Taille compacte par défaut */
+        transition: width 0.3s ease; /* Animation fluide de l'élargissement */
+    }
 
 /* Élargissement automatique lors du clic (focus) */
-	.search-box input:focus {
-		width: 200px; /* S'agrandit pour plus de confort */
-	}
+    .search-box input:focus {
+        width: 200px; /* S'agrandit pour plus de confort */
+    }
 
 /* Optionnel : mettre en valeur la barre active */
-	.search-box:focus-within {
-		border-color: var(--accent);
-		background: #2a2a2a;
-		box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
-	}
+    .search-box:focus-within {
+        border-color: var(--accent);
+        background: #2a2a2a;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    }
 
 /* --- INTERFACE DOSSIER --- */
     #folderOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(2px); display: none; z-index: 2500; align-items: center; justify-content: center; }
     #folderPopup { background: var(--sidebar-bg); border-radius: 20px;
-		border: 2px solid var(--accent); padding: 20px;	box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-		/* Retirez toute ligne 'animation:' ou 'transition:' ici */
-		will-change: transform, opacity; /* Optimise la fluidité */
-	}
-	
+        border: 2px solid var(--accent); padding: 20px;    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        /* Retirez toute ligne 'animation:' ou 'transition:' ici */
+        will-change: transform, opacity; /* Optimise la fluidité */
+    }
+    
     .folder-content { display: grid; gap: 10px; }
     .folder-toolbar { display: flex; gap: 10px; padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 15px; align-items: center; opacity: 0.3; transition: 0.3s; }
     .folder-toolbar:hover { opacity: 1; }
@@ -250,20 +250,20 @@
     .folder-toolbar input { width: 45px; padding: 3px; font-size: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 3px; }
     .folder-toolbar input[type="color"] { width: 40px; height: 25px; padding: 0; cursor: pointer; }
 
-	#folderPopup {
-		position: relative; /* Indispensable pour le positionnement du bouton */
-	}
+    #folderPopup {
+        position: relative; /* Indispensable pour le positionnement du bouton */
+    }
 
-	#closeFolderBtn {
-		position: absolute; top: -12px; right: -12px; width: 26px; height: 26px; background: #ef4444;
-		color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-		cursor: pointer; font-size: 18px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-		z-index: 3000; transition: transform 0.2s ease;
-	}
+    #closeFolderBtn {
+        position: absolute; top: -12px; right: -12px; width: 26px; height: 26px; background: #ef4444;
+        color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 18px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        z-index: 3000; transition: transform 0.2s ease;
+    }
 
-	#closeFolderBtn:hover {
-		transform: scale(1.1); background: #dc2626;
-	}
+    #closeFolderBtn:hover {
+        transform: scale(1.1); background: #dc2626;
+    }
 
     /* --- MODALES ÉDITION --- */
     .control-group { margin-bottom: 12px; }
@@ -359,7 +359,7 @@
     <div id="modalLink" class="overlay" style="z-index:4000; align-items:center; justify-content:center;" onclick="closeAllModals()">
         <div style="background:var(--sidebar-bg); padding:25px; border-radius:15px; width:400px; border:1px solid var(--accent);" onclick="event.stopPropagation()">
             <h3 style="color:var(--accent); margin-top:0">🔗 Édition Lien</h3>
-            <div class="control-group"><label>URL</label><input type="text" id="linkUrl"></div>
+            <div class="control-group"><label>URL</label><input type="text" id="linkUrl" autofocus></div>
             <div class="control-group"><label>Nom</label><input type="text" id="linkName"></div>
             <div class="control-group">
                 <label>Image de la tuile</label>
