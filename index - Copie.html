@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Speed Dial Perso</title>
+<style>
+    :root {
+        --bg-main: #000000; --sidebar-bg: #1e293b; --tile-bg: #000000;
+        --accent: #38bdf8; --text: #f8fafc; --border: #475569;
+        --cols: 4; --rows: 4; --gap: 15px; --font-size: 12px;
+        --folder-tile-bg: #ffd43b;
+    }
+
+    body { margin: 0; background-color: var(--bg-main); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; transition: background-color 0.3s; }
+
+    /* --- STRUCTURE --- */
+    .sidebar { display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
+    justify-content: space-between;
+    box-sizing: border-box; position: fixed; top: 0; left: -250px; width: 250px; background: var(--sidebar-bg);
+    box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 1000; padding: 10px 25px;
+    overflow-y: auto; }
+    
+    .sidebar.open { left: 0; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
+    .overlay.active { display: block; }
+
+    .sidebar-content {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .sidebar-footer {
+        padding: 20px 0;
+        border-top: 1px solid #333;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .menu-text {
+        font-size: 1.0rem;
+        font-weight: bold;
+        color: var(--text);
+        background: #222;
+        padding: 10px 12px;
+        border-radius: 2px;
+        border: 1px solid #38bdf8;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+        user-select: none;
+        text-align: center;
+    }
+
+    .menu-text:hover {
+        color: var(--accent);
+        box-shadow: 0px 0px 10px rgba(200,200,200,1);
+    }
+
+    /* --- GRILLE & TUILES --- */
+    #grid {
+        transition: filter 0.3s ease;
+        will-change: filter;
+    }
+
+    .grid-container { 
+        display: grid; 
+        grid-template-columns: repeat(var(--cols), 1fr); 
+        grid-template-rows: repeat(var(--rows), 1fr);
+        width: 100vw; 
+        height: calc(100vh - 100px); 
+        gap: var(--gap); 
+        padding: var(--gap); 
+        box-sizing: border-box; 
+    }
+
+    .tile { 
+        background: var(--tile-bg); border-radius: 12px; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        cursor: pointer; transition: 0.2s; overflow: hidden; position: relative; 
+    }
+    
+    .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.2; }
+    .tile.empty:hover { opacity: 0.5; }
+
+    .tile img { 
+        width: auto; height: 70%; max-width: 80%; 
+        object-fit: contain; pointer-events: none; 
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        margin-bottom: 20px;
+    }
+
+    .tile-label { 
+        position: absolute; bottom: 0; width: 100%; 
+        background: rgba(0,0,0,0); padding: 5px 0; 
+        text-align: center; font-size: var(--font-size); 
+        pointer-events: none; white-space: nowrap; 
+        overflow: hidden; text-overflow: ellipsis; z-index: 0;
+    }
+
+    .tile.folder { background: var(--folder-tile-bg); }
+
+    .tile.drag-over {
+        border: 2px solid var(--accent) !important;
+        background: rgba(56, 189, 248, 0.2) !important;
+        transform: scale(1.05);
+        z-index: 10;
+    }
+
+    /* --- RECHERCHE FOOTER --- */
+    .search-footer {
+        position: fixed;
+        bottom: 0; left: 0;
+        width: 100vw; height: 90px;
+        background: #111111;
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 25px;
+        box-sizing: border-box;
+        z-index: 100;
+    }
+
+    #footerClock { text-align: right; line-height: 1.2; margin-left: auto; }
+    #footerTime { font-size: 1.4rem; font-weight: bold; color: var(--accent); line-height: 1; }
+    #footerDate { font-size: 0.8rem; color: var(--text); text-transform: capitalize; }
+
+    .search-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        max-width: 60%;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        background: #222;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #444;
+    }
+
+    .search-box input {
+        background: transparent; 
+        border: none; 
+        color: white; 
+        margin-left: 8px; 
+        outline: none;
+        width: 100px;
+        transition: width 0.3s ease;
+    }
+
+    .search-box input:focus { width: 160px; }
+
+    /* --- ADAPTATION MOBILE --- */
+    @media (max-width: 768px) {
+        :root {
+            --cols: 2 !important;
+            --gap: 10px !important;
+        }
+        .grid-container {
+            height: calc(100vh - 140px);
+            padding: 10px;
+        }
+        .search-footer {
+            flex-direction: column;
+            height: auto;
+            padding: 10px;
+            gap: 8px;
+        }
+        .search-group {
+            position: static;
+            transform: none;
+            max-width: 100%;
+            width: 100%;
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding: 5px 0;
+            white-space: nowrap;
+        }
+        .search-box { flex-shrink: 0; }
+        #footerClock {
+            margin-left: 0;
+            text-align: center;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .sidebar { width: 85%; }
+    }
+
+    /* --- INTERFACE DOSSIER & MODALES --- */
+    #folderOverlay {
+        position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px); display: none; z-index: 2500;
+        align-items: center; justify-content: center;
+    }
+    #folderPopup {
+        background: var(--sidebar-bg); border-radius: 20px; border: 2px solid var(--accent);
+        padding: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); position: relative; 
+        max-height: 85vh; display: flex; flex-direction: column; min-width: 150px;
+    }
+    #closeFolderBtn {
+        position: absolute; top: -15px; right: -15px; width: 32px; height: 32px;
+        background: #ef4444; color: white; border-radius: 50%; display: flex;
+        align-items: center; justify-content: center; cursor: pointer; font-size: 22px;
+        z-index: 9999; border: 2px solid white;
+    }
+    .control-group { margin-bottom: 12px; }
+    .control-group label { display: block; font-size: 10px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
+    input { width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 4px; box-sizing: border-box; }
+    .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+</style>
+</head>
+<body>
+
+    <div class="overlay" id="overlay"></div>
+
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-content">
+        <h2 style="color:var(--accent); margin-top:0">Paramètres</h2>
+        <div class="control-group"><label>Couleur de fond globale</label><input type="color" id="bgInput"></div>
+        <div class="control-group"><label>Couleur des tuiles (Lien)</label><input type="color" id="tileColorInput"></div>
+        <div class="control-group"><label>Couleur des tuiles (Dossier)</label><input type="color" id="folderTileColorInput"></div>
+        <div class="control-group"><label>Colonnes</label><input type="number" id="colsInput" min="1"></div>
+        <div class="control-group"><label>Lignes</label><input type="number" id="rowsInput" min="1"></div>
+        <div class="control-group"><label>Espacement (px)</label><input type="number" id="gapInput" min="0"></div>
+        <div class="control-group"><label>Taille police (px)</label><input type="number" id="fontInput" min="6"></div>
+        
+        <hr style="border:0; border-top:1px solid var(--border); margin: 10px 0;">
+        
+        <button class="btn" style="background:#5D9948; margin-top:10px" id="btn-export">📤 EXPORTER CONFIG</button>
+        <button class="btn" style="background:#f59e0b; margin-top:15px" id="btn-trigger-import">📥 IMPORTER CONFIG</button>
+        <button class="btn" style="background:#D14747; margin-top:20px" id="btn-undo">↩ ANNULER</button>
+        <button class="btn" style="background:#e11d48; margin-top:10px" id="btn-reset" onclick="if(confirm('Réinitialiser tout ?')) { localStorage.clear(); location.reload(); }">⚠️ RESET COMPLET</button>
+        <input type="file" id="importFile" style="display:none">
+    </div>
+
+    <div class="sidebar-footer">
+        <div id="btn-close-sidebar" class="menu-text">FERMER</div>
+    </div>
+</nav>
+
+    <main class="grid-container" id="grid"></main>
+
+<footer class="search-footer" id="search-footer">
+    <div class="footer-left">
+        <div id="btn-menu" class="menu-text" onclick="toggleSidebar()">Paramètres</div>
+    </div>
+
+    <div class="search-group">
+        <div class="search-box">
+            <img src="https://www.google.com/favicon.ico" alt="G" width="20">
+            <input type="text" placeholder="Google" onkeypress="if(event.key==='Enter') window.open('https://www.google.com/search?q='+encodeURIComponent(this.value), '_blank')">
+        </div>
+        <div class="search-box">
+            <img src="https://www.gstatic.com/images/branding/product/1x/photos_96dp.png" alt="GI" width="20">
+            <input type="text" placeholder="Images" onkeypress="if(event.key==='Enter') window.open('https://www.google.com/search?tbm=isch&q='+encodeURIComponent(this.value), '_blank')">
+        </div>
+        <div class="search-box">
+            <img src="https://www.youtube.com/favicon.ico" alt="Y" width="20">
+            <input type="text" placeholder="YouTube" onkeypress="if(event.key==='Enter') window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(this.value), '_blank')">
+        </div>
+    </div>
+    
+    <div id="footerClock">
+        <div id="footerTime"></div>
+        <div id="footerDate"></div>
+    </div>
+</footer>
+
+    <div id="folderOverlay">
+        <div id="folderPopup">
+            <div id="closeFolderBtn" onclick="closeFolder()">&times;</div>
+            <div class="folder-toolbar">
+                <label>Colonnes</label><input type="number" id="fCols" min="1">
+                <label>Lignes</label><input type="number" id="fRows" min="1">
+                <label>Fond</label><input type="color" id="fPopBg">
+            </div>
+            <div class="folder-content" id="folderGrid"></div>
+        </div>
+    </div>
+
+    <div id="modalLink" class="overlay" style="z-index:4000; align-items:center; justify-content:center;" onclick="closeAllModals()">
+        <div style="background:var(--sidebar-bg); padding:25px; border-radius:15px; width:90%; max-width:400px; border:1px solid var(--accent);" onclick="event.stopPropagation()">
+            <h3 style="color:var(--accent); margin-top:0">🔗 Édition Lien</h3>
+            <div class="control-group"><label>URL</label><input type="text" id="linkUrl"></div>
+            <div class="control-group"><label>Nom</label><input type="text" id="linkName"></div>
+            <div class="control-group">
+                <label>Image (URL ou Fichier)</label>
+                <input type="text" id="linkImg" placeholder="Lien direct image">
+                <input type="file" id="linkImgFile" accept="image/*" style="margin-top:5px; font-size:10px;">
+            </div>
+            <button class="btn" style="background:#22c55e; margin-bottom:10px" onclick="confirmEditLink()">Valider</button>
+            <button class="btn" style="background:#ef4444; margin-bottom:10px" onclick="deleteItem()">Supprimer</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--border)" onclick="closeAllModals()">Annuler</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const modalLink = document.getElementById('modalLink');
+        const linkUrlInput = document.getElementById('linkUrl');
+        const observer = new MutationObserver(() => {
+            if (modalLink.style.display === 'flex') {
+                setTimeout(() => linkUrlInput.focus(), 50);
+            }
+        });
+        observer.observe(modalLink, { attributes: true, attributeFilter: ['style'] });
+    </script>
+</body>
+</html>
