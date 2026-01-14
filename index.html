@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Speed Dial Perso</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,13 +15,19 @@
             --folder-tile-bg: #ffd43b;
         }
 
-        body { margin: 0; background-color: var(--bg-main); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; transition: background-color 0.3s; }
+        body { margin: 0;
+            background-color: var(--bg-main);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
 
         /* --- STRUCTURE --- */
         .sidebar { display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
         justify-content: space-between;
         box-sizing: border-box; position: fixed; top: 0; left: -250px; width: 250px; background: var(--sidebar-bg);
-        box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 1000; padding: 10px 25px;
+        box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 5000; padding: 10px 25px;
         overflow-y: auto; }
         
         .sidebar-content { flex: 1; overflow-y: auto; padding-right: 10px; }
@@ -43,6 +49,7 @@
             padding: 10px 12px; border-radius: 2px; border: 1px solid #38bdf8;
             cursor: pointer; letter-spacing: 1px; transition: all 0.2s ease;
             user-select: none; text-align: center;
+            min-width: 40px;
         }
 
         .menu-text:hover { color: var(--accent); box-shadow: 0px 0px 10px rgba(200,200,200,1); }
@@ -62,6 +69,7 @@
             background: var(--tile-bg); border-radius: 12px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             cursor: pointer; transition: 0.2s; overflow: hidden; position: relative; 
+            -webkit-tap-highlight-color: transparent;
         }
         
         .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.2; }
@@ -89,8 +97,6 @@
             background: rgba(56, 189, 248, 0.2) !important;
             transform: scale(1.05); transition: transform 0.1s ease; z-index: 10;
         }
-
-        .tile.folder.drag-over { border-color: #ffd43b !important; background: rgba(255, 212, 59, 0.2) !important; }
 
         .folder-icon-bg { position: absolute; width: 100%; height: 100%; top: -10%; left: 0%; z-index: 1; pointer-events: none; }
 
@@ -135,27 +141,18 @@
 
         /* --- INTERFACE DOSSIER --- */
         #folderOverlay {
-    position: fixed; 
-    inset: 0; 
-    background: rgba(0, 0, 0, 0.4); 
-    backdrop-filter: blur(2px);
-    display: none; 
-    z-index: 2500; 
-    align-items: flex-start; /* Changé de center à flex-start pour mieux gérer le top fixe */
-    justify-content: center;
-    overflow-y: auto; /* Permet de scroller si le dossier est très grand */
-    padding: 20px 0;
-}
-         
-@media (max-width: 600px) {
-    #folderPopup { 
-        max-width: 90vw !important; 
-        margin-top: 10vh; /* Remplace le top fixe pour plus de souplesse */
-        position: relative !important; /* Re-passe en relatif pour le scroll de l'overlay */
-        left: auto !important;
-        top: auto !important;
-    }
-}		 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0, 0, 0, 0.4); 
+            backdrop-filter: blur(2px);
+            display: none; 
+            z-index: 2500; 
+            align-items: flex-start; 
+            justify-content: center;
+            overflow-y: auto; 
+            padding: 20px 0;
+        }
+                 
         #folderPopup {
             background: var(--sidebar-bg); border-radius: 20px; border: 2px solid var(--accent);
             padding: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
@@ -181,43 +178,39 @@
             font-size: 22px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             z-index: 9999; border: 2px solid white;
         }
-        #closeFolderBtn:hover { transform: scale(1.1); background: #dc2626; }
 
-/* --- CORRECTIF MOBILE SÉVÈRE --- */
+        /* --- CORRECTIF MOBILE --- */
         @media (max-width: 600px) {
-            /* On réduit la taille des tuiles de la grille principale aussi */
+            .search-group, #footerClock { display: none !important; }
+
+            .menu-text {
+                width: 45px; height: 45px; padding: 0;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 0; border-radius: 50%; border-width: 2px;
+            }
+            .menu-text::before { content: '≡'; font-size: 30px; color: var(--accent); }
+
+            .search-footer { height: 70px; justify-content: center; padding: 0; }
+            .footer-left { min-width: auto; }
+
+            .grid-container { height: calc(100vh - 80px); grid-template-columns: repeat(3, 1fr) !important; padding: 10px; }
             .tile img { margin-bottom: 5px; max-height: 50%; }
             .tile-label { font-size: 10px; }
-
-            #folderPopup { 
-                padding: 10px; 
-                border-radius: 15px; 
-                max-width: 90vw !important; /* Force la largeur à ne pas dépasser l'écran */
-                left: 5vw !important;        /* Centre horizontalement */
-                top: 15vh !important;       /* Position fixe en haut */
-                transform: none !important;
-                position: fixed !important;  /* Fixe pour éviter les problèmes de scroll */
-            }
-
-            .folder-content { 
-                gap: 5px; 
-                padding: 5px;
-                grid-template-columns: repeat(auto-fit, 60px) !important; /* Force des petites colonnes */
-                justify-content: center;
-            }
-
-            .folder-toolbar { display: none; } /* On cache les réglages sur mobile pour gagner de la place */
             
-            #folderGrid .tile { width: 60px; height: 70px; }
-            #folderGrid .tile img { max-height: 40px; margin-bottom: 2px; }
-            #folderGrid .tile-label { font-size: 8px; }
+            #folderPopup { 
+                max-width: 90vw !important; left: 5vw !important; top: 10vh !important; 
+                position: fixed !important; padding: 10px; border-radius: 15px;
+            }
+            .folder-content { 
+                grid-template-columns: repeat(3, 1fr) !important; gap: 8px; padding: 10px;
+            }
+            .folder-toolbar { display: none; }
         }
 
-        /* --- MODALES ÉDITION --- */
+        /* --- MODALES --- */
         .control-group { margin-bottom: 12px; }
         .control-group label { display: block; font-size: 10px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
-        input { width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 4px; box-sizing: border-box; }
-        input[type="color"] { height: 40px; width: 100%; cursor: pointer; padding: 2px; }
+        input, select { width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 4px; box-sizing: border-box; }
         .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
         .btn:hover { filter: brightness(1.3); color: black;}
         .img-suggestions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
@@ -238,6 +231,17 @@
             <div class="control-group"><label>Lignes</label><input type="number" id="rowsInput" min="1"></div>
             <div class="control-group"><label>Espacement (px)</label><input type="number" id="gapInput" min="0"></div>
             <div class="control-group"><label>Taille police (px)</label><input type="number" id="fontInput" min="6"></div>
+            
+            <div class="control-group">
+                <label>Police d'écriture</label>
+                <select id="fontFamilyInput">
+                    <option value="'Segoe UI', sans-serif">Standard (Segoe UI)</option>
+                    <option value="'Roboto', sans-serif">Roboto (Moderne)</option>
+                    <option value="'Courier New', monospace">Code (Monospace)</option>
+                    <option value="'Georgia', serif">Élégant (Serif)</option>
+                    <option value="cursive">Manuscrit</option>
+                </select>
+            </div>
             
             <hr style="border:0; border-top:1px solid var(--border); margin: 10px 0;">
             
@@ -294,14 +298,14 @@
     </div>
 
     <div id="modalLink" class="overlay" style="z-index:4000; align-items:center; justify-content:center;">
-        <div style="background:var(--sidebar-bg); padding:25px; border-radius:15px; width:400px; border:1px solid var(--accent);" class="modal-stop-prop">
+        <div style="background:var(--sidebar-bg); padding:25px; border-radius:15px; width:400px; max-width:90vw; border:1px solid var(--accent);" class="modal-stop-prop">
             <h3 style="color:var(--accent); margin-top:0">🔗 Édition Lien</h3>
             <div class="control-group"><label>URL</label><input type="text" id="linkUrl"></div>
             <div class="control-group"><label>Nom</label><input type="text" id="linkName"></div>
             <div class="control-group">
                 <label>Image de la tuile</label>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <input type="file" id="linkImgFile" accept="image/*" style="font-size: 10px; flex: 1; width: 40%;">
+                    <input type="file" id="linkImgFile" accept="image/*" style="font-size: 10px; flex: 1;">
                     <button class="btn" id="btn-auto-icon" style="background:var(--accent); width: auto; font-size: 10px; padding: 5px 10px;">AUTO</button>
                     <button class="btn btn-google-search" data-type="link" style="background:#ea4335; width: auto; font-size: 10px; padding: 5px 10px;">GOOGLE</button>
                 </div>
@@ -316,7 +320,7 @@
     </div>
 
     <div id="modalFolder" class="overlay" style="z-index:4000; align-items:center; justify-content:center;">
-        <div style="background:var(--sidebar-bg); padding:25px; border-radius:15px; width:400px; border:1px solid #ffd43b;" class="modal-stop-prop">
+        <div style="background:var(--sidebar-bg); padding:25px; border-radius:15px; width:400px; max-width:90vw; border:1px solid #ffd43b;" class="modal-stop-prop">
             <h3 style="color:#ffd43b; margin-top:0">📂 Édition Dossier</h3>
             <div class="control-group"><label>Nom du dossier</label><input type="text" id="folderName"></div>
             <div class="control-group">

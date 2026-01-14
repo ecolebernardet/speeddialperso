@@ -2,6 +2,7 @@
 let tilesData = {};
 let config = { 
     cols: 4, rows: 4, gap: 15, fontSize: 12, 
+    fontFamily: "'Segoe UI', sans-serif",
     bgColor: '#000000', tileBgColor: '#000000', folderTileBgColor: '#ffd43b' 
 };
 
@@ -39,6 +40,7 @@ function inputGridParams() {
     config.rows = parseInt(document.getElementById('rowsInput').value) || 1;
     config.gap = parseInt(document.getElementById('gapInput').value) || 0;
     config.fontSize = parseInt(document.getElementById('fontInput').value) || 12;
+    config.fontFamily = document.getElementById('fontFamilyInput').value;
     config.tileBgColor = document.getElementById('tileColorInput').value;
     config.folderTileBgColor = document.getElementById('folderTileColorInput').value;
     renderGrid();
@@ -83,13 +85,14 @@ function migrateToCoords(data, cols = 4) {
 function init() {
     tilesData = migrateToCoords(tilesData, config.cols);
     saveToLocal();
-    const bgInput = document.getElementById('bgInput');
-    if(bgInput) {
-        bgInput.value = config.bgColor;
+    
+    if(document.getElementById('bgInput')) {
+        document.getElementById('bgInput').value = config.bgColor;
         document.getElementById('colsInput').value = config.cols;
         document.getElementById('rowsInput').value = config.rows;
         document.getElementById('gapInput').value = config.gap;
         document.getElementById('fontInput').value = config.fontSize;
+        document.getElementById('fontFamilyInput').value = config.fontFamily || "'Segoe UI', sans-serif";
         document.getElementById('tileColorInput').value = config.tileBgColor;
         document.getElementById('folderTileColorInput').value = config.folderTileBgColor;
         document.body.style.backgroundColor = config.bgColor;
@@ -105,6 +108,7 @@ function renderGrid() {
     document.documentElement.style.setProperty('--rows', config.rows);
     document.documentElement.style.setProperty('--gap', config.gap + 'px');
     document.documentElement.style.setProperty('--font-size', config.fontSize + 'px');
+    document.body.style.fontFamily = config.fontFamily;
     document.documentElement.style.setProperty('--tile-bg', config.tileBgColor);
     document.documentElement.style.setProperty('--folder-tile-bg', config.folderTileBgColor);
 
@@ -159,9 +163,8 @@ function createTile(coords, data, isMain) {
     return div;
 }
 
-// 5. LOGIQUE DOSSIER (VERSION RÉDUITE & MOBILE)
+// 5. LOGIQUE DOSSIER
 function openFolder(coords) {
-    // 1. Initialisation et Sécurité
     activeFolderCoords = coords;
     const folder = tilesData[coords];
     const overlay = document.getElementById('folderOverlay');
@@ -171,13 +174,11 @@ function openFolder(coords) {
     
     if (!folder) return;
 
-    // 2. Nettoyage forcé des styles résiduels du dossier précédent
-    fPopup.style.opacity = "1";
-    fPopup.style.transform = "none";
+    if (window.innerWidth < 600) document.body.style.overflow = 'hidden';
+
     fPopup.style.display = "flex";
     fPopup.style.flexDirection = "column";
 
-    // 3. Configuration de la Grille
     document.getElementById('fCols').value = folder.fConfig.cols;
     document.getElementById('fRows').value = folder.fConfig.rows;
     document.getElementById('fGap').value = folder.fConfig.gap;
@@ -189,57 +190,42 @@ function openFolder(coords) {
     const displayRows = Math.max(folder.fConfig.rows, maxR + 1);
 
     const isMobile = window.innerWidth < 600;
-    const colWidth = isMobile ? 60 : 100;
-    const rowHeight = isMobile ? 70 : 110;
+    const colWidth = isMobile ? 80 : 100;
 
     fGrid.style.display = 'grid';
-    fGrid.style.gridTemplateColumns = `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
+    fGrid.style.gridTemplateColumns = isMobile ? `repeat(3, 1fr)` : `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
     fGrid.style.gap = `${folder.fConfig.gap}px`;
     fPopup.style.backgroundColor = folder.fConfig.fBgColor;
     fGrid.innerHTML = '';
     
-    // 4. Positionnement
     if (isMobile) {
-        fPopup.style.position = "relative";
-        fPopup.style.left = "auto";
-        fPopup.style.top = "auto";
-        fPopup.style.margin = "10vh auto";
+        fPopup.style.position = "fixed";
+        fPopup.style.left = "5vw";
+        fPopup.style.top = "10vh";
+        fPopup.style.width = "90vw";
+        fPopup.style.margin = "0";
     } else {
         const originTile = document.getElementById(`tile-${coords}`);
         if (originTile) {
             const rect = originTile.getBoundingClientRect();
             fPopup.style.position = 'absolute';
-            let posX = rect.left + window.scrollX;
-            let posY = rect.top + window.scrollY;
-            
-            const estimatedWidth = (folder.fConfig.cols * colWidth) + ((folder.fConfig.cols - 1) * folder.fConfig.gap) + 30;
-            const estimatedHeight = (displayRows * rowHeight) + 80;
-
-            if (posX + estimatedWidth > window.innerWidth - 30) posX = window.innerWidth - estimatedWidth - 30;
-            if (posY + estimatedHeight > window.innerHeight - 100) posY = window.innerHeight - estimatedHeight - 100;
-            
+            let posX = rect.left;
+            let posY = rect.top;
             fPopup.style.left = `${Math.max(20, posX)}px`;
             fPopup.style.top = `${Math.max(30, posY)}px`;
         }
     }
 
-    // 5. Remplissage
     if (!folder.items) folder.items = {};
     for(let r=0; r < displayRows; r++) {
-        for(let c=0; c < folder.fConfig.cols; c++) {
+        for(let c=0; c < (isMobile ? 3 : folder.fConfig.cols); c++) {
             let fCoords = `${c}-${r}`;
             fGrid.appendChild(createTile(fCoords, folder.items[fCoords], false));
         }
     }
 
-    // 6. Affichage et Animation
     overlay.style.display = 'flex'; 
     if(mainGrid) mainGrid.style.filter = 'blur(3px)';
-    
-    fPopup.animate([
-        { transform: 'scale(0.9)', opacity: 0 },
-        { transform: 'scale(1)', opacity: 1 }
-    ], { duration: 200, easing: 'ease-out', fill: 'forwards' });
 }
 
 function closeFolder() { 
@@ -248,6 +234,8 @@ function closeFolder() {
     const mainGrid = document.getElementById('grid');
     
     if (!overlay || overlay.style.display === 'none') return;
+
+    document.body.style.overflow = '';
 
     const anim = fPopup.animate([
         { transform: 'scale(1)', opacity: 1 },
@@ -258,9 +246,6 @@ function closeFolder() {
         overlay.style.display = 'none';
         if(mainGrid) mainGrid.style.filter = 'none';
         activeFolderCoords = null;
-        // On nettoie les styles d'animation pour la prochaine ouverture
-        fPopup.style.opacity = "1";
-        fPopup.style.transform = "none";
     };
 }
 
@@ -438,8 +423,20 @@ function searchGoogleImages(type) {
 
 // 9. IMPORT/EXPORT & HORLOGE
 function exportData() {
+    // Génération de la date au format aaaammjj
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${year}${month}${day}`;
+
+    const fileName = `export_SpeedDialPerso_${dateStr}.json`;
+    
     const blob = new Blob([JSON.stringify({config, data: tilesData})], {type: 'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `speed_dial_export.json`; a.click();
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(blob); 
+    a.download = fileName; 
+    a.click();
 }
 
 function importData(e) {
@@ -478,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     listen('rowsInput', 'input', inputGridParams);
     listen('gapInput', 'input', inputGridParams);
     listen('fontInput', 'input', inputGridParams);
+    listen('fontFamilyInput', 'change', inputGridParams);
     listen('btn-undo', 'click', undo);
     listen('btn-export', 'click', exportData);
     listen('btn-trigger-import', 'click', () => document.getElementById('importFile').click());
