@@ -2,12 +2,11 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speed Dial Perso</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         :root {
             --bg-main: #000000; --sidebar-bg: #1e293b; --tile-bg: #000000;
@@ -20,7 +19,7 @@
             background-color: var(--bg-main);
             color: var(--text);
             font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
             transition: background-color 0.3s;
         }
 
@@ -180,6 +179,42 @@
             z-index: 9999; border: 2px solid white;
         }
 
+        /* --- CORRECTIF MOBILE --- */
+        @media (max-width: 600px) {
+            .search-group, #footerClock { display: none !important; }
+
+            .menu-text {
+                width: 45px; height: 45px; padding: 0;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 0; border-radius: 50%; border-width: 2px;
+            }
+            .menu-text::before { content: '≡'; font-size: 30px; color: var(--accent); }
+
+            .search-footer { height: 70px; justify-content: center; padding: 0; }
+            .footer-left { min-width: auto; }
+
+            .grid-container { 
+                height: auto !important; 
+                min-height: calc(100vh - 80px);
+                grid-template-columns: repeat(3, 1fr) !important; 
+                grid-template-rows: auto !important;
+                padding: 10px; 
+                overflow-y: auto;
+            }
+
+            .tile img { margin-bottom: 5px; max-height: 50%; }
+            .tile-label { font-size: 10px; }
+            
+            #folderPopup { 
+                max-width: 90vw !important; left: 5vw !important; top: 10vh !important; 
+                position: fixed !important; padding: 10px; border-radius: 15px;
+            }
+            .folder-content { 
+                grid-template-columns: repeat(3, 1fr) !important; gap: 8px; padding: 10px;
+            }
+            .folder-toolbar { display: none; }
+        }
+
         /* --- MODALES --- */
         .control-group { margin-bottom: 12px; }
         .control-group label { display: block; font-size: 10px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
@@ -188,65 +223,7 @@
         .btn:hover { filter: brightness(1.3); color: black;}
         .img-suggestions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
         .suggestion-item { width: 100%; aspect-ratio: 1; object-fit: contain; cursor: pointer; background: white; border-radius: 6px; padding: 2px; }
-    
-/* --- CORRECTIF MOBILE ULTRA-ROBUSTE --- */
-@media (max-width: 900px), screen and (orientation: portrait) {
-    /* On cache de force les éléments inutiles */
-    .search-group, 
-    #footerClock, 
-    .search-footer .search-group,
-    footer .search-group { 
-        display: none !important; 
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-    }
-
-    /* Transformation du bouton Paramètres en Hamburger */
-    .menu-text {
-        width: 50px !important;
-        height: 50px !important;
-        padding: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 0 !important;
-        border-radius: 50% !important;
-        position: relative !important;
-    }
-
-    .menu-text::before { 
-        content: '≡' !important; 
-        font-size: 35px !important; 
-        color: var(--accent) !important; 
-        display: block !important;
-        line-height: 1 !important;
-    }
-
-    /* Ajustement du footer pour mobile */
-    .search-footer { 
-        height: 75px !important; 
-        justify-content: center !important; 
-        padding: 0 !important;
-    }
-
-    .footer-left { 
-        min-width: auto !important; 
-        display: flex !important;
-        justify-content: center !important;
-        width: 100% !important;
-    }
-
-    /* Grille forcée en 3 colonnes */
-    .grid-container { 
-        height: calc(100vh - 85px) !important; 
-        grid-template-columns: repeat(3, 1fr) !important; 
-        padding: 10px !important; 
-        gap: 10px !important;
-    }
-}
-
-	</style>
+    </style>
 </head>
 <body>
 

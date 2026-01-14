@@ -104,16 +104,38 @@ function renderGrid() {
     const grid = document.getElementById('grid');
     if(!grid) return;
     grid.innerHTML = '';
-    document.documentElement.style.setProperty('--cols', config.cols);
-    document.documentElement.style.setProperty('--rows', config.rows);
+
+    // CORRECTIF MOBILE : Force 3 colonnes en JS si écran < 600px
+    if (window.innerWidth < 600) {
+        document.documentElement.style.setProperty('--cols', 3);
+        document.documentElement.style.setProperty('--rows', 'auto');
+    } else {
+        document.documentElement.style.setProperty('--cols', config.cols);
+        document.documentElement.style.setProperty('--rows', config.rows);
+    }
+
     document.documentElement.style.setProperty('--gap', config.gap + 'px');
     document.documentElement.style.setProperty('--font-size', config.fontSize + 'px');
     document.body.style.fontFamily = config.fontFamily;
     document.documentElement.style.setProperty('--tile-bg', config.tileBgColor);
     document.documentElement.style.setProperty('--folder-tile-bg', config.folderTileBgColor);
 
-    for (let r = 0; r < config.rows; r++) {
-        for (let c = 0; c < config.cols; c++) {
+    // Calcul du nombre de lignes à afficher
+    let displayRows = config.rows;
+    if (window.innerWidth < 600) {
+        // En mobile, on s'assure d'afficher toutes les tuiles existantes
+        let maxR = 0;
+        Object.keys(tilesData).forEach(coords => {
+            const [c, r] = coords.split('-').map(Number);
+            if (r > maxR) maxR = r;
+        });
+        displayRows = Math.max(config.rows, maxR + 1);
+    }
+
+    const currentCols = window.innerWidth < 600 ? 3 : config.cols;
+
+    for (let r = 0; r < displayRows; r++) {
+        for (let c = 0; c < currentCols; c++) {
             let coords = `${c}-${r}`;
             grid.appendChild(createTile(coords, tilesData[coords], true));
         }
@@ -217,42 +239,23 @@ function openFolder(coords) {
             fPopup.style.position = 'absolute';
             fPopup.style.width = "max-content";
             
-            // Placement initial sur la tuile
             let posX = rect.left + window.scrollX;
             let posY = rect.top + window.scrollY;
             
             fPopup.style.left = `${posX}px`;
             fPopup.style.top = `${posY}px`;
 
-            // On utilise un double délai pour être certain que le rendu CSS est terminé
             requestAnimationFrame(() => {
                 const popupWidth = fPopup.offsetWidth;
                 const popupHeight = fPopup.offsetHeight;
-                const viewportWidth = document.documentElement.clientWidth; // Largeur sans scrollbar
+                const viewportWidth = document.documentElement.clientWidth;
                 const viewportHeight = window.innerHeight;
-
-                // Marge de sécurité de 20px
                 const margin = 20;
 
-                // 1. Correction horizontale (Collision Droite)
-                if (posX + popupWidth > viewportWidth - margin) {
-                    posX = viewportWidth - popupWidth - margin;
-                }
-
-                // 2. Correction horizontale (Collision Gauche)
-                if (posX < margin) {
-                    posX = margin;
-                }
-
-                // 3. Correction verticale (Collision Bas)
-                if (posY + popupHeight > viewportHeight - margin) {
-                    posY = viewportHeight - popupHeight - margin;
-                }
-
-                // 4. Correction verticale (Collision Haut)
-                if (posY < margin) {
-                    posY = margin;
-                }
+                if (posX + popupWidth > viewportWidth - margin) posX = viewportWidth - popupWidth - margin;
+                if (posX < margin) posX = margin;
+                if (posY + popupHeight > viewportHeight - margin) posY = viewportHeight - popupHeight - margin;
+                if (posY < margin) posY = margin;
 
                 fPopup.style.left = `${posX}px`;
                 fPopup.style.top = `${posY}px`;
@@ -554,12 +557,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFooterClock();
     setInterval(updateFooterClock, 1000);
 
+    // Relancer le rendu si la fenêtre est redimensionnée (bascule mobile/desktop)
+    window.addEventListener('resize', renderGrid);
+
     const listen = (id, evt, fn) => { 
         const el = document.getElementById(id); 
         if(el) el.addEventListener(evt, fn); 
     };
     
-    // Import bookmarks
     listen('btn-import-bookmarks', 'click', () => {
         const input = document.createElement('input');
         input.type = 'file'; input.accept = '.html';
@@ -618,9 +623,4 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (document.getElementById('modalFolder').style.display === 'flex') confirmEditFolder();
         }
     });
-	if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log("Service Worker OK"))
-        .catch(err => console.log("Erreur SW:", err));
-}
 });
