@@ -105,34 +105,26 @@ function renderGrid() {
     if(!grid) return;
     grid.innerHTML = '';
 
-    // CORRECTIF MOBILE : Force 3 colonnes en JS si écran < 600px
-    if (window.innerWidth < 600) {
-        document.documentElement.style.setProperty('--cols', 3);
-        document.documentElement.style.setProperty('--rows', 'auto');
-    } else {
-        document.documentElement.style.setProperty('--cols', config.cols);
-        document.documentElement.style.setProperty('--rows', config.rows);
-    }
+    const isMobile = window.innerWidth <= 768;
+    const currentCols = isMobile ? 3 : config.cols;
 
+    // Calcul dynamique du nombre de lignes pour ne jamais avoir de vide ou de manque
+    let maxR = 0;
+    Object.keys(tilesData).forEach(coords => {
+        const [c, r] = coords.split('-').map(Number);
+        if (r > maxR) maxR = r;
+    });
+
+    // En mobile, on s'assure d'afficher au moins assez de lignes pour toutes les tuiles
+    let displayRows = Math.max(config.rows, maxR + 1);
+
+    document.documentElement.style.setProperty('--cols', currentCols);
+    document.documentElement.style.setProperty('--rows', isMobile ? 'auto' : config.rows);
     document.documentElement.style.setProperty('--gap', config.gap + 'px');
     document.documentElement.style.setProperty('--font-size', config.fontSize + 'px');
     document.body.style.fontFamily = config.fontFamily;
     document.documentElement.style.setProperty('--tile-bg', config.tileBgColor);
     document.documentElement.style.setProperty('--folder-tile-bg', config.folderTileBgColor);
-
-    // Calcul du nombre de lignes à afficher
-    let displayRows = config.rows;
-    if (window.innerWidth < 600) {
-        // En mobile, on s'assure d'afficher toutes les tuiles existantes
-        let maxR = 0;
-        Object.keys(tilesData).forEach(coords => {
-            const [c, r] = coords.split('-').map(Number);
-            if (r > maxR) maxR = r;
-        });
-        displayRows = Math.max(config.rows, maxR + 1);
-    }
-
-    const currentCols = window.innerWidth < 600 ? 3 : config.cols;
 
     for (let r = 0; r < displayRows; r++) {
         for (let c = 0; c < currentCols; c++) {
@@ -200,7 +192,7 @@ function openFolder(coords) {
     fPopup.style.opacity = "1";
     fPopup.style.transform = "scale(1)";
 
-    if (window.innerWidth < 600) {
+    if (window.innerWidth < 768) {
         document.body.style.overflow = 'hidden';
     }
 
@@ -217,7 +209,7 @@ function openFolder(coords) {
     itemsKeys.forEach(key => { const [c, r] = key.split('-').map(Number); if (r > maxR) maxR = r; });
     const displayRows = Math.max(folder.fConfig.rows, maxR + 1);
 
-    const isMobile = window.innerWidth < 600;
+    const isMobile = window.innerWidth < 768;
     const colWidth = isMobile ? 80 : 100;
 
     fGrid.style.display = 'grid';
@@ -557,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFooterClock();
     setInterval(updateFooterClock, 1000);
 
-    // Relancer le rendu si la fenêtre est redimensionnée (bascule mobile/desktop)
+    // Relance le rendu au redimensionnement
     window.addEventListener('resize', renderGrid);
 
     const listen = (id, evt, fn) => { 
