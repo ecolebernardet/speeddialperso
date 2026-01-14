@@ -174,11 +174,9 @@ function openFolder(coords) {
     
     if (!folder) return;
 
-    // --- FIX CRITIQUE MOBILE : RÉINITIALISATION TOTALE ---
-    fPopup.style.display = "none"; // On cache tout de suite pour reset
+    fPopup.style.display = "none"; 
     fPopup.style.opacity = "1";
     fPopup.style.transform = "scale(1)";
-    // -----------------------------------------------------
 
     if (window.innerWidth < 600) {
         document.body.style.overflow = 'hidden';
@@ -217,19 +215,48 @@ function openFolder(coords) {
         if (originTile) {
             const rect = originTile.getBoundingClientRect();
             fPopup.style.position = 'absolute';
-            fPopup.style.width = "auto";
+            fPopup.style.width = "max-content";
             
-            const estimatedWidth = (folder.fConfig.cols * colWidth) + ((folder.fConfig.cols - 1) * folder.fConfig.gap) + 30;
-            const estimatedHeight = (displayRows * 110) + 80;
-
+            // Placement initial sur la tuile
             let posX = rect.left + window.scrollX;
             let posY = rect.top + window.scrollY;
+            
+            fPopup.style.left = `${posX}px`;
+            fPopup.style.top = `${posY}px`;
 
-            if (posX + estimatedWidth > window.innerWidth - 20) posX = window.innerWidth - estimatedWidth - 20;
-            if (posY + estimatedHeight > window.innerHeight - 100) posY = window.innerHeight - estimatedHeight - 100;
+            // On utilise un double délai pour être certain que le rendu CSS est terminé
+            requestAnimationFrame(() => {
+                const popupWidth = fPopup.offsetWidth;
+                const popupHeight = fPopup.offsetHeight;
+                const viewportWidth = document.documentElement.clientWidth; // Largeur sans scrollbar
+                const viewportHeight = window.innerHeight;
 
-            fPopup.style.left = `${Math.max(20, posX)}px`;
-            fPopup.style.top = `${Math.max(20, posY)}px`;
+                // Marge de sécurité de 20px
+                const margin = 20;
+
+                // 1. Correction horizontale (Collision Droite)
+                if (posX + popupWidth > viewportWidth - margin) {
+                    posX = viewportWidth - popupWidth - margin;
+                }
+
+                // 2. Correction horizontale (Collision Gauche)
+                if (posX < margin) {
+                    posX = margin;
+                }
+
+                // 3. Correction verticale (Collision Bas)
+                if (posY + popupHeight > viewportHeight - margin) {
+                    posY = viewportHeight - popupHeight - margin;
+                }
+
+                // 4. Correction verticale (Collision Haut)
+                if (posY < margin) {
+                    posY = margin;
+                }
+
+                fPopup.style.left = `${posX}px`;
+                fPopup.style.top = `${posY}px`;
+            });
         }
     }
 
@@ -244,7 +271,6 @@ function openFolder(coords) {
     overlay.style.display = 'flex'; 
     if(mainGrid) mainGrid.style.filter = 'blur(3px)';
     
-    // On relance l'animation proprement
     fPopup.animate([
         { transform: 'scale(0.9)', opacity: 0 },
         { transform: 'scale(1)', opacity: 1 }
@@ -260,7 +286,6 @@ function closeFolder() {
 
     document.body.style.overflow = '';
 
-    // Animation de fermeture
     const anim = fPopup.animate([
         { transform: 'scale(1)', opacity: 1 },
         { transform: 'scale(0.9)', opacity: 0 }
@@ -270,7 +295,6 @@ function closeFolder() {
         overlay.style.display = 'none';
         if(mainGrid) mainGrid.style.filter = 'none';
         activeFolderCoords = null;
-        // On force le nettoyage complet pour la prochaine ouverture
         fPopup.style.opacity = "0"; 
         fPopup.style.display = "none";
     };
@@ -450,22 +474,12 @@ function searchGoogleImages(type) {
 
 // 9. IMPORT/EXPORT & HORLOGE
 function exportData() {
-    // Génération de la date au format aaaammjj et l'heure hhmm
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-    const dateStr = `${year}${month}${day}_${hours}${minutes}`;
+    const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
     const fileName = `export_SpeedDialPerso_${dateStr}.json`;
-    
     const blob = new Blob([JSON.stringify({config, data: tilesData})], {type: 'application/json'});
     const a = document.createElement('a'); 
-    a.href = URL.createObjectURL(blob); 
-    a.download = fileName; 
-    a.click();
+    a.href = URL.createObjectURL(blob); a.download = fileName; a.click();
 }
 
 function importData(e) {
@@ -486,14 +500,77 @@ function updateFooterClock() {
     dateEl.textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
-// 10. LISTENERS
+async function importBookmarks(htmlContent) {
+    saveSnapshot();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    const folders = doc.querySelectorAll('dl > dt > h3');
+
+    function getNextFreeCoords() {
+        let r = 0;
+        while (true) {
+            for (let c = 0; c < config.cols; c++) {
+                let coords = `${c}-${r}`;
+                if (!tilesData[coords]) {
+                    if (r >= config.rows) config.rows = r + 1;
+                    return coords;
+                }
+            }
+            r++; if (r > 500) break;
+        }
+    }
+
+    const processLinks = (links, name) => {
+        const folderCoords = getNextFreeCoords();
+        tilesData[folderCoords] = {
+            type: 'folder', name: name, img: "", items: {},
+            fConfig: { cols: 4, rows: 4, gap: 10, fBgColor: '#1e293b' }
+        };
+        links.forEach((link, lIdx) => {
+            const lx = lIdx % 4; const ly = Math.floor(lIdx / 4);
+            tilesData[folderCoords].items[`${lx}-${ly}`] = {
+                type: 'link', name: link.textContent.trim(), url: link.href, img: ""
+            };
+        });
+    };
+
+    if (folders.length === 0) {
+        processLinks(doc.querySelectorAll('body > dl > dt > a'), "Favoris Importés");
+    } else {
+        folders.forEach(h3 => {
+            const dl = h3.nextElementSibling;
+            if (dl && dl.tagName === 'DL') {
+                const links = dl.querySelectorAll(':scope > dt > a');
+                if (links.length > 0) processLinks(links, h3.textContent);
+            }
+        });
+    }
+    saveToLocal(); alert("Importation réussie !"); location.reload();
+}
+
+// 10. LISTENERS (DÉMARRAGE)
 document.addEventListener('DOMContentLoaded', () => {
     init();
     updateFooterClock();
     setInterval(updateFooterClock, 1000);
 
-    const listen = (id, evt, fn) => { const el = document.getElementById(id); if(el) el.addEventListener(evt, fn); };
+    const listen = (id, evt, fn) => { 
+        const el = document.getElementById(id); 
+        if(el) el.addEventListener(evt, fn); 
+    };
     
+    // Import bookmarks
+    listen('btn-import-bookmarks', 'click', () => {
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = '.html';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = ev => importBookmarks(ev.target.result);
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    });
+
     listen('btn-menu', 'click', toggleMenu);
     listen('btn-close-sidebar', 'click', toggleMenu);
     listen('overlay', 'click', toggleMenu);

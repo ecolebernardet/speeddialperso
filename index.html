@@ -152,7 +152,7 @@
             overflow-y: auto; 
             padding: 20px 0;
         }
-                 
+                     
         #folderPopup {
             background: var(--sidebar-bg); border-radius: 20px; border: 2px solid var(--accent);
             padding: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
@@ -179,34 +179,6 @@
             z-index: 9999; border: 2px solid white;
         }
 
-        /* --- CORRECTIF MOBILE --- */
-        @media (max-width: 600px) {
-            .search-group, #footerClock { display: none !important; }
-
-            .menu-text {
-                width: 45px; height: 45px; padding: 0;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 0; border-radius: 50%; border-width: 2px;
-            }
-            .menu-text::before { content: '≡'; font-size: 30px; color: var(--accent); }
-
-            .search-footer { height: 70px; justify-content: center; padding: 0; }
-            .footer-left { min-width: auto; }
-
-            .grid-container { height: calc(100vh - 80px); grid-template-columns: repeat(3, 1fr) !important; padding: 10px; }
-            .tile img { margin-bottom: 5px; max-height: 50%; }
-            .tile-label { font-size: 10px; }
-            
-            #folderPopup { 
-                max-width: 90vw !important; left: 5vw !important; top: 10vh !important; 
-                position: fixed !important; padding: 10px; border-radius: 15px;
-            }
-            .folder-content { 
-                grid-template-columns: repeat(3, 1fr) !important; gap: 8px; padding: 10px;
-            }
-            .folder-toolbar { display: none; }
-        }
-
         /* --- MODALES --- */
         .control-group { margin-bottom: 12px; }
         .control-group label { display: block; font-size: 10px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
@@ -215,7 +187,46 @@
         .btn:hover { filter: brightness(1.3); color: black;}
         .img-suggestions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
         .suggestion-item { width: 100%; aspect-ratio: 1; object-fit: contain; cursor: pointer; background: white; border-radius: 6px; padding: 2px; }
-    </style>
+    
+	/* --- CORRECTIF MOBILE (Breakpoints plus larges pour Vivaldi) --- */
+@media (max-width: 768px) {
+    .search-group, #footerClock { display: none !important; }
+
+    .menu-text {
+        width: 48px; height: 48px; padding: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0 !important; border-radius: 50%; border-width: 2px;
+    }
+    .menu-text::before { 
+        content: '≡'; 
+        font-size: 32px !important; 
+        color: var(--accent); 
+        display: block;
+    }
+
+    .search-footer { height: 70px; justify-content: center; padding: 0 10px; }
+    .footer-left { min-width: auto; }
+
+    .grid-container { 
+        height: calc(100vh - 80px); 
+        grid-template-columns: repeat(3, 1fr) !important; 
+        padding: 10px; 
+    }
+    
+    .tile img { margin-bottom: 5px; max-height: 50%; }
+    .tile-label { font-size: 10px; }
+    
+    #folderPopup { 
+        max-width: 92vw !important; left: 4vw !important; top: 8vh !important; 
+        position: fixed !important; padding: 10px; border-radius: 15px;
+    }
+    .folder-content { 
+        grid-template-columns: repeat(3, 1fr) !important; gap: 8px; padding: 10px;
+    }
+    .folder-toolbar { display: none !important; }
+}
+
+	</style>
 </head>
 <body>
 
@@ -247,6 +258,7 @@
             
             <button class="btn" style="background:#5D9948; margin-top:10px" id="btn-export">📤 EXPORTER CONFIG</button>
             <button class="btn" style="background:#f59e0b; margin-top:15px" id="btn-trigger-import">📥 IMPORTER CONFIG</button>
+            <button class="btn" style="background:#0284c7; margin-top:15px" id="btn-import-bookmarks">📑 IMPORTER FAVORIS (HTML)</button>
             <button class="btn" style="background:#D14747; margin-top:20px" id="btn-undo">↩ ANNULER</button>
             <input type="file" id="importFile" style="display:none">
         </div>
