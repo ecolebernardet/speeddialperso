@@ -423,13 +423,15 @@ function searchGoogleImages(type) {
 
 // 9. IMPORT/EXPORT & HORLOGE
 function exportData() {
-    // Génération de la date au format aaaammjj
+    // Génération de la date au format aaaammjj et l'heure hhmm
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    const dateStr = `${year}${month}${day}`;
-
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    const dateStr = `${year}${month}${day}_${hours}${minutes}`;
     const fileName = `export_SpeedDialPerso_${dateStr}.json`;
     
     const blob = new Blob([JSON.stringify({config, data: tilesData})], {type: 'application/json'});
