@@ -103,35 +103,17 @@ function init() {
 function renderGrid() {
     const grid = document.getElementById('grid');
     if(!grid) return;
-
-    // --- CORRECTIF VIVALDI MOBILE ---
-    const isMobile = window.innerWidth <= 768;
-    document.body.setAttribute('data-mobile', isMobile ? "true" : "false");
-    // --------------------------------
-
     grid.innerHTML = '';
-    const currentCols = isMobile ? 3 : config.cols;
-
-    // Calcul dynamique du nombre de lignes pour ne jamais avoir de vide ou de manque
-    let maxR = 0;
-    Object.keys(tilesData).forEach(coords => {
-        const [c, r] = coords.split('-').map(Number);
-        if (r > maxR) maxR = r;
-    });
-
-    // En mobile, on s'assure d'afficher au moins assez de lignes pour toutes les tuiles
-    let displayRows = Math.max(config.rows, maxR + 1);
-
-    document.documentElement.style.setProperty('--cols', currentCols);
-    document.documentElement.style.setProperty('--rows', isMobile ? 'auto' : config.rows);
+    document.documentElement.style.setProperty('--cols', config.cols);
+    document.documentElement.style.setProperty('--rows', config.rows);
     document.documentElement.style.setProperty('--gap', config.gap + 'px');
     document.documentElement.style.setProperty('--font-size', config.fontSize + 'px');
     document.body.style.fontFamily = config.fontFamily;
     document.documentElement.style.setProperty('--tile-bg', config.tileBgColor);
     document.documentElement.style.setProperty('--folder-tile-bg', config.folderTileBgColor);
 
-    for (let r = 0; r < displayRows; r++) {
-        for (let c = 0; c < currentCols; c++) {
+    for (let r = 0; r < config.rows; r++) {
+        for (let c = 0; c < config.cols; c++) {
             let coords = `${c}-${r}`;
             grid.appendChild(createTile(coords, tilesData[coords], true));
         }
@@ -196,7 +178,7 @@ function openFolder(coords) {
     fPopup.style.opacity = "1";
     fPopup.style.transform = "scale(1)";
 
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 600) {
         document.body.style.overflow = 'hidden';
     }
 
@@ -213,7 +195,7 @@ function openFolder(coords) {
     itemsKeys.forEach(key => { const [c, r] = key.split('-').map(Number); if (r > maxR) maxR = r; });
     const displayRows = Math.max(folder.fConfig.rows, maxR + 1);
 
-    const isMobile = window.innerWidth < 768;
+    const isMobile = window.innerWidth < 600;
     const colWidth = isMobile ? 80 : 100;
 
     fGrid.style.display = 'grid';
@@ -235,23 +217,42 @@ function openFolder(coords) {
             fPopup.style.position = 'absolute';
             fPopup.style.width = "max-content";
             
+            // Placement initial sur la tuile
             let posX = rect.left + window.scrollX;
             let posY = rect.top + window.scrollY;
             
             fPopup.style.left = `${posX}px`;
             fPopup.style.top = `${posY}px`;
 
+            // On utilise un double délai pour être certain que le rendu CSS est terminé
             requestAnimationFrame(() => {
                 const popupWidth = fPopup.offsetWidth;
                 const popupHeight = fPopup.offsetHeight;
-                const viewportWidth = document.documentElement.clientWidth;
+                const viewportWidth = document.documentElement.clientWidth; // Largeur sans scrollbar
                 const viewportHeight = window.innerHeight;
+
+                // Marge de sécurité de 20px
                 const margin = 20;
 
-                if (posX + popupWidth > viewportWidth - margin) posX = viewportWidth - popupWidth - margin;
-                if (posX < margin) posX = margin;
-                if (posY + popupHeight > viewportHeight - margin) posY = viewportHeight - popupHeight - margin;
-                if (posY < margin) posY = margin;
+                // 1. Correction horizontale (Collision Droite)
+                if (posX + popupWidth > viewportWidth - margin) {
+                    posX = viewportWidth - popupWidth - margin;
+                }
+
+                // 2. Correction horizontale (Collision Gauche)
+                if (posX < margin) {
+                    posX = margin;
+                }
+
+                // 3. Correction verticale (Collision Bas)
+                if (posY + popupHeight > viewportHeight - margin) {
+                    posY = viewportHeight - popupHeight - margin;
+                }
+
+                // 4. Correction verticale (Collision Haut)
+                if (posY < margin) {
+                    posY = margin;
+                }
 
                 fPopup.style.left = `${posX}px`;
                 fPopup.style.top = `${posY}px`;
@@ -553,14 +554,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateFooterClock();
     setInterval(updateFooterClock, 1000);
 
-    // Relance le rendu au redimensionnement
-    window.addEventListener('resize', renderGrid);
-
     const listen = (id, evt, fn) => { 
         const el = document.getElementById(id); 
         if(el) el.addEventListener(evt, fn); 
     };
     
+    // Import bookmarks
     listen('btn-import-bookmarks', 'click', () => {
         const input = document.createElement('input');
         input.type = 'file'; input.accept = '.html';

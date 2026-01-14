@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Speed Dial Perso</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,23 +15,20 @@
             --folder-tile-bg: #ffd43b;
         }
 
-        body { 
-            margin: 0;
+        body { margin: 0;
             background-color: var(--bg-main);
             color: var(--text);
             font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
+            overflow: hidden;
             transition: background-color 0.3s;
         }
 
         /* --- STRUCTURE --- */
-        .sidebar { 
-            display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
-            justify-content: space-between;
-            box-sizing: border-box; position: fixed; top: 0; left: -250px; width: 250px; background: var(--sidebar-bg);
-            box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 5000; padding: 10px 25px;
-            overflow-y: auto; 
-        }
+        .sidebar { display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
+        justify-content: space-between;
+        box-sizing: border-box; position: fixed; top: 0; left: -250px; width: 250px; background: var(--sidebar-bg);
+        box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 5000; padding: 10px 25px;
+        overflow-y: auto; }
         
         .sidebar-content { flex: 1; overflow-y: auto; padding-right: 10px; }
 
@@ -61,8 +58,8 @@
         #grid { transition: filter 0.3s ease; will-change: filter; }
 
         .grid-container { 
-            display: grid !important; 
-            grid-template-columns: repeat(var(--cols), 1fr) !important; 
+            display: grid; 
+            grid-template-columns: repeat(var(--cols), 1fr); 
             grid-template-rows: repeat(var(--rows), 1fr);
             width: 100vw; height: calc(100vh - 100px); 
             gap: var(--gap); padding: var(--gap); box-sizing: border-box; 
@@ -183,7 +180,7 @@
         }
 
         /* --- CORRECTIF MOBILE --- */
-        @media screen and (max-width: 768px) {
+        @media (max-width: 600px) {
             .search-group, #footerClock { display: none !important; }
 
             .menu-text {
@@ -196,16 +193,7 @@
             .search-footer { height: 70px; justify-content: center; padding: 0; }
             .footer-left { min-width: auto; }
 
-            .grid-container { 
-                height: auto !important; 
-                min-height: calc(100vh - 70px) !important;
-                grid-template-columns: repeat(3, 1fr) !important; 
-                grid-template-rows: auto !important;
-                padding: 10px !important; 
-                overflow-y: auto !important;
-                width: 100% !important;
-            }
-
+            .grid-container { height: calc(100vh - 80px); grid-template-columns: repeat(3, 1fr) !important; padding: 10px; }
             .tile img { margin-bottom: 5px; max-height: 50%; }
             .tile-label { font-size: 10px; }
             
@@ -229,7 +217,7 @@
         .suggestion-item { width: 100%; aspect-ratio: 1; object-fit: contain; cursor: pointer; background: white; border-radius: 6px; padding: 2px; }
     </style>
 </head>
-<body data-mobile="false">
+<body>
 
     <div class="overlay" id="overlay"></div>
 
