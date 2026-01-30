@@ -264,15 +264,6 @@
 		#modalTileActions.active { display: block;	pointer-events: auto; }
 
 		.modal-actions { position: absolute; }
-		
-		/* Animation pour la fenêtre de suppression */
-	#modalConfirmDelete .modal-actions { transform: scale(0.9);	transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);	}
-	
-	#modalConfirmDelete.active { display: flex !important; }
-	
-	#modalConfirmDelete.active .modal-actions { transform: scale(1); }
-	
-	#btn-do-delete:hover { background: #dc2626 !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);	}
 
 
 	</style>
@@ -398,24 +389,6 @@
             <button class="btn btn-close-modals" style="background:transparent; border:1px solid var(--border)">Annuler</button>
         </div>
     </div>
-
-	<div id="modalConfirmDelete" class="overlay" style="display:none; z-index:7000; align-items:center; justify-content:center;">
-		<div class="modal-actions modal-stop-prop" style="border-color: #ef4444; text-align: center;">
-			<div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
-			<h3 style="color:#ef4444; margin:0 0 10px 0;">Supprimer l'élément ?</h3>
-			<p style="font-size: 13px; color: var(--text); margin-bottom: 20px; line-height: 1.4;">
-				Cette action est irréversible. Le lien ou le dossier (et tout son contenu) sera définitivement retiré.
-			</p>
-	
-			<button class="action-btn" id="btn-do-delete" style="background: #ef4444; color: white; font-weight: bold; margin-bottom: 5px;">
-				OUI, SUPPRIMER
-			</button>
-	
-			<button class="action-btn cancel" id="btn-cancel-delete" style="border: none;">
-				Annuler
-			</button>
-		</div>
-	</div>
 
 <!-- MODALE ACTIONS TUILE -->
 <div id="modalTileActions" class="overlay" style="display:none; z-index:5000; align-items:center; justify-content:center;">
