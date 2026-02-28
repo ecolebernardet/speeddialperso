@@ -330,9 +330,12 @@
             </div>
         </div>
         
-        <div id="footerClock">
-            <div id="footerTime"></div>
-            <div id="footerDate"></div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div id="btn-help" class="menu-text" title="Aide">?</div>
+            <div id="footerClock">
+                <div id="footerTime"></div>
+                <div id="footerDate"></div>
+            </div>
         </div>
     </footer>
 
@@ -413,6 +416,92 @@
 </div>
 </div>
 
+
+<!-- MODALE AIDE -->
+<div id="modalHelp" class="overlay" style="z-index:6000; align-items:center; justify-content:center;">
+    <div class="modal-stop-prop" style="background:var(--sidebar-bg); padding:30px; border-radius:18px; width:560px; max-width:92vw; max-height:85vh; overflow-y:auto; border:1px solid var(--accent); position:relative;">
+        <button onclick="document.getElementById('modalHelp').style.display='none'" style="position:absolute;top:12px;right:16px;background:#ef4444;border:none;color:white;border-radius:50%;width:30px;height:30px;font-size:18px;cursor:pointer;font-weight:bold;line-height:1;">×</button>
+        <h2 style="color:var(--accent);margin-top:0;font-size:1.3rem;">📖 Guide d'utilisation</h2>
+
+        <section style="margin-bottom:22px;">
+            <h3 style="color:#ffd43b;margin-bottom:8px;font-size:1rem;">🖱️ Navigation de base</h3>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#cbd5e1;">
+                <strong style="color:white;">Clic simple</strong> sur une tuile → ouvre le lien dans un nouvel onglet.<br>
+                <strong style="color:white;">Clic long / Clic droit</strong> sur une tuile → affiche le menu d'actions (éditer, dupliquer, supprimer).<br>
+                <strong style="color:white;">Glisser-déposer</strong> → réorganisez vos tuiles en les faisant glisser d'une position à une autre.
+            </p>
+        </section>
+
+        <section style="margin-bottom:22px;">
+            <h3 style="color:#ffd43b;margin-bottom:8px;font-size:1rem;">➕ Ajouter une tuile</h3>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#cbd5e1;">
+                Cliquez sur une <strong style="color:white;">case vide</strong> (pointillés) pour y ajouter un lien ou un dossier.<br>
+                Renseignez l'URL et le nom, puis choisissez une image via :
+            </p>
+            <ul style="margin:6px 0;padding-left:18px;font-size:13px;color:#cbd5e1;line-height:1.8;">
+                <li><strong style="color:white;">AUTO</strong> — récupère automatiquement le favicon du site.</li>
+                <li><strong style="color:white;">GOOGLE</strong> — recherche une image sur Google Images.</li>
+                <li>Upload depuis votre appareil ou collez un lien direct.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom:22px;">
+            <h3 style="color:#ffd43b;margin-bottom:8px;font-size:1rem;">📂 Dossiers</h3>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#cbd5e1;">
+                Cliquez sur une case vide et choisissez <strong style="color:white;">"Dossier"</strong> pour créer un groupe de liens.<br>
+                Un clic sur la tuile dossier ouvre une <strong style="color:white;">fenêtre flottante</strong> avec sa propre grille de liens.<br>
+                Glissez des tuiles <strong style="color:white;">depuis la grille principale vers un dossier</strong> (et inversement) pour les déplacer.
+            </p>
+        </section>
+
+        <section style="margin-bottom:22px;">
+            <h3 style="color:#ffd43b;margin-bottom:8px;font-size:1rem;">🔍 Barre de recherche</h3>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#cbd5e1;">
+                Trois moteurs disponibles en bas de page : <strong style="color:white;">Google</strong>, <strong style="color:white;">Google Images</strong> et <strong style="color:white;">DuckDuckGo</strong>.<br>
+                Tapez votre recherche et appuyez sur <kbd style="background:#0f172a;border:1px solid #475569;padding:1px 6px;border-radius:4px;font-size:12px;">Entrée</kbd> pour ouvrir les résultats dans un nouvel onglet.
+            </p>
+        </section>
+
+        <section style="margin-bottom:22px;">
+            <h3 style="color:#ffd43b;margin-bottom:8px;font-size:1rem;">⚙️ Paramètres (menu latéral)</h3>
+            <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#cbd5e1;">
+                Ouvrez le menu via le bouton <strong style="color:white;">"Paramètres"</strong> en bas à gauche pour :
+            </p>
+            <ul style="margin:6px 0;padding-left:18px;font-size:13px;color:#cbd5e1;line-height:1.8;">
+                <li>Changer la <strong style="color:white;">couleur de fond</strong> et la couleur des tuiles.</li>
+                <li>Ajuster le nombre de <strong style="color:white;">colonnes</strong>, de <strong style="color:white;">lignes</strong> et l'<strong style="color:white;">espacement</strong>.</li>
+                <li>Modifier la <strong style="color:white;">taille et la police</strong> du texte.</li>
+                <li><strong style="color:white;">📤 Exporter</strong> votre configuration en fichier JSON (sauvegarde).</li>
+                <li><strong style="color:white;">📥 Importer</strong> une configuration JSON précédemment sauvegardée.</li>
+                <li><strong style="color:white;">📑 Importer des favoris</strong> depuis un fichier HTML exporté de votre navigateur.</li>
+                <li><strong style="color:white;">↩ Annuler</strong> — revient à la dernière sauvegarde automatique.</li>
+            </ul>
+        </section>
+
+        <section style="margin-bottom:10px;">
+            <h3 style="color:#ffd43b;margin-bottom:8px;font-size:1rem;">💡 Conseils & astuces</h3>
+            <ul style="margin:0;padding-left:18px;font-size:13px;color:#cbd5e1;line-height:1.9;">
+                <li>Vos données sont <strong style="color:white;">sauvegardées automatiquement</strong> dans le navigateur (localStorage).</li>
+                <li>Pensez à <strong style="color:white;">exporter régulièrement</strong> votre config pour éviter toute perte.</li>
+                <li>Sur mobile, le glisser-déposer fonctionne avec un <strong style="color:white;">appui long</strong>.</li>
+                <li>Les images encodées en base64 sont stockées localement — pas besoin d'internet.</li>
+            </ul>
+        </section>
+
+        <div style="text-align:center;margin-top:22px;">
+            <button onclick="document.getElementById('modalHelp').style.display='none'" style="background:var(--accent);color:black;border:none;padding:10px 30px;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('btn-help').addEventListener('click', function() {
+        document.getElementById('modalHelp').style.display = 'flex';
+    });
+    document.getElementById('modalHelp').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+</script>
 
     <script src="script.js"></script>
 </body>
