@@ -1,44 +1,25 @@
 {
-  "manifest_version": 3,
   "name": "Speed Dial Perso",
-  "version": "2.19",
-  "description": "Mon nouvel onglet personnalisé avec gestion de dossiers.",
-  "permissions": ["storage"],
-  "background": {
-    "scripts": ["sw.js"]
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "speed-dial-perso@votre-nom.local",
-      "strict_min_version": "142.0",
-      "data_collection_permissions": {
-        "required": ["none"]
-      }
-    }
-  },
-  "chrome_settings_overrides": {
-    "homepage": "index.html"
-  },
-  "chrome_url_overrides": {
-    "newtab": "index.html"
-  },
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
-  },
-  "icons": {
-    "16":  "icons/icon-16.png",
-    "32":  "icons/icon-32.png",
-    "48":  "icons/icon-48.png",
-    "96":  "icons/icon-96.png",
-    "128": "icons/icon-128.png"
-  },
-  "action": {
-    "default_icon": {
-      "16":  "icons/icon-16.png",
-      "32":  "icons/icon-32.png",
-      "48":  "icons/icon-48.png",
-      "128": "icons/icon-128.png"
+  "short_name": "SpeedDial",
+  "description": "Votre page de démarrage personnalisée",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
-    "default_title": "Speed Dial Perso"
-  }
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
