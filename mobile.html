@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Speed Dial Perso</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <style>
+        :root {
+            --bg-main: #000000;
+            --sidebar-bg: #1e293b;
+            --tile-bg: #000000;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --border: #475569;
+            --cols: 4; --rows: 4; --gap: 10px; --font-size: 10px;
+            --folder-tile-bg: #ffd43b;
+            --fcols: 3;
+            --footer-h: 64px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; background-color: var(--bg-main);
+            color: var(--text); font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; height: 100dvh; width: 100vw;
+        }
+
+        /* GRILLE */
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(var(--cols), 1fr);
+            grid-template-rows: repeat(var(--rows), var(--row-height, 80px));
+            gap: var(--gap); padding: var(--gap);
+            width: 100vw; height: calc(100dvh - var(--footer-h));
+            overflow-y: auto; align-content: start;
+            transition: filter 0.3s ease;
+        }
+
+        /* TUILES */
+        .tile {
+            background: var(--tile-bg); border-radius: 12px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; position: relative;
+            transition: transform 0.1s;
+        }
+        .tile:active { transform: scale(0.93); }
+        .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.25; }
+        .tile.folder { background: var(--folder-tile-bg); }
+        .tile.drag-over { border: 2px solid var(--accent) !important; background: rgba(56,189,248,0.2) !important; transform: scale(1.05); }
+
+        .tile img {
+            width: auto; height: 55%; max-width: 65%;
+            object-fit: contain; pointer-events: none;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            margin-bottom: 18px; border-radius: 8px;
+        }
+        .tile-label {
+            position: absolute; bottom: 0; width: 100%;
+            padding: 3px 2px; text-align: center; font-size: var(--font-size);
+            pointer-events: none; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .tile.folder .tile-label { background: rgba(0,0,0,0.4); z-index: 3; }
+        .folder-icon-bg {
+            position: absolute; width: auto; height: 88%; max-width: 80%;
+            top: 0; left: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none;
+        }
+        .tile.folder .folder-thumb {
+            position: absolute; z-index: 2; width: 38%; height: 38%;
+            top: 44%; left: 50%; transform: translate(-50%, -50%);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* FOOTER */
+        #footer {
+            position: fixed; bottom: 0; left: 0;
+            width: 100vw; height: var(--footer-h);
+            background: #111; border-top: 1px solid var(--border);
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 16px; z-index: 100;
+        }
+        .footer-btn {
+            width: 44px; height: 44px;
+            background: #222; border: 2px solid var(--accent);
+            border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0; transition: background 0.2s;
+        }
+        .footer-btn:active { background: #333; }
+        #footerClock { text-align: center; line-height: 1.2; }
+        #footerTime { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+        #footerDate { font-size: 0.7rem; color: var(--text); text-transform: capitalize; }
+
+        /* SIDEBAR */
+        .sidebar {
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: -290px; width: 280px;
+            height: 100dvh; background: var(--sidebar-bg);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.7);
+            transition: left 0.3s; z-index: 5000;
+            padding: 16px 20px; overflow-y: auto;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar-content { flex: 1; overflow-y: auto; }
+        .sidebar-footer { padding: 16px 0 0; border-top: 1px solid #333; display: flex; justify-content: center; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
+        .overlay.active { display: block; }
+
+        .control-group { margin-bottom: 14px; }
+        .control-group label { display: block; font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        .control-group input, .control-group select {
+            width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px;
+        }
+        .control-group input[type="color"] { height: 36px; padding: 2px; cursor: pointer; }
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+        .stepper { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+        .stepper-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .stepper-val { font-size: 18px; font-weight: bold; color: white; min-width: 30px; text-align: center; }
+
+        /* RECHERCHE OVERLAY */
+        #searchOverlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.88); z-index: 9000;
+            align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+        }
+        #searchOverlay.active { display: flex; }
+        .search-bar {
+            width: 88vw; max-width: 420px; display: flex; align-items: center;
+            background: #1e293b; border-radius: 30px; border: 2px solid var(--accent);
+            padding: 10px 16px; gap: 10px;
+        }
+        .search-bar img { width: 22px; height: 22px; flex-shrink: 0; }
+        .search-bar input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 17px; }
+        .search-bar button { background: var(--accent); border: none; border-radius: 20px; padding: 7px 16px; font-weight: bold; color: black; cursor: pointer; font-size: 15px; }
+        #searchHint { color: #64748b; font-size: 13px; }
+        #searchClose { background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 20px; padding: 9px 26px; cursor: pointer; font-size: 13px; }
+
+        /* DOSSIER */
+        #folderOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(2px); display: none; z-index: 2500;
+            align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px 0;
+        }
+        #folderPopup {
+            background: var(--sidebar-bg); border-radius: 18px; border: 2px solid var(--accent);
+            padding: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            position: relative; width: 90vw; max-width: 420px; display: flex; flex-direction: column;
+        }
+        #closeFolderBtn {
+            position: absolute; top: -14px; right: -14px; width: 30px; height: 30px;
+            background: #ef4444; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 20px; font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 9999; border: 2px solid white;
+        }
+        #folderGrid {
+            display: grid; grid-template-columns: repeat(var(--fcols, 3), 1fr);
+            gap: 8px; padding: 8px; max-height: 65vh; overflow-y: auto;
+        }
+        .folder-toolbar { display: none; }
+        .folder-toolbar-mobile { display: flex; justify-content: center; gap: 20px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; }
+        .ftm-group { display: flex; align-items: center; gap: 8px; }
+        .ftm-label { font-size: 11px; color: var(--accent); min-width: 60px; text-align: center; }
+        .ftm-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* MODALES */
+        #modalLink, #modalFolder {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: none; z-index: 4000; align-items: center; justify-content: center;
+        }
+        .modal-inner {
+            background: var(--sidebar-bg); padding: 22px;
+            border-radius: 14px; width: 88vw; max-width: 400px;
+        }
+        .modal-inner h3 { margin-top: 0; }
+        .modal-inner input[type="text"] {
+            width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 14px; margin-top: 4px;
+        }
+        .modal-inner label { font-size: 11px; color: var(--accent); text-transform: uppercase; display: block; margin-top: 12px; margin-bottom: 4px; }
+        .modal-stop-prop { /* handled by inner div */ }
+        .img-suggestions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+        .img-suggestions img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; }
+        .img-suggestions img:hover { border-color: var(--accent); }
+
+        #modalTileActions {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: none; z-index: 5000; align-items: flex-end; justify-content: center; padding-bottom: 20px;
+        }
+        .modal-actions { background: var(--sidebar-bg); border-radius: 16px; padding: 16px; width: 88vw; max-width: 380px; }
+        .modal-actions h3 { text-align: center; margin: 0 0 14px; font-size: 15px; }
+        .action-btn { width: 100%; padding: 13px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 15px; cursor: pointer; margin-bottom: 8px; text-align: left; }
+        .action-btn.primary { border-color: var(--accent); color: var(--accent); }
+        .action-btn.cancel { background: transparent; color: #94a3b8; text-align: center; }
+
+        /* AIDE */
+        #helpPanel {
+            position: fixed; top: 0; right: -100vw; width: 92vw; max-width: 380px;
+            height: 100dvh; background: var(--sidebar-bg); z-index: 6000;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.7); transition: right 0.3s ease;
+            overflow-y: auto; padding: 24px 20px; border-left: 1px solid var(--accent);
+        }
+        #helpPanel.open { right: 0; }
+        #helpOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 5999; }
+        #helpOverlay.active { display: block; }
+
+        /* classes requises par script.js */
+        .hide-mobile { display: none !important; }
+        .show-mobile-flex { display: block; }
+        .grid-container { /* alias pour #grid */ }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <h2 style="color:var(--accent);margin-top:0;font-size:1.1rem;">⚙️ Paramètres</h2>
+            <div class="control-group"><label>Couleur de fond</label><input type="color" id="bgInput"></div>
+            <div class="control-group"><label>Couleur tuiles liens</label><input type="color" id="tileColorInput"></div>
+            <div class="control-group"><label>Couleur tuiles dossiers</label><input type="color" id="folderTileColorInput"></div>
+            <div class="control-group">
+                <label>Colonnes</label>
+                <div class="stepper">
+                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
+                    <span class="stepper-val" id="stepperColsVal">4</span>
+                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
+                    <input type="hidden" id="colsInput" value="4">
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Lignes</label>
+                <div class="stepper">
+                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
+                    <span class="stepper-val" id="stepperRowsVal">4</span>
+                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
+                    <input type="hidden" id="rowsInput" value="4">
+                </div>
+            </div>
+            <div class="control-group"><label>Espacement (px)</label><input type="number" id="gapInput" min="0" value="10"></div>
+            <div class="control-group"><label>Taille police (px)</label><input type="number" id="fontInput" min="6" value="10"></div>
+            <div class="control-group">
+                <label>Police</label>
+                <select id="fontFamilyInput">
+                    <option value="'Segoe UI', sans-serif">Standard</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                    <option value="'Courier New', monospace">Monospace</option>
+                    <option value="'Georgia', serif">Serif</option>
+                    <option value="cursive">Manuscrit</option>
+                </select>
+            </div>
+            <hr style="border:0;border-top:1px solid var(--border);margin:12px 0;">
+            <button class="btn" style="background:#5D9948" id="btn-export">📤 Exporter config</button>
+            <button class="btn" style="background:#f59e0b" id="btn-trigger-import">📥 Importer config</button>
+            <button class="btn" style="background:#0284c7" id="btn-import-bookmarks">📑 Importer favoris (HTML)</button>
+            <button class="btn" style="background:#D14747" id="btn-undo">↩ Annuler</button>
+            <input type="file" id="importFile" style="display:none">
+        </div>
+        <div class="sidebar-footer">
+            <div id="btn-close-sidebar" style="background:var(--accent);color:black;border:none;padding:10px 30px;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;">FERMER</div>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- GRILLE — id="grid" requis par script.js -->
+    <main id="grid"></main>
+
+    <!-- FOOTER -->
+    <footer id="footer">
+        <button class="footer-btn" id="btn-menu" title="Paramètres" style="font-size:26px;">≡</button>
+        <button class="footer-btn" id="btn-search-mobile" title="Recherche Google" style="font-size:20px;">🔍</button>
+        <div id="footerClock">
+            <div id="footerTime"></div>
+            <div id="footerDate"></div>
+        </div>
+        <button class="footer-btn" id="btn-help" title="Aide" style="font-size:18px;">❔</button>
+    </footer>
+
+    <!-- RECHERCHE OVERLAY -->
+    <div id="searchOverlay">
+        <div class="search-bar">
+            <img src="https://www.google.com/favicon.ico" alt="G">
+            <input id="searchOverlayInput" type="text" placeholder="Rechercher sur Google…">
+            <button id="searchOverlayBtn">→</button>
+        </div>
+        <div id="searchHint">Tapez et appuyez sur Entrée ou →</div>
+        <button id="searchClose">Fermer</button>
+    </div>
+
+    <!-- DOSSIER -->
+    <div id="folderOverlay">
+        <div id="folderPopup">
+            <div id="closeFolderBtn">&times;</div>
+            <div class="folder-toolbar">
+                <input type="number" id="fCols" min="1">
+                <input type="number" id="fRows" min="1">
+                <input type="number" id="fGap" min="0">
+                <input type="color" id="fPopBg">
+            </div>
+            <div id="folderGrid"></div>
+            <div class="folder-toolbar-mobile" id="folderToolbarMobile">
+                <div class="ftm-group">
+                    <button class="ftm-btn" onclick="changeFolderSetting('fCols', -1)">−</button>
+                    <span class="ftm-label">Cols <span id="ftmColsVal">3</span></span>
+                    <button class="ftm-btn" onclick="changeFolderSetting('fCols', +1)">+</button>
+                </div>
+                <div class="ftm-group">
+                    <button class="ftm-btn" onclick="changeFolderSetting('fRows', -1)">−</button>
+                    <span class="ftm-label">Lignes <span id="ftmRowsVal">3</span></span>
+                    <button class="ftm-btn" onclick="changeFolderSetting('fRows', +1)">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE LIEN -->
+    <div id="modalLink" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;z-index:4000;align-items:center;justify-content:center;">
+        <div class="modal-inner modal-stop-prop" style="border:1px solid var(--accent);">
+            <h3 style="color:var(--accent);">🔗 Édition Lien</h3>
+            <label>URL</label><input type="text" id="linkUrl">
+            <label>Nom</label><input type="text" id="linkName">
+            <label>Image</label>
+            <div style="display:flex;gap:6px;margin:6px 0;">
+                <input type="file" id="linkImgFile" accept="image/*" style="font-size:11px;flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;padding:6px;color:white;">
+                <button class="btn" id="btn-auto-icon" style="background:var(--accent);width:auto;font-size:11px;padding:6px 10px;color:black;margin:0;">AUTO</button>
+                <button class="btn btn-google-search" data-type="link" style="background:#ea4335;width:auto;font-size:11px;padding:6px 10px;margin:0;">GOOGLE</button>
+            </div>
+            <input type="text" id="linkImg" placeholder="Lien direct image" style="width:100%;padding:8px;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:white;border-radius:6px;font-size:13px;">
+            <div id="linkSuggestions" class="img-suggestions" style="display:none"></div>
+            <center><img id="linkPreview" style="max-width:70px;margin-top:8px;display:none;border-radius:8px;"></center>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+                <button class="btn" id="btn-confirm-link" style="background:#22c55e;margin:0;flex:1;">Valider</button>
+                <button class="btn btn-delete-item" style="background:#ef4444;margin:0;flex:1;">Supprimer</button>
+            </div>
+            <button class="btn btn-close-modals" style="background:transparent;border:1px solid var(--border);margin-top:8px;">Annuler</button>
+        </div>
+    </div>
+
+    <!-- MODALE DOSSIER -->
+    <div id="modalFolder" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;z-index:4000;align-items:center;justify-content:center;">
+        <div class="modal-inner modal-stop-prop" style="border:1px solid #ffd43b;">
+            <h3 style="color:#ffd43b;">📂 Édition Dossier</h3>
+            <label>Nom du dossier</label><input type="text" id="folderName">
+            <label>Image (optionnel)</label>
+            <div style="display:flex;gap:6px;margin:6px 0;">
+                <input type="file" id="folderImgFile" accept="image/*" style="font-size:11px;flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;padding:6px;color:white;">
+                <button class="btn btn-google-search" data-type="folder" style="background:#ea4335;width:auto;font-size:11px;padding:6px 10px;margin:0;">GOOGLE</button>
+            </div>
+            <input type="text" id="folderImg" placeholder="Lien direct image" style="width:100%;padding:8px;background:rgba(0,0,0,0.3);border:1px solid var(--border);color:white;border-radius:6px;font-size:13px;">
+            <center><img id="folderPreview" style="max-width:70px;margin-top:8px;display:none;border-radius:8px;"></center>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+                <button class="btn" id="btn-confirm-folder" style="background:#22c55e;margin:0;flex:1;">Valider</button>
+                <button class="btn btn-delete-item" style="background:#ef4444;margin:0;flex:1;">Supprimer</button>
+            </div>
+            <button class="btn btn-close-modals" style="background:transparent;border:1px solid var(--border);margin-top:8px;">Annuler</button>
+        </div>
+    </div>
+
+    <!-- MODALE ACTIONS TUILE -->
+    <div id="modalTileActions" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;z-index:5000;align-items:flex-end;justify-content:center;padding-bottom:20px;">
+        <div class="modal-actions">
+            <h3>Action sur la tuile</h3>
+            <button class="action-btn primary" data-action="edit">✏️ Éditer</button>
+            <button class="action-btn" data-action="duplicate">📄 Dupliquer</button>
+            <button class="action-btn" data-action="delete" style="border-color:#ef4444;background:rgba(239,68,68,0.1);color:#ef4444;">🗑️ Supprimer</button>
+            <button class="action-btn cancel" id="btn-cancel-tile-actions">Annuler</button>
+        </div>
+    </div>
+
+    <!-- AIDE -->
+    <div id="helpOverlay"></div>
+    <div id="helpPanel">
+        <button id="btn-close-help-x" style="position:absolute;top:12px;right:16px;background:#ef4444;border:none;color:white;border-radius:50%;width:30px;height:30px;font-size:18px;cursor:pointer;font-weight:bold;">×</button>
+        <h2 style="color:var(--accent);margin-top:0;font-size:1.2rem;">📖 Guide</h2>
+        <p style="font-size:13px;color:#cbd5e1;line-height:1.8;">
+            <strong style="color:white;">Tap</strong> → ouvre le lien<br>
+            <strong style="color:white;">Appui long</strong> → éditer / supprimer<br>
+            <strong style="color:white;">Glisser</strong> → réorganiser<br>
+            <strong style="color:white;">Case vide</strong> → ajouter lien ou dossier<br>
+            <strong style="color:white;">🔍</strong> → recherche Google<br>
+            <strong style="color:white;">⚙️</strong> → paramètres<br>
+        </p>
+        <button id="btn-close-help-bottom" style="background:var(--accent);color:black;border:none;padding:10px 30px;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;display:block;margin:16px auto 0;">Fermer</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // ── RECHERCHE ──
+        const searchOverlay = document.getElementById('searchOverlay');
+        const searchInput   = document.getElementById('searchOverlayInput');
+
+        document.getElementById('btn-search-mobile').addEventListener('click', () => {
+            searchOverlay.classList.add('active');
+            setTimeout(() => searchInput.focus(), 150);
+        });
+        document.getElementById('searchClose').addEventListener('click', closeSearch);
+        document.getElementById('searchOverlayBtn').addEventListener('click', doSearch);
+        searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+        searchOverlay.addEventListener('click', e => { if (e.target === searchOverlay) closeSearch(); });
+
+        function doSearch() {
+            const q = searchInput.value.trim();
+            if (q) {
+                window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+                closeSearch();
+            }
+        }
+        function closeSearch() {
+            searchOverlay.classList.remove('active');
+            searchInput.value = '';
+        }
+
+        // ── AIDE ──
+        document.getElementById('btn-help').addEventListener('click', () => {
+            document.getElementById('helpPanel').classList.add('open');
+            document.getElementById('helpOverlay').classList.add('active');
+        });
+        ['helpOverlay','btn-close-help-x','btn-close-help-bottom'].forEach(id => {
+            document.getElementById(id).addEventListener('click', () => {
+                document.getElementById('helpPanel').classList.remove('open');
+                document.getElementById('helpOverlay').classList.remove('active');
+            });
+        });
+
+        // ── SERVICE WORKER ──
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+        }
+    </script>
+</body>
+</html>
