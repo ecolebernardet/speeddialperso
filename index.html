@@ -422,7 +422,7 @@
     <footer class="search-footer" id="search-footer">
         <div class="footer-left">
             <div id="btn-menu" class="menu-text">⚙️</div>
-            <div id="btn-search-mobile" class="menu-text" title="Recherche Google" style="margin-left:8px; display:none; align-items:center; justify-content:center; font-size:22px;">🔍</div>
+            <div id="btn-search-mobile" class="menu-text" title="Recherche Google" style="margin-left:8px;">🔍</div>
         </div>
 
         <div class="search-group">
@@ -634,21 +634,7 @@
         const searchOverlay = document.getElementById('searchOverlay');
         const searchInput = document.getElementById('searchOverlayInput');
 
-        // Affiche le bouton loupe sur mobile/tactile
-        function initSearchButton() {
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            const searchMobileBtn = document.getElementById('btn-search-mobile');
-            if (isTouchDevice) {
-                searchMobileBtn.style.display = 'flex';
-            } else {
-                searchMobileBtn.style.display = 'none';
-            }
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initSearchButton);
-        } else {
-            initSearchButton();
-        }
+
 
         document.getElementById('btn-search-mobile').addEventListener('click', () => {
             searchOverlay.style.display = 'flex';
