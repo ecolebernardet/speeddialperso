@@ -253,6 +253,27 @@
             .folder-toolbar { display: none; }
         }
 
+        /* --- STEPPER MOBILE SETTINGS --- */
+        .hide-mobile { display: block; }
+        .show-mobile-flex { display: none; }
+        .stepper {
+            display: flex; align-items: center; gap: 12px; margin-top: 4px;
+        }
+        .stepper-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 1px solid var(--accent); background: transparent;
+            color: var(--accent); font-size: 20px; line-height: 1;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .stepper-val {
+            font-size: 18px; font-weight: bold; color: white;
+            min-width: 30px; text-align: center;
+        }
+        @media (max-width: 600px) {
+            .hide-mobile { display: none !important; }
+            .show-mobile-flex { display: block; }
+        }
+
         /* --- TOOLBAR DOSSIER MOBILE --- */
         .folder-toolbar-mobile {
             display: none;
@@ -349,12 +370,28 @@
             <div class="control-group"><label>Couleur de fond globale</label><input type="color" id="bgInput"></div>
             <div class="control-group"><label>Couleur des tuiles (Lien)</label><input type="color" id="tileColorInput"></div>
             <div class="control-group"><label>Couleur des tuiles (Dossier)</label><input type="color" id="folderTileColorInput"></div>
-            <div class="control-group"><label>Colonnes</label><input type="number" id="colsInput" min="1"></div>
-            <div class="control-group"><label>Lignes</label><input type="number" id="rowsInput" min="1"></div>
-            <div class="control-group"><label>Espacement (px)</label><input type="number" id="gapInput" min="0"></div>
-            <div class="control-group"><label>Taille police (px)</label><input type="number" id="fontInput" min="6"></div>
+            <div class="control-group hide-mobile"><label>Colonnes</label><input type="number" id="colsInput" min="1"></div>
+            <div class="control-group show-mobile-flex">
+                <label>Colonnes</label>
+                <div class="stepper">
+                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
+                    <span class="stepper-val" id="stepperColsVal">4</span>
+                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
+                </div>
+            </div>
+            <div class="control-group hide-mobile"><label>Lignes</label><input type="number" id="rowsInput" min="1"></div>
+            <div class="control-group show-mobile-flex">
+                <label>Lignes</label>
+                <div class="stepper">
+                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
+                    <span class="stepper-val" id="stepperRowsVal">4</span>
+                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
+                </div>
+            </div>
+            <div class="control-group hide-mobile"><label>Espacement (px)</label><input type="number" id="gapInput" min="0"></div>
+            <div class="control-group hide-mobile"><label>Taille police (px)</label><input type="number" id="fontInput" min="6"></div>
             
-            <div class="control-group">
+            <div class="control-group hide-mobile">
                 <label>Police d'écriture</label>
                 <select id="fontFamilyInput">
                     <option value="'Segoe UI', sans-serif">Standard (Segoe UI)</option>

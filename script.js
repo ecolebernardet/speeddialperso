@@ -95,6 +95,17 @@ function _applyGridParams() {
     saveToLocal();
 }
 
+function changeGridSetting(field, delta) {
+    const input = document.getElementById(field);
+    if (!input) return;
+    const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
+    input.value = newVal;
+    // Mettre à jour le stepper affiché
+    if (field === 'colsInput') { const el = document.getElementById('stepperColsVal'); if (el) el.textContent = newVal; }
+    if (field === 'rowsInput') { const el = document.getElementById('stepperRowsVal'); if (el) el.textContent = newVal; }
+    inputGridParams();
+}
+
 function saveToLocal() {
     localStorage.setItem('sd_v2_data', JSON.stringify(tilesData));
     localStorage.setItem('sd_v2_config', JSON.stringify(config));
@@ -142,6 +153,10 @@ function init() {
         document.getElementById('fontInput').value = config.fontSize;
         document.getElementById('fontFamilyInput').value = config.fontFamily || "'Segoe UI', sans-serif";
         document.getElementById('tileColorInput').value = config.tileBgColor;
+        const sc = document.getElementById('stepperColsVal');
+        const sr = document.getElementById('stepperRowsVal');
+        if (sc) sc.textContent = config.cols;
+        if (sr) sr.textContent = config.rows;
         document.getElementById('folderTileColorInput').value = config.folderTileBgColor;
         document.body.style.backgroundColor = config.bgColor;
     }
