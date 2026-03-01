@@ -303,40 +303,51 @@ function createTile(coords, data, isMain) {
                 document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
 
                 const touch = e.changedTouches[0];
-
-                // Masquer temporairement popup et overlay pour que elementFromPoint voit la grille dessous
-                const folderPopup = document.getElementById('folderPopup');
-                const folderOverlay = document.getElementById('folderOverlay');
-                if (folderPopup) folderPopup.style.pointerEvents = 'none';
-                if (folderOverlay) folderOverlay.style.pointerEvents = 'none';
-
-                const el = document.elementFromPoint(touch.clientX, touch.clientY);
-
-                if (folderPopup) folderPopup.style.pointerEvents = '';
-                if (folderOverlay) folderOverlay.style.pointerEvents = '';
-
-                const targetTile = el?.closest('.tile');
-                const droppedInsidePopup = !!el?.closest('#folderPopup');
+                const tx = touch.clientX;
+                const ty = touch.clientY;
                 const wasInFolder = !isMain;
 
-                if (wasInFolder && !droppedInsidePopup) {
-                    // Drag sorti du dossier vers la grille principale
-                    const toCoords = targetTile?.id?.startsWith('tile-')
-                        ? targetTile.id.replace('tile-', '')
-                        : null;
-                    if (toCoords) {
-                        handleDropMain(toCoords);
-                        closeFolder();
-                    }
-                } else if (targetTile) {
-                    const targetId = targetTile.id;
-                    let toCoords = null;
-                    if (targetId.startsWith('tile-')) toCoords = targetId.replace('tile-', '');
-                    else if (targetId.startsWith('folder-tile-')) toCoords = targetId.replace('folder-tile-', '');
+                if (wasInFolder) {
+                    // Vérifier si le doigt est sorti du folderPopup
+                    const popup = document.getElementById('folderPopup');
+                    const popupRect = popup ? popup.getBoundingClientRect() : null;
+                    const isOutsidePopup = popupRect && (
+                        tx < popupRect.left || tx > popupRect.right ||
+                        ty < popupRect.top  || ty > popupRect.bottom
+                    );
 
-                    if (toCoords && toCoords !== coords) {
-                        if (targetId.startsWith('folder-tile-')) handleDropFolder(toCoords);
-                        else handleDropMain(toCoords);
+                    if (isOutsidePopup) {
+                        // Trouver la tuile principale par coordonnées géométriques
+                        const toCoords = getTileAtPoint(tx, ty);
+                        if (toCoords) {
+                            handleDropMain(toCoords);
+                            closeFolder();
+                        }
+                    } else {
+                        // Réorganisation interne au dossier via elementsFromPoint
+                        const targetTile = document.elementsFromPoint(tx, ty)
+                            .find(el => el.classList.contains('tile') && el !== div);
+                        if (targetTile) {
+                            const targetId = targetTile.id;
+                            if (targetId.startsWith('folder-tile-')) {
+                                const toCoords = targetId.replace('folder-tile-', '');
+                                if (toCoords !== coords) handleDropFolder(toCoords);
+                            }
+                        }
+                    }
+                } else {
+                    // Drag depuis la grille principale
+                    const elements = document.elementsFromPoint(tx, ty);
+                    const targetTile = elements.find(el => el.classList.contains('tile') && el !== div);
+                    if (targetTile) {
+                        const targetId = targetTile.id;
+                        let toCoords = null;
+                        if (targetId.startsWith('tile-')) toCoords = targetId.replace('tile-', '');
+                        else if (targetId.startsWith('folder-tile-')) toCoords = targetId.replace('folder-tile-', '');
+                        if (toCoords && toCoords !== coords) {
+                            if (targetId.startsWith('folder-tile-')) handleDropFolder(toCoords);
+                            else handleDropMain(toCoords);
+                        }
                     }
                 }
 
@@ -555,6 +566,19 @@ function updateFolderSettings() {
 }
 
 // 6. DRAG & DROP
+// Trouve les coords d'une tuile principale (tile-*) à partir de coordonnées écran
+function getTileAtPoint(x, y) {
+    const tiles = document.querySelectorAll('#grid .tile');
+    for (const tile of tiles) {
+        const r = tile.getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+            const id = tile.id;
+            if (id.startsWith('tile-')) return id.replace('tile-', '');
+        }
+    }
+    return null;
+}
+
 function handleDropMain(to) {
     saveSnapshot();
     const source = draggedFromFolder ? tilesData[activeFolderCoords].items[draggedCoords] : tilesData[draggedCoords];
