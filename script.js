@@ -461,6 +461,7 @@ function openFolder(coords) {
 
     fGrid.style.display = 'grid';
 fGrid.style.gridTemplateColumns = isMobile ? `repeat(${folder.fConfig.cols}, 1fr)` : `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
+document.documentElement.style.setProperty('--fcols', folder.fConfig.cols);
 fGrid.style.gap = `${folder.fConfig.gap}px`;
 fPopup.style.backgroundColor = folder.fConfig.fBgColor;
 
