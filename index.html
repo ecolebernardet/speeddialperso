@@ -220,7 +220,7 @@
         }
 
         /* --- CORRECTIF MOBILE --- */
-        @media (max-width: 600px) {
+        @media (max-width: 1024px) {
             .search-group, #footerClock, .help-text { display: none !important; }
 
             .menu-text {
@@ -229,7 +229,7 @@
                 font-size: 0; border-radius: 50%; border-width: 2px;
             }
             #btn-menu::before { content: '≡'; font-size: 30px; color: var(--accent); }
-            #btn-search-mobile { display: flex !important; font-size: 22px !important; width: 45px; height: 45px; }
+
 
 
 
@@ -274,7 +274,7 @@
             font-size: 18px; font-weight: bold; color: white;
             min-width: 30px; text-align: center;
         }
-        @media (max-width: 600px) {
+        @media (max-width: 1024px) {
             .hide-mobile { display: none !important; }
             .show-mobile-flex { display: block; }
         }
@@ -283,7 +283,7 @@
         .folder-toolbar-mobile {
             display: none;
         }
-        @media (max-width: 600px) {
+        @media (max-width: 1024px) {
             .folder-toolbar-mobile {
                 display: flex;
                 justify-content: center;
@@ -426,7 +426,7 @@
     <footer class="search-footer" id="search-footer">
         <div class="footer-left">
             <div id="btn-menu" class="menu-text">⚙️</div>
-            <div id="btn-search-mobile" class="menu-text" title="Recherche Google" style="margin-left:8px; display:flex !important; font-size:22px !important; min-width:45px; height:45px; align-items:center; justify-content:center;">🔍</div>
+            <div id="btn-search-mobile" title="Recherche Google" style="margin-left:8px; display:flex; align-items:center; justify-content:center; width:45px; height:45px; font-size:26px; cursor:pointer; background:#222; border-radius:50%; border:2px solid #38bdf8; flex-shrink:0;">🔍</div>
         </div>
 
         <div class="search-group">
