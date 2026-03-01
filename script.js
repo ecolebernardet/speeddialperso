@@ -237,14 +237,13 @@ function createTile(coords, data, isMain) {
                 if (navigator.vibrate) navigator.vibrate(40);
                 openTileActionsModal(coords);
             }, 500);
-        }, { passive: true });
+        }, { passive: false });
 
         div.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
             const dx = touch.clientX - touchStartX;
             const dy = touch.clientY - touchStartY;
 
-            // Si le doigt bouge de plus de 8px avant le long press → c'est un drag
             if (!touchDragStarted && !longPressFired && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
                 clearTimeout(longPressTimer);
                 longPressTimer = null;
@@ -252,7 +251,6 @@ function createTile(coords, data, isMain) {
                 draggedCoords = coords;
                 draggedFromFolder = !isMain;
 
-                // Créer le clone flottant
                 const rect = div.getBoundingClientRect();
                 touchClone = div.cloneNode(true);
                 touchClone.style.cssText = `
@@ -276,15 +274,14 @@ function createTile(coords, data, isMain) {
             if (touchDragStarted && touchClone) {
                 e.preventDefault();
                 const t = e.touches[0];
-                const rect = touchClone.getBoundingClientRect();
-                touchClone.style.left = (t.clientX - rect.width / 2) + 'px';
-                touchClone.style.top  = (t.clientY - rect.height / 2) + 'px';
+                const cRect = touchClone.getBoundingClientRect();
+                touchClone.style.left = (t.clientX - cRect.width / 2) + 'px';
+                touchClone.style.top  = (t.clientY - cRect.height / 2) + 'px';
 
-                // Surbrillance de la tuile cible
+                // Surbrillance de la tuile cible (recherche géométrique)
                 document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
-                const el = document.elementFromPoint(t.clientX, t.clientY);
-                const targetTile = el?.closest('.tile');
-                if (targetTile && targetTile !== div) targetTile.classList.add('drag-over');
+                const hovered = getTileElementAtPoint(t.clientX, t.clientY, div);
+                if (hovered) hovered.classList.add('drag-over');
             }
         }, { passive: false });
 
@@ -305,40 +302,34 @@ function createTile(coords, data, isMain) {
                 const touch = e.changedTouches[0];
                 const tx = touch.clientX;
                 const ty = touch.clientY;
-                const wasInFolder = !isMain;
 
-                if (wasInFolder) {
-                    // Vérifier si le doigt est sorti du folderPopup
+                if (!isMain) {
+                    // === Drag depuis l'intérieur d'un dossier ===
                     const popup = document.getElementById('folderPopup');
                     const popupRect = popup ? popup.getBoundingClientRect() : null;
-                    const isOutsidePopup = popupRect && (
+                    const isOutside = popupRect && (
                         tx < popupRect.left || tx > popupRect.right ||
                         ty < popupRect.top  || ty > popupRect.bottom
                     );
 
-                    if (isOutsidePopup) {
-                        // Trouver la tuile principale par coordonnées géométriques
-                        const toCoords = getTileAtPoint(tx, ty);
-                        if (toCoords) {
+                    if (isOutside) {
+                        // Sortie vers la grille principale
+                        const toCoords = getTileCoordsAtPoint(tx, ty, 'main');
+                        if (toCoords !== null) {
                             handleDropMain(toCoords);
                             closeFolder();
                         }
                     } else {
-                        // Réorganisation interne au dossier via elementsFromPoint
-                        const targetTile = document.elementsFromPoint(tx, ty)
-                            .find(el => el.classList.contains('tile') && el !== div);
-                        if (targetTile) {
-                            const targetId = targetTile.id;
-                            if (targetId.startsWith('folder-tile-')) {
-                                const toCoords = targetId.replace('folder-tile-', '');
-                                if (toCoords !== coords) handleDropFolder(toCoords);
-                            }
+                        // Réorganisation interne au dossier
+                        const toCoords = getTileCoordsAtPoint(tx, ty, 'folder');
+                        if (toCoords !== null && toCoords !== coords) {
+                            handleDropFolder(toCoords);
                         }
                     }
                 } else {
-                    // Drag depuis la grille principale : on utilise getTileAtPoint (géométrique, fiable)
-                    const toCoords = getTileAtPoint(tx, ty);
-                    if (toCoords && toCoords !== coords) {
+                    // === Drag depuis la grille principale ===
+                    const toCoords = getTileCoordsAtPoint(tx, ty, 'main');
+                    if (toCoords !== null && toCoords !== coords) {
                         handleDropMain(toCoords);
                     }
                 }
@@ -346,10 +337,10 @@ function createTile(coords, data, isMain) {
                 touchDragStarted = false;
                 draggedCoords = null;
             }
-        });
+        }, { passive: false });
     }
 
-    // Logique de Drag & Drop souris desktop (inchangée)
+        // Logique de Drag & Drop souris desktop (inchangée)
     div.addEventListener('dragstart', (e) => { draggedCoords = coords; draggedFromFolder = !isMain; div.classList.add('dragging'); e.dataTransfer.setData('text/plain', coords); });
     div.addEventListener('dragend', () => { div.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t => t.classList.remove('drag-over')); });
     div.addEventListener('dragover', (e) => { e.preventDefault(); if(coords !== draggedCoords) div.classList.add('drag-over'); });
@@ -558,14 +549,29 @@ function updateFolderSettings() {
 }
 
 // 6. DRAG & DROP
-// Trouve les coords d'une tuile principale (tile-*) à partir de coordonnées écran
-function getTileAtPoint(x, y) {
-    const tiles = document.querySelectorAll('#grid .tile');
+// Trouve l'élément tuile sous un point (excluant la tuile draggée)
+function getTileElementAtPoint(x, y, exclude) {
+    const tiles = document.querySelectorAll('.tile');
+    for (const tile of tiles) {
+        if (tile === exclude) continue;
+        const r = tile.getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+            return tile;
+        }
+    }
+    return null;
+}
+
+// Trouve les coords d'une tuile à partir de coordonnées écran
+// mode 'main' → cherche dans #grid (tile-*), mode 'folder' → cherche dans #folderGrid (folder-tile-*)
+function getTileCoordsAtPoint(x, y, mode) {
+    const selector = mode === 'main' ? '#grid .tile' : '#folderGrid .tile';
+    const prefix   = mode === 'main' ? 'tile-'        : 'folder-tile-';
+    const tiles = document.querySelectorAll(selector);
     for (const tile of tiles) {
         const r = tile.getBoundingClientRect();
         if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-            const id = tile.id;
-            if (id.startsWith('tile-')) return id.replace('tile-', '');
+            if (tile.id.startsWith(prefix)) return tile.id.replace(prefix, '');
         }
     }
     return null;
