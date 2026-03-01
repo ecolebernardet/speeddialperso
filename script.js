@@ -217,6 +217,45 @@ function createTile(coords, data, isMain) {
     }
 });
 
+    // Gestion du long press tactile sur mobile
+    if (data) {
+        let longPressTimer = null;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let longPressFired = false;
+
+        div.addEventListener('touchstart', (e) => {
+            longPressFired = false;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            longPressTimer = setTimeout(() => {
+                longPressFired = true;
+                e.preventDefault();
+                openTileActionsModal(coords);
+            }, 500);
+        }, { passive: true });
+
+        div.addEventListener('touchmove', (e) => {
+            const dx = Math.abs(e.touches[0].clientX - touchStartX);
+            const dy = Math.abs(e.touches[0].clientY - touchStartY);
+            // Si l'utilisateur bouge de plus de 10px, on annule le long press
+            if (dx > 10 || dy > 10) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        }, { passive: true });
+
+        div.addEventListener('touchend', (e) => {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+            // Si le long press a été déclenché, on empêche le click qui suivrait
+            if (longPressFired) {
+                e.preventDefault();
+                longPressFired = false;
+            }
+        });
+    }
+
     // Logique de Drag & Drop (inchangée)
     div.addEventListener('dragstart', (e) => { draggedCoords = coords; draggedFromFolder = !isMain; div.classList.add('dragging'); e.dataTransfer.setData('text/plain', coords); });
     div.addEventListener('dragend', () => { div.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t => t.classList.remove('drag-over')); });
