@@ -303,10 +303,32 @@ function createTile(coords, data, isMain) {
                 document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
 
                 const touch = e.changedTouches[0];
-                const el = document.elementFromPoint(touch.clientX, touch.clientY);
-                const targetTile = el?.closest('.tile');
 
-                if (targetTile) {
+                // Masquer temporairement popup et overlay pour que elementFromPoint voit la grille dessous
+                const folderPopup = document.getElementById('folderPopup');
+                const folderOverlay = document.getElementById('folderOverlay');
+                if (folderPopup) folderPopup.style.pointerEvents = 'none';
+                if (folderOverlay) folderOverlay.style.pointerEvents = 'none';
+
+                const el = document.elementFromPoint(touch.clientX, touch.clientY);
+
+                if (folderPopup) folderPopup.style.pointerEvents = '';
+                if (folderOverlay) folderOverlay.style.pointerEvents = '';
+
+                const targetTile = el?.closest('.tile');
+                const droppedInsidePopup = !!el?.closest('#folderPopup');
+                const wasInFolder = !isMain;
+
+                if (wasInFolder && !droppedInsidePopup) {
+                    // Drag sorti du dossier vers la grille principale
+                    const toCoords = targetTile?.id?.startsWith('tile-')
+                        ? targetTile.id.replace('tile-', '')
+                        : null;
+                    if (toCoords) {
+                        handleDropMain(toCoords);
+                        closeFolder();
+                    }
+                } else if (targetTile) {
                     const targetId = targetTile.id;
                     let toCoords = null;
                     if (targetId.startsWith('tile-')) toCoords = targetId.replace('tile-', '');
