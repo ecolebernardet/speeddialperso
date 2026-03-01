@@ -227,7 +227,7 @@
                 font-size: 0; border-radius: 50%; border-width: 2px;
             }
             #btn-menu::before { content: '≡'; font-size: 30px; color: var(--accent); }
-            #btn-search-mobile { display: flex !important; font-size: 0; }
+            #btn-search-mobile { font-size: 0; }
             #btn-search-mobile::before { content: '🔍'; font-size: 22px; }
 
             .search-footer { height: 70px; justify-content: center; padding: 0; }
@@ -634,6 +634,15 @@
     <script>
         const searchOverlay = document.getElementById('searchOverlay');
         const searchInput = document.getElementById('searchOverlayInput');
+
+        // Affiche le bouton loupe uniquement sur écran tactile (mobile/tablette)
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        const searchMobileBtn = document.getElementById('btn-search-mobile');
+        if (!isTouchDevice) {
+            searchMobileBtn.style.display = 'none';
+        } else {
+            searchMobileBtn.style.display = 'flex';
+        }
 
         document.getElementById('btn-search-mobile').addEventListener('click', () => {
             searchOverlay.style.display = 'flex';
