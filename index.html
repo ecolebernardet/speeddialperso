@@ -616,15 +616,5 @@
 </div>
 
     <script src="script.js"></script>
-    <script>
-      // Enregistrement du Service Worker (PWA)
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('[PWA] Service Worker enregistré :', reg.scope))
-            .catch(err => console.warn('[PWA] Échec enregistrement SW :', err));
-        });
-      }
-    </script>
 </body>
 </html>
