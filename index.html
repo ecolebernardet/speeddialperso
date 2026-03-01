@@ -253,6 +253,43 @@
             .folder-toolbar { display: none; }
         }
 
+        /* --- TOOLBAR DOSSIER MOBILE --- */
+        .folder-toolbar-mobile {
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .folder-toolbar-mobile {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                padding: 8px 0 2px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+                margin-top: 8px;
+            }
+            .ftm-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .ftm-label {
+                font-size: 11px;
+                color: var(--accent);
+                min-width: 60px;
+                text-align: center;
+            }
+            .ftm-btn {
+                width: 28px; height: 28px;
+                border-radius: 50%;
+                border: 1px solid var(--accent);
+                background: transparent;
+                color: var(--accent);
+                font-size: 18px;
+                line-height: 1;
+                cursor: pointer;
+                display: flex; align-items: center; justify-content: center;
+            }
+        }
+
         /* --- PANNEAU AIDE DROITE --- */
         #helpPanel {
             position: fixed; top: 0; right: -420px; width: 400px; max-width: 92vw;
@@ -383,6 +420,18 @@
                 <label>Fond</label><input type="color" id="fPopBg">
             </div>
             <div class="folder-content" id="folderGrid"></div>
+            <div class="folder-toolbar-mobile" id="folderToolbarMobile">
+                <div class="ftm-group">
+                    <button class="ftm-btn" onclick="changeFolderSetting('fCols', -1)">−</button>
+                    <span class="ftm-label">Cols <span id="ftmColsVal">3</span></span>
+                    <button class="ftm-btn" onclick="changeFolderSetting('fCols', +1)">+</button>
+                </div>
+                <div class="ftm-group">
+                    <button class="ftm-btn" onclick="changeFolderSetting('fRows', -1)">−</button>
+                    <span class="ftm-label">Lignes <span id="ftmRowsVal">3</span></span>
+                    <button class="ftm-btn" onclick="changeFolderSetting('fRows', +1)">+</button>
+                </div>
+            </div>
         </div>
     </div>
 

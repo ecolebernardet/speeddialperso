@@ -431,6 +431,10 @@ function openFolder(coords) {
     document.getElementById('fRows').value = folder.fConfig.rows;
     document.getElementById('fGap').value = folder.fConfig.gap;
     document.getElementById('fPopBg').value = folder.fConfig.fBgColor;
+    const ftmCols = document.getElementById('ftmColsVal');
+    const ftmRows = document.getElementById('ftmRowsVal');
+    if (ftmCols) ftmCols.textContent = folder.fConfig.cols;
+    if (ftmRows) ftmRows.textContent = folder.fConfig.rows;
     
     const itemsKeys = Object.keys(folder.items || {});
     let maxR = folder.fConfig.rows - 1;
@@ -585,6 +589,19 @@ function getTileCoordsAtPoint(x, y, mode) {
         }
     }
     return null;
+}
+
+function changeFolderSetting(field, delta) {
+    const folder = tilesData[activeFolderCoords];
+    if (!folder) return;
+    const input = document.getElementById(field);
+    if (!input) return;
+    const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
+    input.value = newVal;
+    updateFolderSettings();
+    // Mettre à jour les compteurs de la barre mobile
+    if (field === 'fCols') { const el = document.getElementById('ftmColsVal'); if (el) el.textContent = newVal; }
+    if (field === 'fRows') { const el = document.getElementById('ftmRowsVal'); if (el) el.textContent = newVal; }
 }
 
 function handleDropMain(to) {
