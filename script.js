@@ -640,11 +640,11 @@ function searchIcons() {
         const src = `https://icon.horse/icon/${domain}`;
         const img = document.createElement('img');
         img.src = src; img.className = 'suggestion-item';
-        img.onclick = () => { 
+        img.addEventListener('click', () => {
             document.getElementById('linkImg').value = src; 
             const prev = document.getElementById('linkPreview');
             prev.src = src; prev.style.display = "block";
-        };
+        });
         container.appendChild(img);
     } catch(e) {}
 }
@@ -863,4 +863,32 @@ document.getElementById('modalTileActions')
             else if (document.getElementById('modalFolder').style.display === 'flex') confirmEditFolder();
         }
     });
+
+    // Panneau d'aide
+    function openHelpPanel() {
+        console.log('[SpeedDial] openHelpPanel appelé');
+        document.getElementById('helpPanel').classList.add('open');
+        document.getElementById('helpOverlay').classList.add('active');
+    }
+    function closeHelpPanel() {
+        document.getElementById('helpPanel').classList.remove('open');
+        document.getElementById('helpOverlay').classList.remove('active');
+    }
+    const btnHelp = document.getElementById('btn-help');
+    console.log('[SpeedDial] btn-help trouvé :', btnHelp);
+    if (btnHelp) btnHelp.addEventListener('click', openHelpPanel);
+
+    const helpOverlay = document.getElementById('helpOverlay');
+    if (helpOverlay) helpOverlay.addEventListener('click', closeHelpPanel);
+
+    const btnCloseX = document.getElementById('btn-close-help-x');
+    if (btnCloseX) btnCloseX.addEventListener('click', closeHelpPanel);
+
+    const btnCloseBottom = document.getElementById('btn-close-help-bottom');
+    if (btnCloseBottom) btnCloseBottom.addEventListener('click', closeHelpPanel);
+
+    const btnCancelTile = document.getElementById('btn-cancel-tile-actions');
+    if (btnCancelTile) btnCancelTile.addEventListener('click', closeTileActionsModal);
+
+    console.log('[SpeedDial] Tous les listeners enregistrés.');
 });
