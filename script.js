@@ -460,7 +460,7 @@ function openFolder(coords) {
     const colWidth = isMobile ? 80 : 100;
 
     fGrid.style.display = 'grid';
-fGrid.style.gridTemplateColumns = isMobile ? `repeat(3, 1fr)` : `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
+fGrid.style.gridTemplateColumns = isMobile ? `repeat(${folder.fConfig.cols}, 1fr)` : `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
 fGrid.style.gap = `${folder.fConfig.gap}px`;
 fPopup.style.backgroundColor = folder.fConfig.fBgColor;
 
@@ -527,7 +527,7 @@ fGrid.innerHTML = '';
 
     if (!folder.items) folder.items = {};
     for(let r=0; r < displayRows; r++) {
-        for(let c=0; c < (isMobile ? 3 : folder.fConfig.cols); c++) {
+        for(let c=0; c < folder.fConfig.cols; c++) {
             let fCoords = `${c}-${r}`;
             fGrid.appendChild(createTile(fCoords, folder.items[fCoords], false));
         }
