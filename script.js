@@ -15,6 +15,7 @@ try {
 }
 
 let currentEditingCoords = null;
+let gridParamsDebounceTimer = null;
 let draggedCoords = null;
 let activeFolderCoords = null;
 let draggedFromFolder = false;
@@ -36,6 +37,11 @@ function updateGridParams() {
 }
 
 function inputGridParams() {
+    clearTimeout(gridParamsDebounceTimer);
+    gridParamsDebounceTimer = setTimeout(_applyGridParams, 600);
+}
+
+function _applyGridParams() {
     const oldCols = config.cols;
     const oldRows = config.rows;
     
@@ -209,8 +215,8 @@ function createTile(coords, data, isMain) {
         });
     }
 
-    div.addEventListener('contextmenu', (e) => { 
-        if (data) { 
+    div.addEventListener('contextmenu', (e) => {
+        if (data) {
             e.preventDefault();
             e.stopPropagation();
             openTileActionsModal(coords);
@@ -278,7 +284,6 @@ function createTile(coords, data, isMain) {
                 touchClone.style.left = (t.clientX - cRect.width / 2) + 'px';
                 touchClone.style.top  = (t.clientY - cRect.height / 2) + 'px';
 
-                // Surbrillance de la tuile cible (recherche géométrique)
                 document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
                 const hovered = getTileElementAtPoint(t.clientX, t.clientY, div);
                 if (hovered) hovered.classList.add('drag-over');
@@ -313,14 +318,12 @@ function createTile(coords, data, isMain) {
                     );
 
                     if (isOutside) {
-                        // Sortie vers la grille principale
                         const toCoords = getTileCoordsAtPoint(tx, ty, 'main');
                         if (toCoords !== null) {
                             handleDropMain(toCoords);
                             closeFolder();
                         }
                     } else {
-                        // Réorganisation interne au dossier
                         const toCoords = getTileCoordsAtPoint(tx, ty, 'folder');
                         if (toCoords !== null && toCoords !== coords) {
                             handleDropFolder(toCoords);
@@ -340,7 +343,7 @@ function createTile(coords, data, isMain) {
         }, { passive: false });
     }
 
-        // Logique de Drag & Drop souris desktop (inchangée)
+    // Logique de Drag & Drop souris desktop (inchangée)
     div.addEventListener('dragstart', (e) => { draggedCoords = coords; draggedFromFolder = !isMain; div.classList.add('dragging'); e.dataTransfer.setData('text/plain', coords); });
     div.addEventListener('dragend', () => { div.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t => t.classList.remove('drag-over')); });
     div.addEventListener('dragover', (e) => { e.preventDefault(); if(coords !== draggedCoords) div.classList.add('drag-over'); });
@@ -563,7 +566,7 @@ function getTileElementAtPoint(x, y, exclude) {
 }
 
 // Trouve les coords d'une tuile à partir de coordonnées écran
-// mode 'main' → cherche dans #grid (tile-*), mode 'folder' → cherche dans #folderGrid (folder-tile-*)
+// mode 'main' → cherche dans #grid, mode 'folder' → cherche dans #folderGrid
 function getTileCoordsAtPoint(x, y, mode) {
     const selector = mode === 'main' ? '#grid .tile' : '#folderGrid .tile';
     const prefix   = mode === 'main' ? 'tile-'        : 'folder-tile-';
