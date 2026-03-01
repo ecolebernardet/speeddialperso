@@ -155,6 +155,13 @@ function renderGrid() {
     document.documentElement.style.setProperty('--cols', config.cols);
     document.documentElement.style.setProperty('--rows', config.rows);
     document.documentElement.style.setProperty('--gap', config.gap + 'px');
+
+    // Sur mobile : calcule une hauteur fixe par ligne pour que toutes les lignes soient visibles
+    if (window.innerWidth <= 600) {
+        const availH = window.innerHeight - 80 - 20 - (config.gap * (config.rows - 1));
+        const rowH = Math.max(60, Math.floor(availH / config.rows));
+        document.documentElement.style.setProperty('--row-height', rowH + 'px');
+    }
     document.documentElement.style.setProperty('--font-size', config.fontSize + 'px');
     document.body.style.fontFamily = config.fontFamily;
     document.documentElement.style.setProperty('--tile-bg', config.tileBgColor);

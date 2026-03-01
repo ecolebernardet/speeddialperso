@@ -234,9 +234,9 @@
             .grid-container { 
                 height: calc(100vh - 80px);
                 grid-template-columns: repeat(var(--cols), 1fr);
-                grid-template-rows: none;
-                grid-auto-rows: minmax(60px, calc((100vh - 80px - 20px) / var(--rows)));
+                grid-template-rows: repeat(var(--rows), var(--row-height, 80px));
                 overflow-y: auto;
+                align-content: start;
                 padding: 10px;
             }
             .tile img { margin-bottom: 5px; max-height: 50%; }
