@@ -231,16 +231,24 @@
             .search-footer { height: 70px; justify-content: center; padding: 0; }
             .footer-left { min-width: auto; }
 
-            .grid-container { height: calc(100vh - 80px); grid-template-columns: repeat(4, 1fr) !important; padding: 10px; }
+            .grid-container { 
+                height: calc(100vh - 80px);
+                grid-template-columns: repeat(var(--cols), 1fr);
+                grid-template-rows: none;
+                grid-auto-rows: minmax(60px, calc((100vh - 80px - 20px) / var(--rows)));
+                overflow-y: auto;
+                padding: 10px;
+            }
             .tile img { margin-bottom: 5px; max-height: 50%; }
             .tile-label { font-size: 9px; }
+            .tile.empty { border: 1px dashed var(--border) !important; background: transparent !important; opacity: 0.25 !important; display: flex !important; }
             
             #folderPopup { 
-                max-width: 75vw !important; left: 10vw !important; top: 10vh !important; 
+                max-width: 90vw !important; left: 5vw !important; top: 10vh !important; 
                 position: fixed !important; padding: 10px; border-radius: 15px;
             }
             .folder-content { 
-                grid-template-columns: repeat(4, 1fr) !important; gap: 8px; padding: 10px;
+                grid-template-columns: repeat(3, 1fr) !important; gap: 8px; padding: 10px;
             }
             .folder-toolbar { display: none; }
         }
