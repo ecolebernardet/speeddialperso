@@ -336,18 +336,10 @@ function createTile(coords, data, isMain) {
                         }
                     }
                 } else {
-                    // Drag depuis la grille principale
-                    const elements = document.elementsFromPoint(tx, ty);
-                    const targetTile = elements.find(el => el.classList.contains('tile') && el !== div);
-                    if (targetTile) {
-                        const targetId = targetTile.id;
-                        let toCoords = null;
-                        if (targetId.startsWith('tile-')) toCoords = targetId.replace('tile-', '');
-                        else if (targetId.startsWith('folder-tile-')) toCoords = targetId.replace('folder-tile-', '');
-                        if (toCoords && toCoords !== coords) {
-                            if (targetId.startsWith('folder-tile-')) handleDropFolder(toCoords);
-                            else handleDropMain(toCoords);
-                        }
+                    // Drag depuis la grille principale : on utilise getTileAtPoint (géométrique, fiable)
+                    const toCoords = getTileAtPoint(tx, ty);
+                    if (toCoords && toCoords !== coords) {
+                        handleDropMain(toCoords);
                     }
                 }
 
