@@ -574,6 +574,7 @@ function updateFolderSettings() {
         gap: parseInt(document.getElementById('fGap').value) || 0,
         fBgColor: document.getElementById('fPopBg').value
     };
+    document.documentElement.style.setProperty('--fcols', folder.fConfig.cols);
     openFolder(activeFolderCoords);
     saveToLocal();
 }
