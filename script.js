@@ -210,53 +210,121 @@ function createTile(coords, data, isMain) {
     }
 
     div.addEventListener('contextmenu', (e) => { 
-    if (data) { 
-        e.preventDefault();
-        e.stopPropagation();
-        openTileActionsModal(coords);
-    }
-});
+        if (data) { 
+            e.preventDefault();
+            e.stopPropagation();
+            openTileActionsModal(coords);
+        }
+    });
 
-    // Gestion du long press tactile sur mobile
+    // --- TOUCH : long press (édition) + drag tactile avec clone flottant ---
     if (data) {
         let longPressTimer = null;
         let touchStartX = 0;
         let touchStartY = 0;
         let longPressFired = false;
+        let touchDragStarted = false;
+        let touchClone = null;
 
         div.addEventListener('touchstart', (e) => {
             longPressFired = false;
+            touchDragStarted = false;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
+
             longPressTimer = setTimeout(() => {
                 longPressFired = true;
-                e.preventDefault();
+                if (navigator.vibrate) navigator.vibrate(40);
                 openTileActionsModal(coords);
             }, 500);
         }, { passive: true });
 
         div.addEventListener('touchmove', (e) => {
-            const dx = Math.abs(e.touches[0].clientX - touchStartX);
-            const dy = Math.abs(e.touches[0].clientY - touchStartY);
-            // Si l'utilisateur bouge de plus de 10px, on annule le long press
-            if (dx > 10 || dy > 10) {
+            const touch = e.touches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+
+            // Si le doigt bouge de plus de 8px avant le long press → c'est un drag
+            if (!touchDragStarted && !longPressFired && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
                 clearTimeout(longPressTimer);
                 longPressTimer = null;
+                touchDragStarted = true;
+                draggedCoords = coords;
+                draggedFromFolder = !isMain;
+
+                // Créer le clone flottant
+                const rect = div.getBoundingClientRect();
+                touchClone = div.cloneNode(true);
+                touchClone.style.cssText = `
+                    position: fixed;
+                    width: ${rect.width}px;
+                    height: ${rect.height}px;
+                    left: ${rect.left}px;
+                    top: ${rect.top}px;
+                    opacity: 0.8;
+                    pointer-events: none;
+                    z-index: 9999;
+                    border-radius: 12px;
+                    transform: scale(1.1);
+                    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+                    transition: none;
+                `;
+                document.body.appendChild(touchClone);
+                div.style.opacity = '0.3';
             }
-        }, { passive: true });
+
+            if (touchDragStarted && touchClone) {
+                e.preventDefault();
+                const t = e.touches[0];
+                const rect = touchClone.getBoundingClientRect();
+                touchClone.style.left = (t.clientX - rect.width / 2) + 'px';
+                touchClone.style.top  = (t.clientY - rect.height / 2) + 'px';
+
+                // Surbrillance de la tuile cible
+                document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
+                const el = document.elementFromPoint(t.clientX, t.clientY);
+                const targetTile = el?.closest('.tile');
+                if (targetTile && targetTile !== div) targetTile.classList.add('drag-over');
+            }
+        }, { passive: false });
 
         div.addEventListener('touchend', (e) => {
             clearTimeout(longPressTimer);
             longPressTimer = null;
-            // Si le long press a été déclenché, on empêche le click qui suivrait
+
             if (longPressFired) {
-                e.preventDefault();
                 longPressFired = false;
+                return;
+            }
+
+            if (touchDragStarted) {
+                if (touchClone) { touchClone.remove(); touchClone = null; }
+                div.style.opacity = '';
+                document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
+
+                const touch = e.changedTouches[0];
+                const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                const targetTile = el?.closest('.tile');
+
+                if (targetTile) {
+                    const targetId = targetTile.id;
+                    let toCoords = null;
+                    if (targetId.startsWith('tile-')) toCoords = targetId.replace('tile-', '');
+                    else if (targetId.startsWith('folder-tile-')) toCoords = targetId.replace('folder-tile-', '');
+
+                    if (toCoords && toCoords !== coords) {
+                        if (targetId.startsWith('folder-tile-')) handleDropFolder(toCoords);
+                        else handleDropMain(toCoords);
+                    }
+                }
+
+                touchDragStarted = false;
+                draggedCoords = null;
             }
         });
     }
 
-    // Logique de Drag & Drop (inchangée)
+    // Logique de Drag & Drop souris desktop (inchangée)
     div.addEventListener('dragstart', (e) => { draggedCoords = coords; draggedFromFolder = !isMain; div.classList.add('dragging'); e.dataTransfer.setData('text/plain', coords); });
     div.addEventListener('dragend', () => { div.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t => t.classList.remove('drag-over')); });
     div.addEventListener('dragover', (e) => { e.preventDefault(); if(coords !== draggedCoords) div.classList.add('drag-over'); });
