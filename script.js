@@ -568,14 +568,40 @@ function closeFolder() {
 
 function updateFolderSettings() {
     const folder = tilesData[activeFolderCoords];
+    const newCols = parseInt(document.getElementById('fCols').value) || 1;
+    const newRows = parseInt(document.getElementById('fRows').value) || 1;
+
     folder.fConfig = {
-        cols: parseInt(document.getElementById('fCols').value) || 1,
-        rows: parseInt(document.getElementById('fRows').value) || 1,
+        cols: newCols,
+        rows: newRows,
         gap: parseInt(document.getElementById('fGap').value) || 0,
         fBgColor: document.getElementById('fPopBg').value
     };
-    document.documentElement.style.setProperty('--fcols', folder.fConfig.cols);
-    openFolder(activeFolderCoords);
+
+    // Met à jour la variable CSS pour le mobile
+    document.documentElement.style.setProperty('--fcols', newCols);
+
+    // Redessine uniquement la grille sans recalculer displayRows dynamiquement
+    const fGrid = document.getElementById('folderGrid');
+    const fPopup = document.getElementById('folderPopup');
+    const isMobile = window.innerWidth < 600;
+    const colWidth = isMobile ? 80 : 100;
+
+    fGrid.style.gridTemplateColumns = isMobile
+        ? `repeat(${newCols}, 1fr)`
+        : `repeat(${newCols}, ${colWidth}px)`;
+    fGrid.style.gap = `${folder.fConfig.gap}px`;
+    fPopup.style.backgroundColor = folder.fConfig.fBgColor;
+
+    fGrid.innerHTML = '';
+    if (!folder.items) folder.items = {};
+    for (let r = 0; r < newRows; r++) {
+        for (let c = 0; c < newCols; c++) {
+            const fCoords = `${c}-${r}`;
+            fGrid.appendChild(createTile(fCoords, folder.items[fCoords], false));
+        }
+    }
+
     saveToLocal();
 }
 
