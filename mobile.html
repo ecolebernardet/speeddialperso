@@ -54,7 +54,7 @@
         .tile.drag-over { border: 2px solid var(--accent) !important; background: rgba(56,189,248,0.2) !important; transform: scale(1.05); }
 
         .tile img {
-            width: auto; height: 55%; max-width: 65%;
+            width: auto; height: 80%; max-width: 80%;
             object-fit: contain; pointer-events: none;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
             margin-bottom: 18px; border-radius: 8px;
@@ -67,13 +67,13 @@
         }
         .tile.folder .tile-label { background: rgba(0,0,0,0.4); z-index: 3; }
         .folder-icon-bg {
-            position: absolute; width: auto; height: 88%; max-width: 80%;
+            position: absolute; width: auto; height: 100%; max-width: 100%;
             top: 0; left: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none;
         }
         .tile.folder .folder-thumb {
-            position: absolute; z-index: 2; width: 38%; height: 38%;
-            top: 44%; left: 50%; transform: translate(-50%, -50%);
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            position: absolute; z-index: 2; width: 50%; height: 50%; border-radius: 5%;
+            top: 55%; left: 50%; transform: translate(-50%, -50%);
+            filter: drop-shadow(0 2px 4px rgba(0,0,10,0.9));
         }
 
         /* FOOTER */
@@ -131,96 +131,28 @@
             align-items: center; justify-content: center; flex-direction: column; gap: 16px;
         }
         #searchOverlay.active { display: flex; }
-        .search-bar{
-		  width: 88vw;               /* évite les soucis de 100vw sur mobile */
-		  max-width: 420px;
-		  display: flex;
-		  align-items: center;
-		  box-sizing: border-box;
+        .search-bar{ width: 88vw; max-width: 420px; display: flex; align-items: center; box-sizing: border-box;
+		  background: #1e293b; border-radius: 30px; border: 2px solid var(--accent); padding: 10px 16px; gap: 10px; }
 
-		  /* IMPORTANT (Vivaldi/Chromium): retirer overflow:hidden pour éviter le triangle */
-		  /* overflow: hidden; */
+		.search-bar img{ width: 22px; height: 22px; flex: 0 0 22px; }
 
-		  background: #1e293b;
-		  border-radius: 30px;
-		  border: 2px solid var(--accent);
-		  padding: 10px 16px;
-		  gap: 10px;
-		}
+		.search-bar input{ flex: 1 1 auto; min-width: 0; background: transparent; border: none; outline: none; color: white; font-size: 17px; }
 
-		.search-bar img{
-		  width: 22px;
-		  height: 22px;
-		  flex: 0 0 22px;            /* taille fixe */
-		}
+		.search-bar button{ flex: 0 0 42px; width: 42px; height: 32px; padding: 0; -webkit-appearance: none; appearance: none;
+		  background: var(--accent); border: 0; outline: none; box-shadow: none;  border-radius: 16px; display: grid;
+		  place-items: center;  cursor: pointer; position: relative; font-size: 0; line-height: 0; }
 
-		.search-bar input{
-		  flex: 1 1 auto;
-		  min-width: 0;              /* IMPORTANT: autorise l’input à rétrécir en flex */
-		  background: transparent;
-		  border: none;
-		  outline: none;
-		  color: white;
-		  font-size: 17px;
-		}
-
-		.search-bar button{
-		  flex: 0 0 42px;
-		  width: 42px;
-		  height: 32px;
-		  padding: 0;
-
-		  -webkit-appearance: none;
-		  appearance: none;
-
-		  background: var(--accent);
-		  border: 0;
-		  outline: none;
-		  box-shadow: none;
-
-		  border-radius: 16px;
-		  display: grid;
-		  place-items: center;
-
-		  cursor: pointer;
-		  position: relative;
-
-		  font-size: 0;              /* masque tout texte éventuel (le →) */
-		  line-height: 0;
-		}
-
-		.search-bar button::before{
-		  content: "";
-		  width: 10px;
-		  height: 10px;
-		  border-right: 3px solid #000;
-		  border-top: 3px solid #000;
-		  transform: rotate(45deg);  /* flèche vers la droite */
-		}
+		.search-bar button::before{ content: ""; width: 10px; height: 10px; border-right: 3px solid #000; border-top: 3px solid #000;
+		  transform: rotate(45deg); }
 
 		.search-bar button:focus,
-		.search-bar button:focus-visible{
-		  outline: none;
-		}
+		.search-bar button:focus-visible{ outline: none; }
 
-		.search-bar button::-moz-focus-inner{
-		  border: 0;
-		}
+		.search-bar button::-moz-focus-inner{ border: 0; }
 
-		#searchHint{
-		  color: #64748b;
-		  font-size: 13px;
-		}
+		#searchHint{ color: #64748b; font-size: 13px; }
 
-		#searchClose{
-		  background: transparent;
-		  border: 1px solid #475569;
-		  color: #94a3b8;
-		  border-radius: 20px;
-		  padding: 9px 26px;
-		  cursor: pointer;
-		  font-size: 13px;
-		}
+		#searchClose{ background: #1e293b; border: 1px solid #475569; color: #94a3b8; border-radius: 20px; padding: 9px 26px; cursor: pointer; font-size: 13px; }
 
         /* DOSSIER */
         #folderOverlay {
@@ -356,10 +288,7 @@
     <footer id="footer">
         <button class="footer-btn" id="btn-menu" title="Paramètres" style="font-size:26px; color:white;">⚙️</button>
         <button class="footer-btn" id="btn-search-mobile" title="Recherche Google" style="font-size:20px;">🔍</button>
-        <div id="footerClock">
-            <div id="footerTime"></div>
-            <div id="footerDate"></div>
-        </div>
+        
         <button class="footer-btn" id="btn-help" title="Aide" style="font-size:18px;">❔</button>
     </footer>
 
@@ -371,19 +300,17 @@
             <button id="searchOverlayBtn" aria-label="Rechercher"></button>
         </div>
 
-        <div id="searchHint">Tapez et appuyez sur Entrée ou →</div>
-
-        <!-- Boutons + historique -->
+         <!-- Boutons + historique -->
         <div style="display:flex; gap:10px; justify-content:center; width:88vw; max-width:420px;">
-            <button id="btn-show-history" style="background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:9px 14px;cursor:pointer;font-size:13px;">
+            <button id="btn-show-history" style="background: #134E59;border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:9px 14px;cursor:pointer;font-size:13px;">
                 Historique
             </button>
-            <button id="btn-clear-history" style="background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:20px;padding:9px 14px;cursor:pointer;font-size:13px;">
+            <button id="btn-clear-history" style="background: #471509;border:1px solid #ef4444;color:#ef4444;border-radius:20px;padding:9px 14px;cursor:pointer;font-size:13px;">
                 Effacer
             </button>
         </div>
 
-        <div id="searchHistoryBox" style="width:88vw; max-width:420px; max-height:38vh; overflow:auto; display:none; border:1px solid #475569; border-radius:14px; padding:10px; background:rgba(30,41,59,0.55);">
+        <div id="searchHistoryBox" style="width:88vw; max-width:420px; max-height:38vh; overflow:auto; display:none; border:1px solid #475569; border-radius:14px; padding:10px; background:rgba(30,41,59,1);">
             <!-- rempli par JS -->
         </div>
 
@@ -626,7 +553,7 @@
             const when = formatDate(item.ts);
 
             return `
-                <div style="display:flex; gap:8px; align-items:stretch; margin-bottom:8px;">
+                <div style="display:flex; gap:8px; align-items:stretch; margin-bottom:2px;">
                     <button
                         type="button"
                         data-action="run"
@@ -646,7 +573,7 @@
                         style="width:42px; flex:0 0 42px; background:rgba(239,68,68,0.12);
                                border:1px solid rgba(239,68,68,0.6); color:#ef4444;
                                border-radius:12px; cursor:pointer; font-size:18px;">
-                        ×
+                        🗑️
                     </button>
                 </div>
             `;
