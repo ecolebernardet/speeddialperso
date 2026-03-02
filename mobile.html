@@ -488,253 +488,229 @@
 
     <script src="script.js"></script>
     <script>
-        // ── RECHERCHE ──
-        const searchOverlay = document.getElementById('searchOverlay');
-        const searchInput   = document.getElementById('searchOverlayInput');
+    // ── RECHERCHE ──
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput   = document.getElementById('searchOverlayInput');
 
-        document.getElementById('btn-search-mobile').addEventListener('click', () => {
-            refreshSearchHistoryDatalist();
-            searchOverlay.classList.add('active');
-            setTimeout(() => searchInput.focus(), 150);
-        });
-        document.getElementById('searchClose').addEventListener('click', closeSearch);
-        document.getElementById('searchOverlayBtn').addEventListener('click', doSearch);
-        searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-        searchOverlay.addEventListener('click', e => { if (e.target === searchOverlay) closeSearch(); });
+    document.getElementById('btn-search-mobile').addEventListener('click', () => {
+        // IMPORTANT: pas de datalist (triangle sur Vivaldi)
+        searchOverlay.classList.add('active');
+        setTimeout(() => searchInput.focus(), 150);
+    });
+    document.getElementById('searchClose').addEventListener('click', closeSearch);
+    document.getElementById('searchOverlayBtn').addEventListener('click', doSearch);
+    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+    searchOverlay.addEventListener('click', e => { if (e.target === searchOverlay) closeSearch(); });
 
-        function doSearch() {
-            const q = searchInput.value.trim();
-            if (q) {
-                addToSearchHistory(q);
-                window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
-                closeSearch();
-            }
-        }
-        function closeSearch() {
-            searchOverlay.classList.remove('active');
-            searchInput.value = '';
-        }
-
-        // ── AIDE ──
-        document.getElementById('btn-help').addEventListener('click', () => {
-            document.getElementById('helpPanel').classList.add('open');
-            document.getElementById('helpOverlay').classList.add('active');
-        });
-        ['helpOverlay','btn-close-help-x','btn-close-help-bottom'].forEach(id => {
-            document.getElementById(id).addEventListener('click', () => {
-                document.getElementById('helpPanel').classList.remove('open');
-                document.getElementById('helpOverlay').classList.remove('active');
-            });
-        });
-
-        // ── HISTORIQUE RECHERCHE GOOGLE (localStorage) ──
-        const SEARCH_HISTORY_KEY = 'googleSearchHistory_v1';
-        const SEARCH_HISTORY_MAX = 50;
-
-        function loadSearchHistory() {
-            try { return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []; }
-            catch { return []; }
-        }
-
-        function saveSearchHistory(list) {
-            localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list));
-        }
-
-        function addToSearchHistory(query) {
-            const q = query.trim();
-            if (!q) return;
-
-            let hist = loadSearchHistory();
-
-            // dédoublonne (si tu retapes la même requête, elle remonte en haut)
-            hist = hist.filter(item => item.q.toLowerCase() !== q.toLowerCase());
-
-            hist.unshift({ q, ts: Date.now() });
-
-            if (hist.length > SEARCH_HISTORY_MAX) hist = hist.slice(0, SEARCH_HISTORY_MAX);
-            saveSearchHistory(hist);
-        }
-
-        // Suggestions via datalist (très léger)
-        function ensureSearchHistoryDatalist() {
-            let dl = document.getElementById('searchHistoryDatalist');
-            if (!dl) {
-                dl = document.createElement('datalist');
-                dl.id = 'searchHistoryDatalist';
-                document.body.appendChild(dl);
-                searchInput.setAttribute('list', 'searchHistoryDatalist');
-            }
-            return dl;
-        }
-
-        function refreshSearchHistoryDatalist() {
-            const dl = ensureSearchHistoryDatalist();
-            const hist = loadSearchHistory();
-            dl.innerHTML = hist
-                .map(item => `<option value="${escapeHtmlAttr(item.q)}"></option>`)
-                .join('');
-        }
-
-        // petit helper pour éviter les soucis de guillemets dans value=""
-        function escapeHtmlAttr(str) {
-            return String(str)
-                .replaceAll('&', '&amp;')
-                .replaceAll('"', '&quot;')
-                .replaceAll('<', '&lt;')
-                .replaceAll('>', '&gt;');
-        }
-
-        // ── HISTORIQUE UI : afficher / relancer / supprimer 1 / effacer tout ──
-        const historyBox = document.getElementById('searchHistoryBox');
-        const btnShowHistory = document.getElementById('btn-show-history');
-        const btnClearHistory = document.getElementById('btn-clear-history');
-
-        btnShowHistory.addEventListener('click', () => {
-            toggleHistoryBox();
-        });
-
-        btnClearHistory.addEventListener('click', () => {
-            clearSearchHistory();
-        });
-
-        function formatDate(ts) {
-            try {
-                return new Date(ts).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
-            } catch {
-                return '';
-            }
-        }
-
-        // Tap sur une entrée => relance la recherche + remet l'entrée en haut
-        function runGoogleSearch(query) {
-            const q = String(query || '').trim();
-            if (!q) return;
-
-            searchInput.value = q;
+    function doSearch() {
+        const q = searchInput.value.trim();
+        if (q) {
             addToSearchHistory(q);
-            refreshSearchHistoryDatalist();
-
             window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
             closeSearch();
         }
+    }
+    function closeSearch() {
+        searchOverlay.classList.remove('active');
+        searchInput.value = '';
+    }
 
-        // Bouton X => supprime uniquement cette entrée
-        function deleteOneHistoryItem(query) {
-            const q = String(query || '').trim();
-            if (!q) return;
+    // ── AIDE ──
+    document.getElementById('btn-help').addEventListener('click', () => {
+        document.getElementById('helpPanel').classList.add('open');
+        document.getElementById('helpOverlay').classList.add('active');
+    });
+    ['helpOverlay','btn-close-help-x','btn-close-help-bottom'].forEach(id => {
+        document.getElementById(id).addEventListener('click', () => {
+            document.getElementById('helpPanel').classList.remove('open');
+            document.getElementById('helpOverlay').classList.remove('active');
+        });
+    });
 
-            let hist = loadSearchHistory();
-            const before = hist.length;
+    // ── HISTORIQUE RECHERCHE GOOGLE (localStorage) ──
+    const SEARCH_HISTORY_KEY = 'googleSearchHistory_v1';
+    const SEARCH_HISTORY_MAX = 50;
 
-            hist = hist.filter(item => item.q.toLowerCase() !== q.toLowerCase());
+    function loadSearchHistory() {
+        try { return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []; }
+        catch { return []; }
+    }
 
-            if (hist.length === before) return;
+    function saveSearchHistory(list) {
+        localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list));
+    }
 
-            saveSearchHistory(hist);
-            refreshSearchHistoryDatalist();
+    function addToSearchHistory(query) {
+        const q = query.trim();
+        if (!q) return;
+
+        let hist = loadSearchHistory();
+
+        // dédoublonne (si tu retapes la même requête, elle remonte en haut)
+        hist = hist.filter(item => item.q.toLowerCase() !== q.toLowerCase());
+
+        hist.unshift({ q, ts: Date.now() });
+
+        if (hist.length > SEARCH_HISTORY_MAX) hist = hist.slice(0, SEARCH_HISTORY_MAX);
+        saveSearchHistory(hist);
+    }
+
+    // petit helper pour éviter les soucis de guillemets dans value=""
+    function escapeHtmlAttr(str) {
+        return String(str)
+            .replaceAll('&', '&amp;')
+            .replaceAll('"', '&quot;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;');
+    }
+
+    // ── HISTORIQUE UI : afficher / relancer / supprimer 1 / effacer tout ──
+    const historyBox = document.getElementById('searchHistoryBox');
+    const btnShowHistory = document.getElementById('btn-show-history');
+    const btnClearHistory = document.getElementById('btn-clear-history');
+
+    btnShowHistory.addEventListener('click', () => {
+        toggleHistoryBox();
+    });
+
+    btnClearHistory.addEventListener('click', () => {
+        clearSearchHistory();
+    });
+
+    function formatDate(ts) {
+        try {
+            return new Date(ts).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+        } catch {
+            return '';
+        }
+    }
+
+    // Tap sur une entrée => relance la recherche + remet l'entrée en haut
+    function runGoogleSearch(query) {
+        const q = String(query || '').trim();
+        if (!q) return;
+
+        searchInput.value = q;
+        addToSearchHistory(q);
+
+        window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+        closeSearch();
+    }
+
+    // Bouton X => supprime uniquement cette entrée
+    function deleteOneHistoryItem(query) {
+        const q = String(query || '').trim();
+        if (!q) return;
+
+        let hist = loadSearchHistory();
+        const before = hist.length;
+
+        hist = hist.filter(item => item.q.toLowerCase() !== q.toLowerCase());
+        if (hist.length === before) return;
+
+        saveSearchHistory(hist);
+        renderHistoryBox();
+    }
+
+    function renderHistoryBox() {
+        const hist = loadSearchHistory();
+
+        if (!hist.length) {
+            historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Aucun historique.</div>`;
+            return;
+        }
+
+        historyBox.innerHTML = hist.map(item => {
+            const qAttr = escapeHtmlAttr(item.q);
+            const qText = escapeHtmlAttr(item.q);
+            const when = formatDate(item.ts);
+
+            return `
+                <div style="display:flex; gap:8px; align-items:stretch; margin-bottom:8px;">
+                    <button
+                        type="button"
+                        data-action="run"
+                        data-q="${qAttr}"
+                        style="flex:1; text-align:left; background:rgba(255,255,255,0.03);
+                               border:1px solid rgba(255,255,255,0.08); color:var(--text);
+                               padding:10px 10px; border-radius:12px; cursor:pointer; overflow:hidden;">
+                        <div style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${qText}</div>
+                        <div style="font-size:11px;color:#94a3b8;margin-top:2px;">${when}</div>
+                    </button>
+
+                    <button
+                        type="button"
+                        data-action="delete"
+                        data-q="${qAttr}"
+                        title="Supprimer"
+                        style="width:42px; flex:0 0 42px; background:rgba(239,68,68,0.12);
+                               border:1px solid rgba(239,68,68,0.6); color:#ef4444;
+                               border-radius:12px; cursor:pointer; font-size:18px;">
+                        ×
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        historyBox.querySelectorAll('[data-action="run"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const q = btn.getAttribute('data-q') || '';
+                runGoogleSearch(q);
+            });
+        });
+
+        historyBox.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const q = btn.getAttribute('data-q') || '';
+                deleteOneHistoryItem(q);
+            });
+        });
+    }
+
+    function toggleHistoryBox() {
+        const isHidden = historyBox.style.display === 'none' || !historyBox.style.display;
+        if (isHidden) {
             renderHistoryBox();
-        }
-
-        function renderHistoryBox() {
-            const hist = loadSearchHistory();
-
-            if (!hist.length) {
-                historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Aucun historique.</div>`;
-                return;
-            }
-
-            historyBox.innerHTML = hist.map(item => {
-                const qAttr = escapeHtmlAttr(item.q);
-                const qText = escapeHtmlAttr(item.q);
-                const when = formatDate(item.ts);
-
-                return `
-                    <div style="display:flex; gap:8px; align-items:stretch; margin-bottom:8px;">
-                        <button
-                            type="button"
-                            data-action="run"
-                            data-q="${qAttr}"
-                            style="flex:1; text-align:left; background:rgba(255,255,255,0.03);
-                                   border:1px solid rgba(255,255,255,0.08); color:var(--text);
-                                   padding:10px 10px; border-radius:12px; cursor:pointer; overflow:hidden;">
-                            <div style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${qText}</div>
-                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">${when}</div>
-                        </button>
-
-                        <button
-                            type="button"
-                            data-action="delete"
-                            data-q="${qAttr}"
-                            title="Supprimer"
-                            style="width:42px; flex:0 0 42px; background:rgba(239,68,68,0.12);
-                                   border:1px solid rgba(239,68,68,0.6); color:#ef4444;
-                                   border-radius:12px; cursor:pointer; font-size:18px;">
-                            ×
-                        </button>
-                    </div>
-                `;
-            }).join('');
-
-            historyBox.querySelectorAll('[data-action="run"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const q = btn.getAttribute('data-q') || '';
-                    runGoogleSearch(q);
-                });
-            });
-
-            historyBox.querySelectorAll('[data-action="delete"]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const q = btn.getAttribute('data-q') || '';
-                    deleteOneHistoryItem(q);
-                });
-            });
-        }
-
-        function toggleHistoryBox() {
-            const isHidden = historyBox.style.display === 'none' || !historyBox.style.display;
-            if (isHidden) {
-                renderHistoryBox();
-                historyBox.style.display = 'block';
-                btnShowHistory.textContent = 'Masquer';
-            } else {
-                historyBox.style.display = 'none';
-                btnShowHistory.textContent = 'Historique';
-            }
-        }
-
-        // Effacer tout
-        function clearSearchHistory() {
-            const hist = loadSearchHistory();
-            if (!hist.length) {
-                historyBox.style.display = 'block';
-                btnShowHistory.textContent = 'Masquer';
-                historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Aucun historique.</div>`;
-                return;
-            }
-
-            if (!confirm('Effacer tout l’historique de recherche ?')) return;
-
-            localStorage.removeItem(SEARCH_HISTORY_KEY);
-            refreshSearchHistoryDatalist();
-
             historyBox.style.display = 'block';
             btnShowHistory.textContent = 'Masquer';
-            historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Historique effacé.</div>`;
-        }
-
-        // Quand on ferme l'overlay, on reset l'état de l'historique UI
-        const _oldCloseSearch = closeSearch;
-        closeSearch = function () {
+        } else {
             historyBox.style.display = 'none';
             btnShowHistory.textContent = 'Historique';
-            _oldCloseSearch();
-        };
-
-        // ── SERVICE WORKER ──
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
         }
-    </script>
+    }
+
+    // Effacer tout
+    function clearSearchHistory() {
+        const hist = loadSearchHistory();
+        if (!hist.length) {
+            historyBox.style.display = 'block';
+            btnShowHistory.textContent = 'Masquer';
+            historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Aucun historique.</div>`;
+            return;
+        }
+
+        if (!confirm('Effacer tout l’historique de recherche ?')) return;
+
+        localStorage.removeItem(SEARCH_HISTORY_KEY);
+
+        historyBox.style.display = 'block';
+        btnShowHistory.textContent = 'Masquer';
+        historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Historique effacé.</div>`;
+    }
+
+    // Quand on ferme l'overlay, on reset l'état de l'historique UI
+    const _oldCloseSearch = closeSearch;
+    closeSearch = function () {
+        historyBox.style.display = 'none';
+        btnShowHistory.textContent = 'Historique';
+        _oldCloseSearch();
+    };
+
+    // ── SERVICE WORKER ──
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+</script>
 </body>
 </html>
