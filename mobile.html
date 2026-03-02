@@ -132,66 +132,84 @@
         }
         #searchOverlay.active { display: flex; }
         .search-bar{
-  width: 88vw;               /* évite les soucis de 100vw sur mobile */
-  max-width: 420px;
-  display: flex;
-  align-items: center;
+		  width: 88vw;               /* évite les soucis de 100vw sur mobile */
+		  max-width: 420px;
+		  display: flex;
+		  align-items: center;
+		  box-sizing: border-box;
+		  overflow: hidden;          /* empêche le bouton de dépasser visuellement */
+		  background: #1e293b;
+		  border-radius: 30px;
+		  border: 2px solid var(--accent);
+		  padding: 10px 16px;
+		  gap: 10px;
+		}
 
-  box-sizing: border-box;
-  overflow: hidden;          /* empêche le bouton de dépasser visuellement */
+		.search-bar img{
+		  width: 22px;
+		  height: 22px;
+		  flex: 0 0 22px;            /* taille fixe */
+		}
 
-  background: #1e293b;
-  border-radius: 30px;
-  border: 2px solid var(--accent);
+		.search-bar input{
+		  flex: 1 1 auto;
+		  min-width: 0;              /* IMPORTANT: autorise l’input à rétrécir en flex */
 
-  padding: 10px 16px;
-  gap: 10px;
-}
+		  background: transparent;
+		  border: none;
+		  outline: none;
+		  color: white;
+		  font-size: 17px;
+		}
 
-.search-bar img{
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;            /* taille fixe */
-}
+		.search-bar button{
+		  flex: 0 0 auto;
 
-.search-bar input{
-  flex: 1 1 auto;
-  min-width: 0;              /* IMPORTANT: autorise l’input à rétrécir en flex */
+		  -webkit-appearance: none;
+		  appearance: none;
 
-  background: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  font-size: 17px;
-}
+		  background: var(--accent);
+		  border: 0;
+		  outline: none;
+		  box-shadow: none;
 
-.search-bar button{
-  flex: 0 0 auto;            /* le bouton ne s’étire pas */
+		  border-radius: 20px;
+		  padding: 0 12px;
+		  height: 32px;              /* fixe -> ��vite les artefacts */
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
 
-  background: var(--accent);
-  border: none;
-  border-radius: 20px;
-  padding: 7px 12px;         /* un peu plus large, évite l’effet “écrasé” */
-  font-weight: bold;
-  color: black;
-  cursor: pointer;
-  font-size: 15px;
-}
+		  font-weight: 800;
+		  color: #000;
+		  cursor: pointer;
+		  font-size: 16px;
+		  line-height: 1;
+		}
 
-#searchHint{
-  color: #64748b;
-  font-size: 13px;
-}
+		.search-bar button:focus,
+		.search-bar button:focus-visible{
+		  outline: none;
+		}
 
-#searchClose{
-  background: transparent;
-  border: 1px solid #475569;
-  color: #94a3b8;
-  border-radius: 20px;
-  padding: 9px 26px;
-  cursor: pointer;
-  font-size: 13px;
-}
+		.search-bar button::-moz-focus-inner{
+		  border: 0;
+		}
+
+		#searchHint{
+		  color: #64748b;
+		  font-size: 13px;
+		}
+
+		#searchClose{
+		  background: transparent;
+		  border: 1px solid #475569;
+		  color: #94a3b8;
+		  border-radius: 20px;
+		  padding: 9px 26px;
+		  cursor: pointer;
+		  font-size: 13px;
+		}
 
         /* DOSSIER */
         #folderOverlay {
