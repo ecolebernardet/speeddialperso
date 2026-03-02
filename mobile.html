@@ -131,16 +131,67 @@
             align-items: center; justify-content: center; flex-direction: column; gap: 16px;
         }
         #searchOverlay.active { display: flex; }
-        .search-bar {
-            width: 88vw; max-width: 420px; display: flex; align-items: center;
-            background: #1e293b; border-radius: 30px; border: 2px solid var(--accent);
-            padding: 10px 16px; gap: 10px;
-        }
-        .search-bar img { width: 22px; height: 22px; flex-shrink: 0; }
-        .search-bar input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 17px; }
-        .search-bar button { background: var(--accent); border: none; border-radius: 20px; padding: 7px 16px; font-weight: bold; color: black; cursor: pointer; font-size: 15px; }
-        #searchHint { color: #64748b; font-size: 13px; }
-        #searchClose { background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 20px; padding: 9px 26px; cursor: pointer; font-size: 13px; }
+        .search-bar{
+  width: 88vw;               /* évite les soucis de 100vw sur mobile */
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+  overflow: hidden;          /* empêche le bouton de dépasser visuellement */
+
+  background: #1e293b;
+  border-radius: 30px;
+  border: 2px solid var(--accent);
+
+  padding: 10px 16px;
+  gap: 10px;
+}
+
+.search-bar img{
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;            /* taille fixe */
+}
+
+.search-bar input{
+  flex: 1 1 auto;
+  min-width: 0;              /* IMPORTANT: autorise l’input à rétrécir en flex */
+
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 17px;
+}
+
+.search-bar button{
+  flex: 0 0 auto;            /* le bouton ne s’étire pas */
+
+  background: var(--accent);
+  border: none;
+  border-radius: 20px;
+  padding: 7px 12px;         /* un peu plus large, évite l’effet “écrasé” */
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+#searchHint{
+  color: #64748b;
+  font-size: 13px;
+}
+
+#searchClose{
+  background: transparent;
+  border: 1px solid #475569;
+  color: #94a3b8;
+  border-radius: 20px;
+  padding: 9px 26px;
+  cursor: pointer;
+  font-size: 13px;
+}
 
         /* DOSSIER */
         #folderOverlay {
@@ -202,7 +253,7 @@
 
         /* AIDE */
         #helpPanel {
-            position: fixed; top: 0; right: -100vw; width: 80vw; max-width: 380px;
+            position: fixed; top: 0; right: -100vw; width: 80vw; max-width: 300px;
             height: 100dvh; background: var(--sidebar-bg); z-index: 6000;
             box-shadow: -5px 0 25px rgba(0,0,0,0.7); transition: right 0.3s ease;
             overflow-y: auto; padding: 24px 20px; border-left: 1px solid var(--accent);
@@ -290,7 +341,23 @@
             <input id="searchOverlayInput" type="text" placeholder="Rechercher sur Google…">
             <button id="searchOverlayBtn">→</button>
         </div>
+
         <div id="searchHint">Tapez et appuyez sur Entrée ou →</div>
+
+        <!-- Boutons + historique -->
+        <div style="display:flex; gap:10px; justify-content:center; width:88vw; max-width:420px;">
+            <button id="btn-show-history" style="background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:9px 14px;cursor:pointer;font-size:13px;">
+                Historique
+            </button>
+            <button id="btn-clear-history" style="background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:20px;padding:9px 14px;cursor:pointer;font-size:13px;">
+                Effacer
+            </button>
+        </div>
+
+        <div id="searchHistoryBox" style="width:88vw; max-width:420px; max-height:38vh; overflow:auto; display:none; border:1px solid #475569; border-radius:14px; padding:10px; background:rgba(30,41,59,0.55);">
+            <!-- rempli par JS -->
+        </div>
+
         <button id="searchClose">Fermer</button>
     </div>
 
@@ -397,6 +464,7 @@
         const searchInput   = document.getElementById('searchOverlayInput');
 
         document.getElementById('btn-search-mobile').addEventListener('click', () => {
+            refreshSearchHistoryDatalist();
             searchOverlay.classList.add('active');
             setTimeout(() => searchInput.focus(), 150);
         });
@@ -408,6 +476,7 @@
         function doSearch() {
             const q = searchInput.value.trim();
             if (q) {
+                addToSearchHistory(q);
                 window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
                 closeSearch();
             }
@@ -428,6 +497,210 @@
                 document.getElementById('helpOverlay').classList.remove('active');
             });
         });
+
+        // ── HISTORIQUE RECHERCHE GOOGLE (localStorage) ──
+        const SEARCH_HISTORY_KEY = 'googleSearchHistory_v1';
+        const SEARCH_HISTORY_MAX = 50;
+
+        function loadSearchHistory() {
+            try { return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || []; }
+            catch { return []; }
+        }
+
+        function saveSearchHistory(list) {
+            localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list));
+        }
+
+        function addToSearchHistory(query) {
+            const q = query.trim();
+            if (!q) return;
+
+            let hist = loadSearchHistory();
+
+            // dédoublonne (si tu retapes la même requête, elle remonte en haut)
+            hist = hist.filter(item => item.q.toLowerCase() !== q.toLowerCase());
+
+            hist.unshift({ q, ts: Date.now() });
+
+            if (hist.length > SEARCH_HISTORY_MAX) hist = hist.slice(0, SEARCH_HISTORY_MAX);
+            saveSearchHistory(hist);
+        }
+
+        // Suggestions via datalist (très léger)
+        function ensureSearchHistoryDatalist() {
+            let dl = document.getElementById('searchHistoryDatalist');
+            if (!dl) {
+                dl = document.createElement('datalist');
+                dl.id = 'searchHistoryDatalist';
+                document.body.appendChild(dl);
+                searchInput.setAttribute('list', 'searchHistoryDatalist');
+            }
+            return dl;
+        }
+
+        function refreshSearchHistoryDatalist() {
+            const dl = ensureSearchHistoryDatalist();
+            const hist = loadSearchHistory();
+            dl.innerHTML = hist
+                .map(item => `<option value="${escapeHtmlAttr(item.q)}"></option>`)
+                .join('');
+        }
+
+        // petit helper pour éviter les soucis de guillemets dans value=""
+        function escapeHtmlAttr(str) {
+            return String(str)
+                .replaceAll('&', '&amp;')
+                .replaceAll('"', '&quot;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;');
+        }
+
+        // ── HISTORIQUE UI : afficher / relancer / supprimer 1 / effacer tout ──
+        const historyBox = document.getElementById('searchHistoryBox');
+        const btnShowHistory = document.getElementById('btn-show-history');
+        const btnClearHistory = document.getElementById('btn-clear-history');
+
+        btnShowHistory.addEventListener('click', () => {
+            toggleHistoryBox();
+        });
+
+        btnClearHistory.addEventListener('click', () => {
+            clearSearchHistory();
+        });
+
+        function formatDate(ts) {
+            try {
+                return new Date(ts).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+            } catch {
+                return '';
+            }
+        }
+
+        // Tap sur une entrée => relance la recherche + remet l'entrée en haut
+        function runGoogleSearch(query) {
+            const q = String(query || '').trim();
+            if (!q) return;
+
+            searchInput.value = q;
+            addToSearchHistory(q);
+            refreshSearchHistoryDatalist();
+
+            window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+            closeSearch();
+        }
+
+        // Bouton X => supprime uniquement cette entrée
+        function deleteOneHistoryItem(query) {
+            const q = String(query || '').trim();
+            if (!q) return;
+
+            let hist = loadSearchHistory();
+            const before = hist.length;
+
+            hist = hist.filter(item => item.q.toLowerCase() !== q.toLowerCase());
+
+            if (hist.length === before) return;
+
+            saveSearchHistory(hist);
+            refreshSearchHistoryDatalist();
+            renderHistoryBox();
+        }
+
+        function renderHistoryBox() {
+            const hist = loadSearchHistory();
+
+            if (!hist.length) {
+                historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Aucun historique.</div>`;
+                return;
+            }
+
+            historyBox.innerHTML = hist.map(item => {
+                const qAttr = escapeHtmlAttr(item.q);
+                const qText = escapeHtmlAttr(item.q);
+                const when = formatDate(item.ts);
+
+                return `
+                    <div style="display:flex; gap:8px; align-items:stretch; margin-bottom:8px;">
+                        <button
+                            type="button"
+                            data-action="run"
+                            data-q="${qAttr}"
+                            style="flex:1; text-align:left; background:rgba(255,255,255,0.03);
+                                   border:1px solid rgba(255,255,255,0.08); color:var(--text);
+                                   padding:10px 10px; border-radius:12px; cursor:pointer; overflow:hidden;">
+                            <div style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${qText}</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">${when}</div>
+                        </button>
+
+                        <button
+                            type="button"
+                            data-action="delete"
+                            data-q="${qAttr}"
+                            title="Supprimer"
+                            style="width:42px; flex:0 0 42px; background:rgba(239,68,68,0.12);
+                                   border:1px solid rgba(239,68,68,0.6); color:#ef4444;
+                                   border-radius:12px; cursor:pointer; font-size:18px;">
+                            ×
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            historyBox.querySelectorAll('[data-action="run"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const q = btn.getAttribute('data-q') || '';
+                    runGoogleSearch(q);
+                });
+            });
+
+            historyBox.querySelectorAll('[data-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const q = btn.getAttribute('data-q') || '';
+                    deleteOneHistoryItem(q);
+                });
+            });
+        }
+
+        function toggleHistoryBox() {
+            const isHidden = historyBox.style.display === 'none' || !historyBox.style.display;
+            if (isHidden) {
+                renderHistoryBox();
+                historyBox.style.display = 'block';
+                btnShowHistory.textContent = 'Masquer';
+            } else {
+                historyBox.style.display = 'none';
+                btnShowHistory.textContent = 'Historique';
+            }
+        }
+
+        // Effacer tout
+        function clearSearchHistory() {
+            const hist = loadSearchHistory();
+            if (!hist.length) {
+                historyBox.style.display = 'block';
+                btnShowHistory.textContent = 'Masquer';
+                historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Aucun historique.</div>`;
+                return;
+            }
+
+            if (!confirm('Effacer tout l’historique de recherche ?')) return;
+
+            localStorage.removeItem(SEARCH_HISTORY_KEY);
+            refreshSearchHistoryDatalist();
+
+            historyBox.style.display = 'block';
+            btnShowHistory.textContent = 'Masquer';
+            historyBox.innerHTML = `<div style="color:#94a3b8;font-size:13px;">Historique effacé.</div>`;
+        }
+
+        // Quand on ferme l'overlay, on reset l'état de l'historique UI
+        const _oldCloseSearch = closeSearch;
+        closeSearch = function () {
+            historyBox.style.display = 'none';
+            btnShowHistory.textContent = 'Historique';
+            _oldCloseSearch();
+        };
 
         // ── SERVICE WORKER ──
         if ('serviceWorker' in navigator) {
