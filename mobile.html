@@ -137,7 +137,10 @@
 		  display: flex;
 		  align-items: center;
 		  box-sizing: border-box;
-		  overflow: hidden;          /* empêche le bouton de dépasser visuellement */
+
+		  /* IMPORTANT (Vivaldi/Chromium): retirer overflow:hidden pour éviter le triangle */
+		  /* overflow: hidden; */
+
 		  background: #1e293b;
 		  border-radius: 30px;
 		  border: 2px solid var(--accent);
@@ -154,7 +157,6 @@
 		.search-bar input{
 		  flex: 1 1 auto;
 		  min-width: 0;              /* IMPORTANT: autorise l’input à rétrécir en flex */
-
 		  background: transparent;
 		  border: none;
 		  outline: none;
@@ -163,7 +165,11 @@
 		}
 
 		.search-bar button{
-		  flex: 0 0 auto;
+		  /* bouton fixe => ne déborde pas et évite les artefacts */
+		  flex: 0 0 42px;
+		  width: 42px;
+		  height: 32px;
+		  padding: 0;
 
 		  -webkit-appearance: none;
 		  appearance: none;
@@ -173,14 +179,12 @@
 		  outline: none;
 		  box-shadow: none;
 
-		  border-radius: 20px;
-		  padding: 0 12px;
-		  height: 32px;              /* fixe -> ��vite les artefacts */
+		  border-radius: 16px;
 		  display: flex;
 		  align-items: center;
 		  justify-content: center;
 
-		  font-weight: 800;
+		  font-weight: 900;
 		  color: #000;
 		  cursor: pointer;
 		  font-size: 16px;
