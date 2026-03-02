@@ -165,7 +165,6 @@
 		}
 
 		.search-bar button{
-		  /* bouton fixe => ne déborde pas et évite les artefacts */
 		  flex: 0 0 42px;
 		  width: 42px;
 		  height: 32px;
@@ -180,15 +179,23 @@
 		  box-shadow: none;
 
 		  border-radius: 16px;
-		  display: flex;
-		  align-items: center;
-		  justify-content: center;
+		  display: grid;
+		  place-items: center;
 
-		  font-weight: 900;
-		  color: #000;
 		  cursor: pointer;
-		  font-size: 16px;
-		  line-height: 1;
+		  position: relative;
+
+		  font-size: 0;              /* masque tout texte éventuel (le →) */
+		  line-height: 0;
+		}
+
+		.search-bar button::before{
+		  content: "";
+		  width: 10px;
+		  height: 10px;
+		  border-right: 3px solid #000;
+		  border-top: 3px solid #000;
+		  transform: rotate(45deg);  /* flèche vers la droite */
 		}
 
 		.search-bar button:focus,
@@ -361,7 +368,7 @@
         <div class="search-bar">
             <img src="https://www.google.com/favicon.ico" alt="G">
             <input id="searchOverlayInput" type="text" placeholder="Rechercher sur Google…">
-            <button id="searchOverlayBtn">→</button>
+            <button id="searchOverlayBtn" aria-label="Rechercher"></button>
         </div>
 
         <div id="searchHint">Tapez et appuyez sur Entrée ou →</div>
