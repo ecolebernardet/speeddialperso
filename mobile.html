@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Speed Dial Perso</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
@@ -50,7 +53,7 @@
             transition: transform 0.1s;
         }
         .tile:active { transform: scale(0.93); }
-        .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.30; }
+        .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.50; }
         .tile.folder { background: var(--folder-tile-bg); }
         .tile.drag-over { border: 2px solid var(--accent) !important; background: rgba(56,189,248,0.2) !important; transform: scale(1.05); }
 
@@ -62,11 +65,11 @@
         }
         .tile-label {
             position: absolute; bottom: 0; width: 100%;
-            padding: 0px 4px; text-align: center; font-size: var(--font-size);
+            padding: 6px 4px; text-align: center; font-size: var(--font-size);
             pointer-events: none; white-space: nowrap;
             overflow: hidden; text-overflow: ellipsis;
         }
-        .tile.folder .tile-label { background: rgba(0,0,0,0); z-index: 3; }
+        .tile.folder .tile-label { background: rgba(0,0,0,0.4); z-index: 3; }
         .folder-icon-bg {
             position: absolute; width: auto; height: 100%; max-width: 100%;
             top: 0; left: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none;
@@ -99,7 +102,7 @@
         #footerDate { font-size: 0.7rem; color: var(--text); text-transform: capitalize; }
 
         /* SIDEBAR */
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Baloo+2:wght@400;600&display=swap');
+
 
         .sidebar {
             display: flex; flex-direction: column;
@@ -575,7 +578,7 @@
                     <select id="fontFamilyInput">
                         <option value="'Segoe UI', sans-serif">Standard</option>
                         <option value="'Roboto', sans-serif">Roboto</option>
-                        <option value="'Baloo 2', cursive">Baloo</option>
+                        <option value="'Baloo 2', sans-serif">Baloo</option>
                     </select>
                 </div>
             </div>
