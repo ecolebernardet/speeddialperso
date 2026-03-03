@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Speed Dial Perso</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         :root {
             --bg-main: #000000; --sidebar-bg: #1e293b; --tile-bg: #000000;
@@ -24,47 +24,158 @@
             transition: background-color 0.3s;
         }
 
-        /* --- STRUCTURE --- */
-        .sidebar { display: flex; flex-direction: column; height: 100vh; max-height: 100vh;
-        justify-content: space-between;
-        box-sizing: border-box; position: fixed; top: 0; left: -250px; width: 250px; background: var(--sidebar-bg);
-        box-shadow: 5px 0 25px rgba(0,0,0,0.6); transition: 0.3s; z-index: 5000; padding: 10px 25px;
-        overflow-y: auto; }
-        
-        .sidebar-content { flex: 1; overflow-y: auto; padding-right: 10px; }
+        /* --- GOOGLE FONTS --- */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Baloo+2:wght@400;600&family=Roboto:wght@400;500;700&display=swap');
 
-        .sidebar-footer {
-            padding: 20px 0;
-            border-top: 1px solid #333;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
+        /* --- SIDEBAR --- */
+        * { box-sizing: border-box; }
+        .sidebar {
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: -320px; width: 300px;
+            height: 100dvh;
+            background: linear-gradient(170deg, #0f172a 0%, #0c1424 60%, #0a1020 100%);
+            box-shadow: 8px 0 40px rgba(0,0,0,0.9), 1px 0 0 rgba(56,189,248,0.15);
+            transition: left 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 5000; overflow: hidden;
         }
-
+        .sidebar::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56,189,248,0.5), transparent);
+        }
         .sidebar.open { left: 0; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
-        .overlay.active { display: block; }
 
-        .menu-text {
-            font-size: 1.2rem; font-weight: bold; color: var(--text); background: #222;
-            padding: 10px 20px; border-radius: 5rem; border: 1px solid #38bdf8;
-            cursor: pointer; letter-spacing: 1px; transition: all 0.2s ease;
-            user-select: none; text-align: center;
-            min-width: 50px; margin-left: 10px;
+        .sidebar-scroll {
+            flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 0 12px;
+            min-height: 0;
+            scrollbar-width: thin; scrollbar-color: rgba(56,189,248,0.2) transparent;
         }
-		.help-text {
-            font-size: 1.2rem; font-weight: bold; color: var(--text); background: #222;
-            padding: 10px 10px; border-radius: 5rem; border: 1px solid #38bdf8;
-            cursor: pointer; letter-spacing: 1px; transition: all 0.2s ease;
-            user-select: none; text-align: center;
-            min-width: 40px;  margin-right: 10px;
+        .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.25); border-radius: 3px; }
+
+        .sidebar-header {
+            padding: 20px 20px 16px; flex-shrink: 0;
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: linear-gradient(170deg, #0f172a 0%, #0c1424 100%);
         }
-        .menu-text:hover { color: var(--accent); box-shadow: 0px 0px 10px rgba(200,200,200,1); }
+        .sidebar-header-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(56,189,248,0.05));
+            border: 1px solid rgba(56,189,248,0.3); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .sidebar-header h2 {
+            margin: 0; font-size: 14px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--accent); letter-spacing: 0.5px;
+        }
+        .sidebar-header span { margin-left: auto; font-size: 10px; color: rgba(255,255,255,0.25); font-family: 'DM Mono', monospace; }
 
+        .sb-section { padding: 10px 16px 2px; }
+        .sb-section-title {
+            font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.25); font-family: 'DM Mono', monospace;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+        }
+        .sb-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
 
-		.help-text:hover { color: var(--accent); box-shadow: 0px 0px 10px rgba(200,200,200,1); }
-		
-        /* --- GRILLE & TUILES --- */
+        /* COLOR TRIO */
+        .color-trio { display: flex; gap: 8px; }
+        .color-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .color-swatch-wrap { position: relative; width: 100%; }
+        .color-swatch-wrap input[type="color"] {
+            position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+        }
+        .color-swatch-preview {
+            width: 100%; height: 34px; border-radius: 8px; display: block;
+            border: 1.5px solid rgba(255,255,255,0.1); transition: border-color 0.2s; pointer-events: none;
+        }
+        .color-swatch-wrap:hover .color-swatch-preview { border-color: rgba(56,189,248,0.4); }
+        .color-trio-label {
+            font-size: 9px; font-family: 'DM Mono', monospace;
+            color: rgba(255,255,255,0.35); line-height: 1; text-align: center; width: 100%;
+        }
+        .color-trio-name {
+            font-size: 10px; font-family: 'DM Sans', sans-serif;
+            color: rgba(255,255,255,0.5); font-weight: 500; text-align: center; width: 100%;
+        }
+
+        /* STEPPER PAIR */
+        .stepper-pair { display: flex; gap: 8px; }
+        .stepper-pair-item { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .stepper-pair-label { font-size: 10px; color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-weight: 500; }
+
+        /* STEPPER */
+        .stepper {
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px; overflow: hidden; height: 42px;
+        }
+        .stepper-sm { height: 36px; }
+        .stepper-btn {
+            width: 42px; height: 42px; flex-shrink: 0; background: transparent;
+            border: none; color: var(--accent); font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s; font-family: 'DM Sans', sans-serif; font-weight: 300;
+        }
+        .stepper-sm .stepper-btn { width: 34px; height: 36px; font-size: 18px; }
+        .stepper-btn:active { background: rgba(56,189,248,0.12); }
+        .stepper-track {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .stepper-track::before, .stepper-track::after {
+            content: ''; position: absolute; top: 20%; bottom: 20%; width: 1px; background: rgba(255,255,255,0.08);
+        }
+        .stepper-track::before { left: 0; }
+        .stepper-track::after { right: 0; }
+        .stepper-val {
+            font-size: 17px; font-weight: 600; color: white;
+            font-family: 'DM Mono', monospace; min-width: 28px; text-align: center;
+        }
+        .stepper-sm .stepper-val { font-size: 15px; }
+        .stepper-unit { font-size: 10px; color: rgba(255,255,255,0.3); font-family: 'DM Mono', monospace; margin-left: 3px; margin-top: 2px; }
+
+        /* CONTROL GROUP (select) */
+        .control-group { margin-bottom: 12px; }
+        .control-group label { display: block; font-size: 11px; color: rgba(255,255,255,0.45); font-family: 'DM Sans', sans-serif; font-weight: 500; margin-bottom: 7px; letter-spacing: 0.3px; }
+        .control-group select {
+            width: 100%; padding: 9px 12px; background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09); color: white; border-radius: 10px;
+            font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .control-group select:focus { border-color: rgba(56,189,248,0.4); background: rgba(56,189,248,0.04); }
+        .control-group select option { background: #0f172a; }
+
+        /* BUTTONS */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .sb-btn {
+            width: 100%; padding: 11px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+            background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.8);
+            font-weight: 500; font-size: 12px; font-family: 'DM Sans', sans-serif;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s; text-align: left;
+            margin-bottom: 0;
+        }
+        .sb-btn:active { transform: scale(0.98); }
+        .sb-btn-export  { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #86efac; }
+        .sb-btn-import  { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: #fcd34d; }
+        .sb-btn-bookmarks { background: rgba(2,132,199,0.1); border-color: rgba(2,132,199,0.25); color: #7dd3fc; }
+        .sb-btn-undo    { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+
+        /* CLOSE BUTTON */
+        .sidebar-footer { padding: 12px 16px 16px; border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+        #btn-close-sidebar {
+            width: 100%; padding: 13px; text-align: center;
+            background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(56,189,248,0.08));
+            border: 1px solid rgba(56,189,248,0.3); border-radius: 12px; color: var(--accent);
+            font-weight: 600; font-size: 13px; font-family: 'DM Sans', sans-serif;
+            cursor: pointer; letter-spacing: 0.5px;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        #btn-close-sidebar:hover { background: rgba(56,189,248,0.2); box-shadow: none; box-shadow: 0px 0px 10px rgba(200,200,200,1);}
+        #btn-close-sidebar:active { transform: scale(0.98); }
         #grid { transition: filter 0.3s ease; will-change: filter; }
 
         .grid-container { 
@@ -93,7 +204,7 @@
         }
 
         .tile-label { 
-            position: absolute; bottom: 0; width: 100%; 
+            position: absolute; bottom: -3px; width: 100%; 
             background: rgba(0,0,0,0); padding: 5px 0; 
             text-align: center; font-size: var(--font-size); 
             pointer-events: none; white-space: nowrap; 
@@ -124,18 +235,18 @@
 		.tile.folder .folder-thumb {
 			position: absolute; 
 			z-index: 2; 
-			width: 40%; /* Un peu plus petit pour rester dans le dossier réduit */
-			height: 40%;
-			top: 45%; /* Ajusté pour rester centré sur le dossier */
+			width: 45%; /* Un peu plus petit pour rester dans le dossier réduit */
+			height: 45%;
+			top: 49%; /* Ajusté pour rester centré sur le dossier */
 			left: 50%;
 			transform: translate(-50%, -50%); 
-			filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+			filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
 		}
 
 /* --- AJUSTEMENT DU LABEL POUR LES DOSSIERS (OPTIONNEL MAIS RECOMMANDÉ) --- */
 		.tile.folder .tile-label {
 			z-index: 3; /* S'assure que le texte passe au-dessus si besoin */
-			background: rgba(0,0,0,0.5); /* Optionnel: léger fond pour la lisibilité */
+			background: rgba(0,0,0,0); /* Optionnel: léger fond pour la lisibilité */
 		}
 
         /* --- RECHERCHE FOOTER --- */
@@ -205,11 +316,18 @@
 		}
 
 
-        .folder-toolbar { display: flex; gap: 10px; padding: 5px 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 15px; align-items: center; opacity: 0.3; transition: 0.3s; }
+        .folder-toolbar {
+            display: flex; gap: 14px; padding: 8px 12px;
+            background: rgba(255,255,255,0.04); border-radius: 10px;
+            margin-bottom: 12px; align-items: flex-end;
+            border: 1px solid rgba(255,255,255,0.07);
+            opacity: 0.4; transition: opacity 0.3s;
+        }
         .folder-toolbar:hover { opacity: 1; }
-        .folder-toolbar label { font-size: 9px; color: var(--accent); text-transform: uppercase; }
-        .folder-toolbar input { width: 45px; padding: 3px; font-size: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 3px; }
-        .folder-toolbar input[type="color"] { width: 40px; height: 25px; padding: 0; cursor: pointer; }
+        .folder-toolbar-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .folder-toolbar-item label { font-size: 8px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; }
+        .stepper-sm .stepper-btn { width: 20px; height: 20px; font-size: 14px; }
+        .stepper-sm .stepper-val { font-size: 12px; min-width: 24px; padding: 1px 4px; }
 
         #closeFolderBtn {
             position: absolute; top: -15px; right: -15px; width: 32px; height: 32px;
@@ -217,103 +335,6 @@
             align-items: center; justify-content: center; cursor: pointer;
             font-size: 22px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             z-index: 9999; border: 2px solid white;
-        }
-
-        /* --- CORRECTIF MOBILE --- */
-        @media (max-width: 1024px) {
-            .search-group, #footerClock, .help-text { display: none !important; }
-
-            .menu-text {
-                width: 45px; height: 45px; padding: 0;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 0; border-radius: 50%; border-width: 2px;
-            }
-            #btn-menu::before { content: '≡'; font-size: 30px; color: var(--accent); }
-
-
-
-
-            .search-footer { height: 70px; justify-content: flex-start; padding: 0 15px; }
-            .footer-left { min-width: auto; display: flex; align-items: center; }
-
-            .grid-container { 
-                height: calc(100vh - 80px);
-                grid-template-columns: repeat(var(--cols), 1fr);
-                grid-template-rows: repeat(var(--rows), var(--row-height, 80px));
-                overflow-y: auto;
-                align-content: start;
-                padding: 10px;
-            }
-            .tile img { margin-bottom: 5px; max-height: 50%; }
-            .tile-label { font-size: 9px; }
-            .tile.empty { border: 1px dashed var(--border) !important; background: transparent !important; opacity: 0.25 !important; display: flex !important; }
-            
-            #folderPopup { 
-                max-width: 80vw !important; left: 5vw !important; top: 5vh !important; 
-                position: fixed !important; padding: 10px; border-radius: 15px;
-            }
-            .folder-content { 
-                grid-template-columns: repeat(var(--fcols, 3), 1fr) !important; gap: 8px; padding: 10px;
-            }
-            .folder-toolbar { display: none; }
-        }
-
-        /* --- STEPPER MOBILE SETTINGS --- */
-        .hide-mobile { display: block; }
-        .show-mobile-flex { display: none; }
-        .stepper {
-            display: flex; align-items: center; gap: 12px; margin-top: 4px;
-        }
-        .stepper-btn {
-            width: 32px; height: 32px; border-radius: 50%;
-            border: 1px solid var(--accent); background: transparent;
-            color: var(--accent); font-size: 20px; line-height: 1;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .stepper-val {
-            font-size: 18px; font-weight: bold; color: white;
-            min-width: 30px; text-align: center;
-        }
-        @media (max-width: 1024px) {
-            .hide-mobile { display: none !important; }
-            .show-mobile-flex { display: block; }
-        }
-
-        /* --- TOOLBAR DOSSIER MOBILE --- */
-        .folder-toolbar-mobile {
-            display: none;
-        }
-        @media (max-width: 1024px) {
-            .folder-toolbar-mobile {
-                display: flex;
-                justify-content: center;
-                gap: 20px;
-                padding: 8px 0 2px;
-                border-top: 1px solid rgba(255,255,255,0.1);
-                margin-top: 8px;
-            }
-            .ftm-group {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .ftm-label {
-                font-size: 11px;
-                color: var(--accent);
-                min-width: 60px;
-                text-align: center;
-            }
-            .ftm-btn {
-                width: 28px; height: 28px;
-                border-radius: 50%;
-                border: 1px solid var(--accent);
-                background: transparent;
-                color: var(--accent);
-                font-size: 18px;
-                line-height: 1;
-                cursor: pointer;
-                display: flex; align-items: center; justify-content: center;
-            }
         }
 
         /* --- PANNEAU AIDE DROITE --- */
@@ -363,6 +384,11 @@
 		.modal-actions { position: absolute; }
 
 
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; z-index: 999; }
+        .overlay.active { display: block; }
+        .menu-text { font-size: 0.85rem; font-weight: 600; color: var(--text); background: rgba(255,255,255,0.05); padding: 9px 18px; border-radius: 8px; border: 1px solid rgba(56,189,248,0.3); cursor: pointer; transition: all 0.2s ease; user-select: none; text-align: center; }
+        .help-text { font-size: 0.85rem; font-weight: 600; color: var(--text); background: rgba(255,255,255,0.05); padding: 9px 14px; border-radius: 8px; border: 1px solid rgba(56,189,248,0.3); cursor: pointer; transition: all 0.2s ease; user-select: none; text-align: center; }
+        .menu-text:hover, .help-text:hover { background: rgba(56,189,248,0.1); border-color: var(--accent); color: var(--accent); box-shadow: 0px 0px 10px rgba(200,200,200,1);}
 	</style>
 </head>
 <body>
@@ -370,54 +396,131 @@
     <div class="overlay" id="overlay"></div>
 
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-content">
-            <h2 style="color:var(--accent); margin-top:0">Paramètres</h2>
-            <div class="control-group"><label>Couleur de fond globale</label><input type="color" id="bgInput"></div>
-            <div class="control-group"><label>Couleur des tuiles (Lien)</label><input type="color" id="tileColorInput"></div>
-            <div class="control-group"><label>Couleur des tuiles (Dossier)</label><input type="color" id="folderTileColorInput"></div>
-            <div class="control-group hide-mobile"><label>Colonnes</label><input type="number" id="colsInput" min="1"></div>
-            <div class="control-group show-mobile-flex">
-                <label>Colonnes</label>
-                <div class="stepper">
-                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
-                    <span class="stepper-val" id="stepperColsVal">4</span>
-                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
+
+        <div class="sidebar-header">
+            <div class="sidebar-header-icon">⚙️</div>
+            <h2>Paramètres</h2>
+            <span>v1.0</span>
+        </div>
+
+        <div class="sidebar-scroll">
+
+            <!-- COULEURS -->
+            <div class="sb-section">
+                <div class="sb-section-title">Couleurs</div>
+                <div class="color-trio">
+                    <div class="color-item">
+                        <div class="color-swatch-wrap">
+                            <div class="color-swatch-preview" id="previewBg" style="background:#000000;"></div>
+                            <input type="color" id="bgInput" value="#000000"
+                                oninput="document.getElementById('previewBg').style.background=this.value; document.getElementById('hexBg').textContent=this.value.toUpperCase();">
+                        </div>
+                        <span class="color-trio-label" id="hexBg">#000000</span>
+                        <span class="color-trio-name">Fond</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch-wrap">
+                            <div class="color-swatch-preview" id="previewTile" style="background:#000000;"></div>
+                            <input type="color" id="tileColorInput" value="#000000"
+                                oninput="document.getElementById('previewTile').style.background=this.value; document.getElementById('hexTile').textContent=this.value.toUpperCase();">
+                        </div>
+                        <span class="color-trio-label" id="hexTile">#000000</span>
+                        <span class="color-trio-name">Liens</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch-wrap">
+                            <div class="color-swatch-preview" id="previewFolder" style="background:#ffd43b;"></div>
+                            <input type="color" id="folderTileColorInput" value="#ffd43b"
+                                oninput="document.getElementById('previewFolder').style.background=this.value; document.getElementById('hexFolder').textContent=this.value.toUpperCase();">
+                        </div>
+                        <span class="color-trio-label" id="hexFolder">#FFD43B</span>
+                        <span class="color-trio-name">Dossiers</span>
+                    </div>
                 </div>
             </div>
-            <div class="control-group hide-mobile"><label>Lignes</label><input type="number" id="rowsInput" min="1"></div>
-            <div class="control-group show-mobile-flex">
-                <label>Lignes</label>
-                <div class="stepper">
-                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
-                    <span class="stepper-val" id="stepperRowsVal">4</span>
-                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
+
+            <!-- GRILLE -->
+            <div class="sb-section">
+                <div class="sb-section-title">Grille</div>
+                <div class="stepper-pair">
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Colonnes</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperColsVal">4</span>
+                            </div>
+                            <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
+                            <input type="number" id="colsInput" min="1" style="display:none">
+                        </div>
+                    </div>
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Lignes</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperRowsVal">4</span>
+                            </div>
+                            <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
+                            <input type="number" id="rowsInput" min="1" style="display:none">
+                        </div>
+                    </div>
+                </div>
+                <div class="stepper-pair" style="margin-top:8px;">
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Espacement</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="changeGridSetting('gapInput', -1)">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperGapVal">15</span>
+                                <span class="stepper-unit">px</span>
+                            </div>
+                            <button class="stepper-btn" onclick="changeGridSetting('gapInput', +1)">+</button>
+                            <input type="number" id="gapInput" min="0" style="display:none">
+                        </div>
+                    </div>
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Police (px)</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="changeGridSetting('fontInput', -1)">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperFontVal">12</span>
+                            </div>
+                            <button class="stepper-btn" onclick="changeGridSetting('fontInput', +1)">+</button>
+                            <input type="number" id="fontInput" min="6" style="display:none">
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="control-group hide-mobile"><label>Espacement (px)</label><input type="number" id="gapInput" min="0"></div>
-            <div class="control-group hide-mobile"><label>Taille police (px)</label><input type="number" id="fontInput" min="6"></div>
-            
-            <div class="control-group hide-mobile">
-                <label>Police d'écriture</label>
-                <select id="fontFamilyInput">
-                    <option value="'Segoe UI', sans-serif">Standard (Segoe UI)</option>
-                    <option value="'Roboto', sans-serif">Roboto (Moderne)</option>
-                    <option value="'Courier New', monospace">Code (Monospace)</option>
-                    <option value="'Georgia', serif">Élégant (Serif)</option>
-                    <option value="cursive">Manuscrit</option>
-                </select>
+
+            <!-- TYPOGRAPHIE -->
+            <div class="sb-section">
+                <div class="sb-section-title">Typographie</div>
+                <div class="control-group" style="margin-bottom:0;">
+                    <select id="fontFamilyInput">
+                        <option value="'Segoe UI', sans-serif">Standard</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Baloo 2', sans-serif">Baloo</option>
+                    </select>
+                </div>
             </div>
-            
-            <hr style="border:0; border-top:1px solid var(--border); margin: 10px 0;">
-            
-            <button class="btn" style="background:#5D9948; margin-top:10px" id="btn-export">📤 EXPORTER CONFIG</button>
-            <button class="btn" style="background:#f59e0b; margin-top:15px" id="btn-trigger-import">📥 IMPORTER CONFIG</button>
-            <button class="btn" style="background:#0284c7; margin-top:15px" id="btn-import-bookmarks">📑 IMPORTER FAVORIS (HTML)</button>
-            <button class="btn" style="background:#D14747; margin-top:20px" id="btn-undo">↩ ANNULER</button>
-            <input type="file" id="importFile" style="display:none">
+
+            <!-- DONNÉES -->
+            <div class="sb-section">
+                <div class="sb-section-title">Données</div>
+                <div class="btn-grid">
+                    <button class="sb-btn sb-btn-export" id="btn-export">📤 Exporter</button>
+                    <button class="sb-btn sb-btn-import" id="btn-trigger-import">📥 Importer</button>
+                    <button class="sb-btn sb-btn-bookmarks" id="btn-import-bookmarks">📑 Favoris HTML</button>
+                    <button class="sb-btn sb-btn-undo" id="btn-undo">↩ Annuler</button>
+                </div>
+                <input type="file" id="importFile" style="display:none">
+            </div>
+
         </div>
 
         <div class="sidebar-footer">
-            <div id="btn-close-sidebar" style="background:var(--accent);color:black;border:none;padding:10px 30px;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;">FERMER</div>
+            <div id="btn-close-sidebar">Fermer</div>
         </div>
     </nav>
 
@@ -426,7 +529,6 @@
     <footer class="search-footer" id="search-footer">
         <div class="footer-left">
             <div id="btn-menu" class="menu-text">⚙️</div>
-            <div id="btn-search-mobile" title="Recherche Google" style="margin-left:8px; display:flex; align-items:center; justify-content:center; width:45px; height:45px; font-size:26px; cursor:pointer; background:#222; border-radius:50%; border:2px solid #38bdf8; flex-shrink:0;">🔍</div>
         </div>
 
         <div class="search-group">
@@ -457,24 +559,39 @@
         <div id="folderPopup">
             <div id="closeFolderBtn">&times;</div>
             <div class="folder-toolbar">
-                <label>Cols</label><input type="number" id="fCols" min="1">
-                <label>Rows</label><input type="number" id="fRows" min="1">
-                <label>Gap</label><input type="number" id="fGap" min="0">
-                <label>Fond</label><input type="color" id="fPopBg">
+                <div class="folder-toolbar-item">
+                    <label>Colonnes</label>
+                    <div class="stepper stepper-sm">
+                        <button class="stepper-btn" onclick="changeFolderSetting('fCols', -1)">&#x2212;</button>
+                        <span class="stepper-val" id="ftmColsVal">3</span>
+                        <button class="stepper-btn" onclick="changeFolderSetting('fCols', +1)">+</button>
+                    </div>
+                    <input type="number" id="fCols" min="1" style="display:none">
+                </div>
+                <div class="folder-toolbar-item">
+                    <label>Lignes</label>
+                    <div class="stepper stepper-sm">
+                        <button class="stepper-btn" onclick="changeFolderSetting('fRows', -1)">&#x2212;</button>
+                        <span class="stepper-val" id="ftmRowsVal">3</span>
+                        <button class="stepper-btn" onclick="changeFolderSetting('fRows', +1)">+</button>
+                    </div>
+                    <input type="number" id="fRows" min="1" style="display:none">
+                </div>
+                <div class="folder-toolbar-item">
+                    <label>Espacement</label>
+                    <div class="stepper stepper-sm">
+                        <button class="stepper-btn" onclick="changeFolderSetting('fGap', -1)">&#x2212;</button>
+                        <span class="stepper-val" id="ftmGapVal">10</span>
+                        <button class="stepper-btn" onclick="changeFolderSetting('fGap', +1)">+</button>
+                    </div>
+                    <input type="number" id="fGap" min="0" style="display:none">
+                </div>
+                <div class="folder-toolbar-item">
+                    <label>Fond</label>
+                    <input type="color" id="fPopBg" style="width:32px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
+                </div>
             </div>
             <div class="folder-content" id="folderGrid"></div>
-            <div class="folder-toolbar-mobile" id="folderToolbarMobile">
-                <div class="ftm-group">
-                    <button class="ftm-btn" onclick="changeFolderSetting('fCols', -1)">−</button>
-                    <span class="ftm-label">Cols <span id="ftmColsVal">3</span></span>
-                    <button class="ftm-btn" onclick="changeFolderSetting('fCols', +1)">+</button>
-                </div>
-                <div class="ftm-group">
-                    <button class="ftm-btn" onclick="changeFolderSetting('fRows', -1)">−</button>
-                    <span class="ftm-label">Lignes <span id="ftmRowsVal">3</span></span>
-                    <button class="ftm-btn" onclick="changeFolderSetting('fRows', +1)">+</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -611,7 +728,6 @@
         <ul style="margin:0;padding-left:18px;font-size:13px;color:#cbd5e1;line-height:1.9;">
             <li>Vos données sont <strong style="color:white;">sauvegardées automatiquement</strong> dans le navigateur (localStorage).</li>
             <li>Pensez à <strong style="color:white;">exporter régulièrement</strong> votre config pour éviter toute perte.</li>
-            <li>Sur mobile, le glisser-déposer fonctionne avec un <strong style="color:white;">appui long</strong>.</li>
             <li>Les images encodées en base64 sont stockées localement — pas besoin d'internet.</li>
         </ul>
     </section>
@@ -621,44 +737,6 @@
     </div>
 </div>
 
-    <!-- OVERLAY RECHERCHE -->
-    <div id="searchOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9000; align-items:center; justify-content:center; flex-direction:column; gap:16px;">
-        <div style="width:85vw; max-width:400px; display:flex; align-items:center; background:#1e293b; border-radius:30px; border:2px solid var(--accent); padding:10px 18px; gap:12px;">
-            <img src="https://www.google.com/favicon.ico" style="width:22px; height:22px; flex-shrink:0;">
-            <input id="searchOverlayInput" type="text" placeholder="Rechercher sur Google…"
-                style="flex:1; background:transparent; border:none; outline:none; color:white; font-size:16px;">
-            <button id="searchOverlayBtn" style="background:var(--accent); border:none; border-radius:20px; padding:6px 14px; font-weight:bold; color:black; cursor:pointer; font-size:14px;">→</button>
-        </div>
-        <div style="color:#64748b; font-size:13px;">Appuyez sur Entrée ou → pour chercher</div>
-        <button id="searchOverlayClose" style="margin-top:10px; background:transparent; border:1px solid #475569; color:#94a3b8; border-radius:20px; padding:8px 24px; cursor:pointer; font-size:13px;">Fermer</button>
-    </div>
-
     <script src="script.js"></script>
-    <script>
-        const searchOverlay = document.getElementById('searchOverlay');
-        const searchInput = document.getElementById('searchOverlayInput');
-
-
-
-        document.getElementById('btn-search-mobile').addEventListener('click', () => {
-            searchOverlay.style.display = 'flex';
-            setTimeout(() => searchInput.focus(), 100);
-        });
-        document.getElementById('searchOverlayClose').addEventListener('click', () => {
-            searchOverlay.style.display = 'none';
-            searchInput.value = '';
-        });
-        function doSearch() {
-            const q = searchInput.value.trim();
-            if (q) {
-                window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
-                searchOverlay.style.display = 'none';
-                searchInput.value = '';
-            }
-        }
-        document.getElementById('searchOverlayBtn').addEventListener('click', doSearch);
-        searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
-        searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) { searchOverlay.style.display = 'none'; searchInput.value = ''; } });
-    </script>
 </body>
 </html>
