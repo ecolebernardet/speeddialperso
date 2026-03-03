@@ -35,7 +35,7 @@
             grid-template-columns: repeat(var(--cols), 1fr);
             grid-template-rows: repeat(var(--rows), var(--row-height, 80px));
             gap: var(--gap); padding: var(--gap);
-            width: 100vw; height: calc(100dvh - var(--footer-h));
+            width: 100vw; height: calc(100dvh - var(--footer-h)); overflow-y: hidden;
             overflow-y: auto; align-content: start;
             transition: filter 0.3s ease;
         }
@@ -49,7 +49,7 @@
             transition: transform 0.1s;
         }
         .tile:active { transform: scale(0.93); }
-        .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.25; }
+        .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.50; }
         .tile.folder { background: var(--folder-tile-bg); }
         .tile.drag-over { border: 2px solid var(--accent) !important; background: rgba(56,189,248,0.2) !important; transform: scale(1.05); }
 
@@ -57,7 +57,7 @@
             width: auto; height: 80%; max-width: 80%;
             object-fit: contain; pointer-events: none;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-            margin-bottom: 18px; border-radius: 8px;
+            margin-bottom: 18px; border-radius: 10px;
         }
         .tile-label {
             position: absolute; bottom: 0; width: 100%;
@@ -71,7 +71,7 @@
             top: 0; left: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none;
         }
         .tile.folder .folder-thumb {
-            position: absolute; z-index: 2; width: 50%; height: 50%; border-radius: 5%;
+            position: absolute; z-index: 2; width: 45%; height: 45%; border-radius: 5%;
             top: 55%; left: 50%; transform: translate(-50%, -50%);
             filter: drop-shadow(0 2px 4px rgba(0,0,10,0.9));
         }
@@ -98,31 +98,262 @@
         #footerDate { font-size: 0.7rem; color: var(--text); text-transform: capitalize; }
 
         /* SIDEBAR */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
         .sidebar {
             display: flex; flex-direction: column;
-            position: fixed; top: 0; left: -290px; width: 280px;
-            height: 100dvh; background: var(--sidebar-bg);
-            box-shadow: 5px 0 25px rgba(0,0,0,0.7);
-            transition: left 0.3s; z-index: 5000;
-            padding: 16px 20px; overflow-y: auto;
+            position: fixed; top: 0; left: -310px; width: 300px;
+            height: 100dvh;
+            background: linear-gradient(170deg, #0f172a 0%, #0c1424 60%, #0a1020 100%);
+            box-shadow: 8px 0 40px rgba(0,0,0,0.9), 1px 0 0 rgba(56,189,248,0.15);
+            transition: left 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 5000;
+            overflow: hidden;
+        }
+        .sidebar::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56,189,248,0.5), transparent);
         }
         .sidebar.open { left: 0; }
-        .sidebar-content { flex: 1; overflow-y: auto; }
-        .sidebar-footer { padding: 16px 0 0; border-top: 1px solid #333; display: flex; justify-content: center; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
-        .overlay.active { display: block; }
 
-        .control-group { margin-bottom: 14px; }
-        .control-group label { display: block; font-size: 11px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
-        .control-group input, .control-group select {
-            width: 100%; padding: 8px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border); color: white; border-radius: 6px; font-size: 13px;
+        .sidebar-scroll {
+            flex: 1; overflow-y: auto; padding: 0 0 12px;
+            scrollbar-width: thin; scrollbar-color: rgba(56,189,248,0.2) transparent;
         }
-        .control-group input[type="color"] { height: 36px; padding: 2px; cursor: pointer; }
-        .btn { width: 100%; padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 13px; cursor: pointer; margin-bottom: 8px; }
-        .stepper { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
-        .stepper-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .stepper-val { font-size: 18px; font-weight: bold; color: white; min-width: 30px; text-align: center; }
+        .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.25); border-radius: 3px; }
+
+        .sidebar-header {
+            padding: 20px 20px 16px;
+            display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0;
+            background: linear-gradient(170deg, #0f172a 0%, #0c1424 100%);
+            z-index: 1;
+        }
+        .sidebar-header-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(56,189,248,0.05));
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .sidebar-header h2 {
+            margin: 0; font-size: 14px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--accent); letter-spacing: 0.5px;
+        }
+        .sidebar-header span {
+            margin-left: auto; font-size: 10px;
+            color: rgba(255,255,255,0.25); font-family: 'DM Mono', monospace;
+        }
+
+        /* SECTIONS */
+        .sb-section {
+            padding: 10px 16px 2px;
+        }
+        .sb-section-title {
+            font-size: 9px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.25);
+            font-family: 'DM Mono', monospace;
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sb-section-title::after {
+            content: ''; flex: 1; height: 1px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        /* COLOR TRIO — 3 swatches sur une ligne */
+        .color-trio {
+            display: flex; gap: 8px;
+        }
+        .color-item {
+            flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+        }
+        .color-swatch-wrap {
+            position: relative; width: 100%;
+        }
+        .color-swatch-wrap input[type="color"] {
+            position: absolute; inset: 0; opacity: 0;
+            width: 100%; height: 100%; cursor: pointer;
+        }
+        .color-swatch-preview {
+            width: 100%; height: 34px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            transition: border-color 0.2s;
+            pointer-events: none;
+        }
+        .color-swatch-wrap:hover .color-swatch-preview { border-color: rgba(56,189,248,0.4); }
+        .color-trio-label {
+            font-size: 9px; font-family: 'DM Mono', monospace;
+            color: rgba(255,255,255,0.35); line-height: 1;
+        }
+        .color-trio-name {
+            font-size: 10px; font-family: 'DM Sans', sans-serif;
+            color: rgba(255,255,255,0.5); font-weight: 500;
+        }
+
+        /* STEPPER PAIR — 2 steppers côte à côte */
+        .stepper-pair {
+            display: flex; gap: 8px;
+        }
+        .stepper-pair-item {
+            flex: 1; display: flex; flex-direction: column; gap: 5px;
+        }
+        .stepper-pair-label {
+            font-size: 10px; color: rgba(255,255,255,0.4);
+            font-family: 'DM Sans', sans-serif; font-weight: 500;
+        }
+        .stepper-sm { height: 36px; }
+        .stepper-sm .stepper-btn { width: 34px; height: 36px; font-size: 18px; }
+        .stepper-sm .stepper-val { font-size: 15px; }
+
+        /* BTN GRID — 2 colonnes */
+        .btn-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+        }
+        .btn-grid .btn { margin-bottom: 0; padding: 9px 10px; font-size: 12px; }
+        .btn-grid .btn-bookmarks { grid-column: 1 / -1; }
+
+        /* CONTROL GROUP */
+        .control-group { margin-bottom: 12px; }
+        .control-group label {
+            display: block; font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            margin-bottom: 7px;
+            letter-spacing: 0.3px;
+        }
+        .control-group input:not([type="color"]):not([type="hidden"]):not([type="file"]),
+        .control-group select {
+            width: 100%; padding: 9px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            color: white; border-radius: 10px;
+            font-size: 13px; font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, background 0.2s;
+            outline: none;
+        }
+        .control-group input:focus, .control-group select:focus {
+            border-color: rgba(56,189,248,0.4);
+            background: rgba(56,189,248,0.04);
+        }
+        .control-group select option { background: #0f172a; }
+
+        /* COLOR PICKER ROW */
+        .color-row {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .color-swatch-wrap {
+            position: relative; flex-shrink: 0;
+        }
+        .color-swatch-wrap input[type="color"] {
+            position: absolute; inset: 0; opacity: 0;
+            width: 100%; height: 100%; cursor: pointer;
+        }
+        .color-swatch-preview {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: border-color 0.2s;
+            pointer-events: none;
+        }
+        .color-swatch-wrap:hover .color-swatch-preview { border-color: rgba(56,189,248,0.4); }
+        .color-label-val {
+            flex: 1;
+            font-size: 12px; font-family: 'DM Mono', monospace;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* STEPPER — Modern */
+        .stepper {
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px; overflow: hidden;
+            height: 42px;
+        }
+        .stepper-btn {
+            width: 42px; height: 42px; flex-shrink: 0;
+            background: transparent;
+            border: none; color: var(--accent);
+            font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+        }
+        .stepper-btn:active { background: rgba(56,189,248,0.12); }
+        .stepper-track {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .stepper-track::before, .stepper-track::after {
+            content: ''; position: absolute; top: 20%; bottom: 20%;
+            width: 1px; background: rgba(255,255,255,0.08);
+        }
+        .stepper-track::before { left: 0; }
+        .stepper-track::after { right: 0; }
+        .stepper-val {
+            font-size: 17px; font-weight: 600;
+            color: white; font-family: 'DM Mono', monospace;
+            min-width: 28px; text-align: center;
+            transition: transform 0.1s ease;
+        }
+        .stepper-unit {
+            font-size: 10px; color: rgba(255,255,255,0.3);
+            font-family: 'DM Mono', monospace;
+            margin-left: 3px; margin-top: 2px;
+        }
+
+        /* SIDEBAR BUTTONS */
+        .btn {
+            width: 100%; padding: 11px 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.8);
+            font-weight: 500; font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; margin-bottom: 7px;
+            display: flex; align-items: center; gap: 8px;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+            text-align: left;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-icon { font-size: 15px; opacity: 0.9; }
+
+        .btn-export  { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #86efac; }
+        .btn-import  { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: #fcd34d; }
+        .btn-bookmarks { background: rgba(2,132,199,0.1); border-color: rgba(2,132,199,0.25); color: #7dd3fc; }
+        .btn-undo    { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+
+        /* CLOSE BUTTON */
+        .sidebar-footer {
+            padding: 12px 20px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .btn-close-sidebar-inner {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(56,189,248,0.08));
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 12px; color: var(--accent);
+            font-weight: 600; font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; letter-spacing: 0.5px;
+            text-align: center;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .btn-close-sidebar-inner:active { transform: scale(0.98); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(2px); display: none; z-index: 999; }
+        .overlay.active { display: block; }
 
         /* RECHERCHE OVERLAY */
         #searchOverlay {
@@ -233,50 +464,139 @@
 
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-content">
-            <h2 style="color:var(--accent);margin-top:0;font-size:1.1rem;">⚙️ Paramètres</h2>
-            <div class="control-group"><label>Couleur de fond</label><input type="color" id="bgInput"></div>
-            <div class="control-group"><label>Couleur tuiles liens</label><input type="color" id="tileColorInput"></div>
-            <div class="control-group"><label>Couleur tuiles dossiers</label><input type="color" id="folderTileColorInput"></div>
-            <div class="control-group">
-                <label>Colonnes</label>
-                <div class="stepper">
-                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
-                    <span class="stepper-val" id="stepperColsVal">4</span>
-                    <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
-                    <input type="hidden" id="colsInput" value="4">
-                </div>
-            </div>
-            <div class="control-group">
-                <label>Lignes</label>
-                <div class="stepper">
-                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
-                    <span class="stepper-val" id="stepperRowsVal">4</span>
-                    <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
-                    <input type="hidden" id="rowsInput" value="4">
-                </div>
-            </div>
-            <div class="control-group"><label>Espacement (px)</label><input type="number" id="gapInput" min="0" value="10"></div>
-            <div class="control-group"><label>Taille police (px)</label><input type="number" id="fontInput" min="6" value="10"></div>
-            <div class="control-group">
-                <label>Police</label>
-                <select id="fontFamilyInput">
-                    <option value="'Segoe UI', sans-serif">Standard</option>
-                    <option value="'Roboto', sans-serif">Roboto</option>
-                    <option value="'Courier New', monospace">Monospace</option>
-                    <option value="'Georgia', serif">Serif</option>
-                    <option value="cursive">Manuscrit</option>
-                </select>
-            </div>
-            <hr style="border:0;border-top:1px solid var(--border);margin:12px 0;">
-            <button class="btn" style="background:#5D9948" id="btn-export">📤 Exporter config</button>
-            <button class="btn" style="background:#f59e0b" id="btn-trigger-import">📥 Importer config</button>
-            <button class="btn" style="background:#0284c7" id="btn-import-bookmarks">📑 Importer favoris (HTML)</button>
-            <button class="btn" style="background:#D14747" id="btn-undo">↩ Annuler</button>
-            <input type="file" id="importFile" style="display:none">
+
+        <!-- Header -->
+        <div class="sidebar-header">
+            <div class="sidebar-header-icon">⚙️</div>
+            <h2>Paramètres</h2>
+            <span>v1.0</span>
         </div>
+
+        <!-- Scrollable content -->
+        <div class="sidebar-scroll">
+
+            <!-- SECTION COULEURS -->
+            <div class="sb-section">
+                <div class="sb-section-title">Couleurs</div>
+                <div class="color-trio">
+                    <div class="color-item">
+                        <div class="color-swatch-wrap">
+                            <div class="color-swatch-preview" id="previewBg" style="background:#000000;"></div>
+                            <input type="color" id="bgInput" value="#000000"
+                                oninput="document.getElementById('previewBg').style.background=this.value; document.getElementById('hexBg').textContent=this.value.toUpperCase();">
+                        </div>
+                        <span class="color-trio-label" id="hexBg">#000</span>
+                        <span class="color-trio-name">Fond</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch-wrap">
+                            <div class="color-swatch-preview" id="previewTile" style="background:#000000;"></div>
+                            <input type="color" id="tileColorInput" value="#000000"
+                                oninput="document.getElementById('previewTile').style.background=this.value; document.getElementById('hexTile').textContent=this.value.toUpperCase();">
+                        </div>
+                        <span class="color-trio-label" id="hexTile">#000</span>
+                        <span class="color-trio-name">Liens</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch-wrap">
+                            <div class="color-swatch-preview" id="previewFolder" style="background:#ffd43b;"></div>
+                            <input type="color" id="folderTileColorInput" value="#ffd43b"
+                                oninput="document.getElementById('previewFolder').style.background=this.value; document.getElementById('hexFolder').textContent=this.value.toUpperCase();">
+                        </div>
+                        <span class="color-trio-label" id="hexFolder">#FFD</span>
+                        <span class="color-trio-name">Dossiers</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION GRILLE -->
+            <div class="sb-section">
+                <div class="sb-section-title">Grille</div>
+
+                <!-- Colonnes + Lignes côte à côte -->
+                <div class="stepper-pair">
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Colonnes</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperColsVal">4</span>
+                            </div>
+                            <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
+                            <input type="hidden" id="colsInput" value="4">
+                        </div>
+                    </div>
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Lignes</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperRowsVal">4</span>
+                            </div>
+                            <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
+                            <input type="hidden" id="rowsInput" value="4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Espacement + Police côte à côte -->
+                <div class="stepper-pair" style="margin-top:8px;">
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Espacement</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="document.getElementById('gapInput').value=Math.max(0,+document.getElementById('gapInput').value-1);document.getElementById('gapInput').dispatchEvent(new Event('input'))">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperGapVal">10</span>
+                                <span class="stepper-unit">px</span>
+                            </div>
+                            <button class="stepper-btn" onclick="document.getElementById('gapInput').value=+document.getElementById('gapInput').value+1;document.getElementById('gapInput').dispatchEvent(new Event('input'))">+</button>
+                            <input type="hidden" id="gapInput" min="0" value="10">
+                        </div>
+                    </div>
+                    <div class="stepper-pair-item">
+                        <div class="stepper-pair-label">Police (px)</div>
+                        <div class="stepper stepper-sm">
+                            <button class="stepper-btn" onclick="document.getElementById('fontInput').value=Math.max(6,+document.getElementById('fontInput').value-1);document.getElementById('fontInput').dispatchEvent(new Event('input'))">−</button>
+                            <div class="stepper-track">
+                                <span class="stepper-val" id="stepperFontVal">10</span>
+                            </div>
+                            <button class="stepper-btn" onclick="document.getElementById('fontInput').value=+document.getElementById('fontInput').value+1;document.getElementById('fontInput').dispatchEvent(new Event('input'))">+</button>
+                            <input type="hidden" id="fontInput" min="6" value="10">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION TYPOGRAPHIE -->
+            <div class="sb-section">
+                <div class="sb-section-title">Typographie</div>
+                <div class="control-group" style="margin-bottom:0;">
+                    <select id="fontFamilyInput">
+                        <option value="'Segoe UI', sans-serif">Standard</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Courier New', monospace">Monospace</option>
+                        <option value="'Georgia', serif">Serif</option>
+                        <option value="cursive">Manuscrit</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SECTION DONNÉES -->
+            <div class="sb-section">
+                <div class="sb-section-title">Données</div>
+                <div class="btn-grid">
+                    <button class="btn btn-export" id="btn-export"><span class="btn-icon">📤</span> Exporter</button>
+                    <button class="btn btn-import" id="btn-trigger-import"><span class="btn-icon">📥</span> Importer</button>
+                    <button class="btn btn-bookmarks" id="btn-import-bookmarks"><span class="btn-icon">📑</span> Favoris HTML</button>
+                    <button class="btn btn-undo" id="btn-undo"><span class="btn-icon">↩</span> Annuler</button>
+                </div>
+                <input type="file" id="importFile" style="display:none">
+            </div>
+
+        </div><!-- end sidebar-scroll -->
+
         <div class="sidebar-footer">
-            <div id="btn-close-sidebar" style="background:var(--accent);color:black;border:none;padding:10px 30px;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;">FERMER</div>
+            <div id="btn-close-sidebar" class="btn-close-sidebar-inner">Fermer</div>
         </div>
     </nav>
     <div class="overlay" id="overlay"></div>
@@ -634,7 +954,49 @@
         _oldCloseSearch();
     };
 
-    // ── SERVICE WORKER ──
+    // ── SIDEBAR STEPPER SYNC ──
+    // Sync gap stepper display
+    const gapInput = document.getElementById('gapInput');
+    const stepperGapVal = document.getElementById('stepperGapVal');
+    if (gapInput && stepperGapVal) {
+        gapInput.addEventListener('input', () => {
+            stepperGapVal.textContent = gapInput.value;
+        });
+    }
+    // Sync font stepper display
+    const fontInput = document.getElementById('fontInput');
+    const stepperFontVal = document.getElementById('stepperFontVal');
+    if (fontInput && stepperFontVal) {
+        fontInput.addEventListener('input', () => {
+            stepperFontVal.textContent = fontInput.value;
+        });
+    }
+    // Sync color previews on settings load
+    function syncColorPreviews() {
+        const bgI = document.getElementById('bgInput');
+        const tileI = document.getElementById('tileColorInput');
+        const folderI = document.getElementById('folderTileColorInput');
+        if (bgI) {
+            document.getElementById('previewBg').style.background = bgI.value;
+            document.getElementById('hexBg').textContent = bgI.value.toUpperCase();
+        }
+        if (tileI) {
+            document.getElementById('previewTile').style.background = tileI.value;
+            document.getElementById('hexTile').textContent = tileI.value.toUpperCase();
+        }
+        if (folderI) {
+            document.getElementById('previewFolder').style.background = folderI.value;
+            document.getElementById('hexFolder').textContent = folderI.value.toUpperCase();
+        }
+    }
+    // Run after script.js has initialized settings
+    setTimeout(syncColorPreviews, 300);
+    // Also update when color inputs change (in addition to oninput handlers in HTML)
+    ['bgInput','tileColorInput','folderTileColorInput'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', syncColorPreviews);
+    });
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
     }
