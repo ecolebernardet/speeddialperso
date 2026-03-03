@@ -50,7 +50,7 @@
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             cursor: pointer; overflow: hidden; position: relative;
-            transition: transform 0.1s;
+            transition: transform 0.1s; overflow: visible;
         }
         .tile:active { transform: scale(0.93); }
         .tile.empty { border: 1px dashed var(--border); background: transparent !important; opacity: 0.50; }
@@ -64,7 +64,7 @@
             margin-bottom: 18px; border-radius: 10px;
         }
         .tile-label {
-            position: absolute; bottom: 0; width: 100%;
+            position: absolute; bottom: -5px; width: 100%;
             padding: 0px 4px; text-align: center; font-size: var(--font-size);
             pointer-events: none; white-space: nowrap;
             overflow: hidden; text-overflow: ellipsis;
