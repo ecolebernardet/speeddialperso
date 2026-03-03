@@ -190,16 +190,18 @@
             border-radius: 8px;
             border: 1.5px solid rgba(255,255,255,0.1);
             transition: border-color 0.2s;
-            pointer-events: none;
+            pointer-events: none; display: block;
         }
         .color-swatch-wrap:hover .color-swatch-preview { border-color: rgba(56,189,248,0.4); }
         .color-trio-label {
             font-size: 9px; font-family: 'DM Mono', monospace;
             color: rgba(255,255,255,0.35); line-height: 1;
+            text-align: center; width: 100%;
         }
         .color-trio-name {
             font-size: 10px; font-family: 'DM Sans', sans-serif;
             color: rgba(255,255,255,0.5); font-weight: 500;
+            text-align: center; width: 100%;
         }
 
         /* STEPPER PAIR — 2 steppers côte à côte */
@@ -222,7 +224,7 @@
             display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
         }
         .btn-grid .btn { margin-bottom: 0; padding: 9px 10px; font-size: 12px; }
-        .btn-grid .btn-bookmarks { grid-column: 1 / -1; }
+        .btn-grid .btn-export, .btn-grid .btn-import { grid-column: auto; }
 
         /* CONTROL GROUP */
         .control-group { margin-bottom: 12px; }
@@ -249,31 +251,6 @@
             background: rgba(56,189,248,0.04);
         }
         .control-group select option { background: #0f172a; }
-
-        /* COLOR PICKER ROW */
-        .color-row {
-            display: flex; align-items: center; gap: 10px;
-        }
-        .color-swatch-wrap {
-            position: relative; flex-shrink: 0;
-        }
-        .color-swatch-wrap input[type="color"] {
-            position: absolute; inset: 0; opacity: 0;
-            width: 100%; height: 100%; cursor: pointer;
-        }
-        .color-swatch-preview {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.1);
-            transition: border-color 0.2s;
-            pointer-events: none;
-        }
-        .color-swatch-wrap:hover .color-swatch-preview { border-color: rgba(56,189,248,0.4); }
-        .color-label-val {
-            flex: 1;
-            font-size: 12px; font-family: 'DM Mono', monospace;
-            color: rgba(255,255,255,0.5);
-        }
 
         /* STEPPER — Modern */
         .stepper {
