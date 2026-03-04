@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Speed Dial Perso",
-  "version": "3.1",
+  "version": "3.5",
   "description": "Mon nouvel onglet personnalisé avec gestion de dossiers.",
   "permissions": ["storage"],
   "background": {
@@ -23,6 +23,6 @@
     "newtab": "index.html"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

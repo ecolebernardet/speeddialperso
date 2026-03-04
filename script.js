@@ -103,7 +103,23 @@ function changeGridSetting(field, delta) {
     // Mettre à jour le stepper affiché
     if (field === 'colsInput') { const el = document.getElementById('stepperColsVal'); if (el) el.textContent = newVal; }
     if (field === 'rowsInput') { const el = document.getElementById('stepperRowsVal'); if (el) el.textContent = newVal; }
+    if (field === 'gapInput')  { const el = document.getElementById('stepperGapVal');  if (el) el.textContent = newVal; }
+    if (field === 'fontInput') { const el = document.getElementById('stepperFontVal'); if (el) el.textContent = newVal; }
     inputGridParams();
+}
+
+function changeFolderSetting(field, delta) {
+    const folder = tilesData[activeFolderCoords];
+    if (!folder) return;
+    const input = document.getElementById(field);
+    if (!input) return;
+    const minVal = field === "fGap" ? 0 : 1;
+    const newVal = Math.max(minVal, (parseInt(input.value) || minVal) + delta);
+    input.value = newVal;
+    updateFolderSettings();
+    const map = { fCols: "ftmColsVal", fRows: "ftmRowsVal", fGap: "ftmGapVal" };
+    const el = document.getElementById(map[field]);
+    if (el) el.textContent = newVal;
 }
 
 function saveToLocal() {
@@ -155,8 +171,12 @@ function init() {
         document.getElementById('tileColorInput').value = config.tileBgColor;
         const sc = document.getElementById('stepperColsVal');
         const sr = document.getElementById('stepperRowsVal');
+        const sg = document.getElementById('stepperGapVal');
+        const sf = document.getElementById('stepperFontVal');
         if (sc) sc.textContent = config.cols;
         if (sr) sr.textContent = config.rows;
+        if (sg) sg.textContent = config.gap;
+        if (sf) sf.textContent = config.fontSize;
         document.getElementById('folderTileColorInput').value = config.folderTileBgColor;
         document.body.style.backgroundColor = config.bgColor;
     }
@@ -171,12 +191,6 @@ function renderGrid() {
     document.documentElement.style.setProperty('--rows', config.rows);
     document.documentElement.style.setProperty('--gap', config.gap + 'px');
 
-    // Sur mobile : calcule une hauteur fixe par ligne pour que toutes les lignes soient visibles
-    if (window.innerWidth <= 600) {
-        const availH = window.innerHeight - 80 - 20 - (config.gap * (config.rows - 1));
-        const rowH = Math.max(60, Math.floor(availH / config.rows));
-        document.documentElement.style.setProperty('--row-height', rowH + 'px');
-    }
     document.documentElement.style.setProperty('--font-size', config.fontSize + 'px');
     document.body.style.fontFamily = config.fontFamily;
     document.documentElement.style.setProperty('--tile-bg', config.tileBgColor);
@@ -245,127 +259,7 @@ function createTile(coords, data, isMain) {
         }
     });
 
-    // --- TOUCH : long press (édition) + drag tactile avec clone flottant ---
-    if (data) {
-        let longPressTimer = null;
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let longPressFired = false;
-        let touchDragStarted = false;
-        let touchClone = null;
-
-        div.addEventListener('touchstart', (e) => {
-            longPressFired = false;
-            touchDragStarted = false;
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-
-            longPressTimer = setTimeout(() => {
-                longPressFired = true;
-                if (navigator.vibrate) navigator.vibrate(40);
-                openTileActionsModal(coords);
-            }, 500);
-        }, { passive: false });
-
-        div.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const dx = touch.clientX - touchStartX;
-            const dy = touch.clientY - touchStartY;
-
-            if (!touchDragStarted && !longPressFired && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
-                touchDragStarted = true;
-                draggedCoords = coords;
-                draggedFromFolder = !isMain;
-
-                const rect = div.getBoundingClientRect();
-                touchClone = div.cloneNode(true);
-                touchClone.style.cssText = `
-                    position: fixed;
-                    width: ${rect.width}px;
-                    height: ${rect.height}px;
-                    left: ${rect.left}px;
-                    top: ${rect.top}px;
-                    opacity: 0.8;
-                    pointer-events: none;
-                    z-index: 9999;
-                    border-radius: 12px;
-                    transform: scale(1.1);
-                    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-                    transition: none;
-                `;
-                document.body.appendChild(touchClone);
-                div.style.opacity = '0.3';
-            }
-
-            if (touchDragStarted && touchClone) {
-                e.preventDefault();
-                const t = e.touches[0];
-                const cRect = touchClone.getBoundingClientRect();
-                touchClone.style.left = (t.clientX - cRect.width / 2) + 'px';
-                touchClone.style.top  = (t.clientY - cRect.height / 2) + 'px';
-
-                document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
-                const hovered = getTileElementAtPoint(t.clientX, t.clientY, div);
-                if (hovered) hovered.classList.add('drag-over');
-            }
-        }, { passive: false });
-
-        div.addEventListener('touchend', (e) => {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-
-            if (longPressFired) {
-                longPressFired = false;
-                return;
-            }
-
-            if (touchDragStarted) {
-                if (touchClone) { touchClone.remove(); touchClone = null; }
-                div.style.opacity = '';
-                document.querySelectorAll('.tile').forEach(tl => tl.classList.remove('drag-over'));
-
-                const touch = e.changedTouches[0];
-                const tx = touch.clientX;
-                const ty = touch.clientY;
-
-                if (!isMain) {
-                    // === Drag depuis l'intérieur d'un dossier ===
-                    const popup = document.getElementById('folderPopup');
-                    const popupRect = popup ? popup.getBoundingClientRect() : null;
-                    const isOutside = popupRect && (
-                        tx < popupRect.left || tx > popupRect.right ||
-                        ty < popupRect.top  || ty > popupRect.bottom
-                    );
-
-                    if (isOutside) {
-                        const toCoords = getTileCoordsAtPoint(tx, ty, 'main');
-                        if (toCoords !== null) {
-                            handleDropMain(toCoords);
-                            closeFolder();
-                        }
-                    } else {
-                        const toCoords = getTileCoordsAtPoint(tx, ty, 'folder');
-                        if (toCoords !== null && toCoords !== coords) {
-                            handleDropFolder(toCoords);
-                        }
-                    }
-                } else {
-                    // === Drag depuis la grille principale ===
-                    const toCoords = getTileCoordsAtPoint(tx, ty, 'main');
-                    if (toCoords !== null && toCoords !== coords) {
-                        handleDropMain(toCoords);
-                    }
-                }
-
-                touchDragStarted = false;
-                draggedCoords = null;
-            }
-        }, { passive: false });
-    }
-
-    // Logique de Drag & Drop souris desktop (inchangée)
+    // Logique de Drag & Drop souris desktop
     div.addEventListener('dragstart', (e) => { draggedCoords = coords; draggedFromFolder = !isMain; div.classList.add('dragging'); e.dataTransfer.setData('text/plain', coords); });
     div.addEventListener('dragend', () => { div.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t => t.classList.remove('drag-over')); });
     div.addEventListener('dragover', (e) => { e.preventDefault(); if(coords !== draggedCoords) div.classList.add('drag-over'); });
@@ -435,10 +329,6 @@ function openFolder(coords) {
     fPopup.style.opacity = "1";
     fPopup.style.transform = "scale(1)";
 
-    if (window.innerWidth < 600) {
-        document.body.style.overflow = 'hidden';
-    }
-
     fPopup.style.display = "flex";
     fPopup.style.flexDirection = "column";
 
@@ -446,21 +336,19 @@ function openFolder(coords) {
     document.getElementById('fRows').value = folder.fConfig.rows;
     document.getElementById('fGap').value = folder.fConfig.gap;
     document.getElementById('fPopBg').value = folder.fConfig.fBgColor;
-    const ftmCols = document.getElementById('ftmColsVal');
-    const ftmRows = document.getElementById('ftmRowsVal');
-    if (ftmCols) ftmCols.textContent = folder.fConfig.cols;
-    if (ftmRows) ftmRows.textContent = folder.fConfig.rows;
+    const scf=document.getElementById('ftmColsVal'); if(scf) scf.textContent=folder.fConfig.cols;
+    const srf=document.getElementById('ftmRowsVal'); if(srf) srf.textContent=folder.fConfig.rows;
+    const sgf=document.getElementById('ftmGapVal');  if(sgf) sgf.textContent=folder.fConfig.gap;
     
     const itemsKeys = Object.keys(folder.items || {});
     let maxR = folder.fConfig.rows - 1;
     itemsKeys.forEach(key => { const [c, r] = key.split('-').map(Number); if (r > maxR) maxR = r; });
     const displayRows = Math.max(folder.fConfig.rows, maxR + 1);
 
-    const isMobile = window.innerWidth < 600;
-    const colWidth = isMobile ? 80 : 100;
+    const colWidth = 100;
 
     fGrid.style.display = 'grid';
-fGrid.style.gridTemplateColumns = isMobile ? `repeat(${folder.fConfig.cols}, 1fr)` : `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
+fGrid.style.gridTemplateColumns = `repeat(${folder.fConfig.cols}, ${colWidth}px)`;
 document.documentElement.style.setProperty('--fcols', folder.fConfig.cols);
 fGrid.style.gap = `${folder.fConfig.gap}px`;
 fPopup.style.backgroundColor = folder.fConfig.fBgColor;
@@ -470,13 +358,6 @@ fGrid.style.overflowY = 'auto';
 fGrid.style.maxHeight = 'calc(80vh - 100px)'; // Réserve de la place pour la toolbar et le bouton fermer
 fGrid.innerHTML = '';
     
-    if (isMobile) {
-        fPopup.style.position = "fixed";
-        fPopup.style.left = "5vw";
-        fPopup.style.top = "10vh";
-        fPopup.style.width = "90vw";
-        fPopup.style.margin = "0";
-    } else {
         const originTile = document.getElementById(`tile-${coords}`);
         if (originTile) {
             const rect = originTile.getBoundingClientRect();
@@ -524,7 +405,6 @@ fGrid.innerHTML = '';
                 fPopup.style.top = `${posY}px`;
             });
         }
-    }
 
     if (!folder.items) folder.items = {};
     for(let r=0; r < displayRows; r++) {
@@ -568,40 +448,14 @@ function closeFolder() {
 
 function updateFolderSettings() {
     const folder = tilesData[activeFolderCoords];
-    const newCols = parseInt(document.getElementById('fCols').value) || 1;
-    const newRows = parseInt(document.getElementById('fRows').value) || 1;
-
     folder.fConfig = {
-        cols: newCols,
-        rows: newRows,
+        cols: parseInt(document.getElementById('fCols').value) || 1,
+        rows: parseInt(document.getElementById('fRows').value) || 1,
         gap: parseInt(document.getElementById('fGap').value) || 0,
         fBgColor: document.getElementById('fPopBg').value
     };
-
-    // Met à jour la variable CSS pour le mobile
-    document.documentElement.style.setProperty('--fcols', newCols);
-
-    // Redessine uniquement la grille sans recalculer displayRows dynamiquement
-    const fGrid = document.getElementById('folderGrid');
-    const fPopup = document.getElementById('folderPopup');
-    const isMobile = window.innerWidth < 600;
-    const colWidth = isMobile ? 80 : 100;
-
-    fGrid.style.gridTemplateColumns = isMobile
-        ? `repeat(${newCols}, 1fr)`
-        : `repeat(${newCols}, ${colWidth}px)`;
-    fGrid.style.gap = `${folder.fConfig.gap}px`;
-    fPopup.style.backgroundColor = folder.fConfig.fBgColor;
-
-    fGrid.innerHTML = '';
-    if (!folder.items) folder.items = {};
-    for (let r = 0; r < newRows; r++) {
-        for (let c = 0; c < newCols; c++) {
-            const fCoords = `${c}-${r}`;
-            fGrid.appendChild(createTile(fCoords, folder.items[fCoords], false));
-        }
-    }
-
+    document.documentElement.style.setProperty('--fcols', folder.fConfig.cols);
+    openFolder(activeFolderCoords);
     saveToLocal();
 }
 
@@ -632,19 +486,6 @@ function getTileCoordsAtPoint(x, y, mode) {
         }
     }
     return null;
-}
-
-function changeFolderSetting(field, delta) {
-    const folder = tilesData[activeFolderCoords];
-    if (!folder) return;
-    const input = document.getElementById(field);
-    if (!input) return;
-    const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
-    input.value = newVal;
-    updateFolderSettings();
-    // Mettre à jour les compteurs de la barre mobile
-    if (field === 'fCols') { const el = document.getElementById('ftmColsVal'); if (el) el.textContent = newVal; }
-    if (field === 'fRows') { const el = document.getElementById('ftmRowsVal'); if (el) el.textContent = newVal; }
 }
 
 function handleDropMain(to) {
