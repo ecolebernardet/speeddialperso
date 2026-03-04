@@ -340,8 +340,10 @@
         #searchOverlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.88); z-index: 9000;
-            align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+            align-items: flex-start; justify-content: flex-start; flex-direction: column; gap: 16px;
+            padding-top: 48px;
         }
+        #searchOverlay > * { align-self: center; }
         #searchOverlay.active { display: flex; }
         .search-bar{ width: 88vw; max-width: 420px; display: flex; align-items: center; box-sizing: border-box;
 		  background: #1e293b; border-radius: 30px; border: 2px solid var(--accent); padding: 10px 16px; gap: 10px; }
