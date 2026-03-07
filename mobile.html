@@ -397,26 +397,26 @@
         }
         #folderGrid {
             display: grid; grid-template-columns: repeat(var(--fcols, 3), 1fr);
-            /* hauteur fixe par ligne : les images ne peuvent pas faire grandir la grille */
-            grid-auto-rows: 72px;
             gap: 8px; padding: 8px;
             max-height: calc(100dvh - var(--footer-h) - 36px - 20px - 90px);
             overflow-y: auto;
             min-height: 0;
         }
-        /* Tuiles dans le dossier : hauteur fixe pour éviter le redimensionnement au chargement des images */
+        /* Tuiles dans le dossier : carrées, label à l'intérieur */
         #folderGrid .tile {
-            height: 72px;
-            overflow: visible; /* label dépasse en dessous, ne pas couper */
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            padding-bottom: 16px; /* espace pour le label en bas */
         }
         #folderGrid .tile img {
-            height: 75%;
+            height: 65%;
             width: auto;
-            max-width: 75%;
-            margin-bottom: 18px;
+            max-width: 70%;
+            margin-bottom: 0;
         }
         #folderGrid .tile-label {
             font-size: max(11px, var(--font-size));
+            bottom: 2px; /* label dans le container */
         }
         .folder-toolbar { display: none; }
         .folder-toolbar-mobile { display: flex; justify-content: center; gap: 20px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; }
