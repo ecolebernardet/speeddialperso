@@ -372,12 +372,21 @@
         #folderOverlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             backdrop-filter: blur(2px); display: none; z-index: 2500;
-            align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px 0;
+            justify-content: center; align-items: flex-start;
+            /* padding-top pour le bouton fermer qui dépasse, padding-bottom pour le footer */
+            padding: 20px 16px calc(var(--footer-h) + 16px);
+            box-sizing: border-box;
+            overflow-y: auto;
         }
         #folderPopup {
             background: var(--sidebar-bg); border-radius: 18px; border: 2px solid var(--accent);
             padding: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-            position: relative; width: 90vw; max-width: 420px; display: flex; flex-direction: column;
+            position: relative; width: 90vw; max-width: 420px;
+            display: flex; flex-direction: column;
+            /* overflow visible pour que le bouton fermer ne soit pas coupé */
+            overflow: visible;
+            /* flex-shrink:0 pour que le popup ne soit pas écrasé par le flexbox */
+            flex-shrink: 0;
         }
         #closeFolderBtn {
             position: absolute; top: -14px; right: -14px; width: 30px; height: 30px;
@@ -388,7 +397,26 @@
         }
         #folderGrid {
             display: grid; grid-template-columns: repeat(var(--fcols, 3), 1fr);
-            gap: 8px; padding: 8px; max-height: 65vh; overflow-y: auto;
+            /* hauteur fixe par ligne : les images ne peuvent pas faire grandir la grille */
+            grid-auto-rows: 72px;
+            gap: 8px; padding: 8px;
+            max-height: calc(100dvh - var(--footer-h) - 36px - 20px - 90px);
+            overflow-y: auto;
+            min-height: 0;
+        }
+        /* Tuiles dans le dossier : hauteur fixe pour éviter le redimensionnement au chargement des images */
+        #folderGrid .tile {
+            height: 72px;
+            overflow: visible; /* label dépasse en dessous, ne pas couper */
+        }
+        #folderGrid .tile img {
+            height: 75%;
+            width: auto;
+            max-width: 75%;
+            margin-bottom: 18px;
+        }
+        #folderGrid .tile-label {
+            font-size: max(11px, var(--font-size));
         }
         .folder-toolbar { display: none; }
         .folder-toolbar-mobile { display: flex; justify-content: center; gap: 20px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 8px; }
