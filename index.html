@@ -407,8 +407,7 @@
                     <div class="color-item">
                         <div class="color-swatch-wrap">
                             <div class="color-swatch-preview" id="previewBg" style="background:#000000;"></div>
-                            <input type="color" id="bgInput" value="#000000"
-                                oninput="document.getElementById('previewBg').style.background=this.value; document.getElementById('hexBg').textContent=this.value.toUpperCase();">
+                            <input type="color" id="bgInput" value="#000000">
                         </div>
                         <span class="color-trio-label" id="hexBg">#000000</span>
                         <span class="color-trio-name">Fond</span>
@@ -416,8 +415,7 @@
                     <div class="color-item">
                         <div class="color-swatch-wrap">
                             <div class="color-swatch-preview" id="previewTile" style="background:#000000;"></div>
-                            <input type="color" id="tileColorInput" value="#000000"
-                                oninput="document.getElementById('previewTile').style.background=this.value; document.getElementById('hexTile').textContent=this.value.toUpperCase();">
+                            <input type="color" id="tileColorInput" value="#000000">
                         </div>
                         <span class="color-trio-label" id="hexTile">#000000</span>
                         <span class="color-trio-name">Liens</span>
@@ -425,8 +423,7 @@
                     <div class="color-item">
                         <div class="color-swatch-wrap">
                             <div class="color-swatch-preview" id="previewFolder" style="background:#ffd43b;"></div>
-                            <input type="color" id="folderTileColorInput" value="#ffd43b"
-                                oninput="document.getElementById('previewFolder').style.background=this.value; document.getElementById('hexFolder').textContent=this.value.toUpperCase();">
+                            <input type="color" id="folderTileColorInput" value="#ffd43b">
                         </div>
                         <span class="color-trio-label" id="hexFolder">#FFD43B</span>
                         <span class="color-trio-name">Dossiers</span>
@@ -441,22 +438,22 @@
                     <div class="stepper-pair-item">
                         <div class="stepper-pair-label">Colonnes</div>
                         <div class="stepper stepper-sm">
-                            <button class="stepper-btn" onclick="changeGridSetting('colsInput', -1)">−</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="colsInput" data-delta="-1">−</button>
                             <div class="stepper-track">
                                 <span class="stepper-val" id="stepperColsVal">4</span>
                             </div>
-                            <button class="stepper-btn" onclick="changeGridSetting('colsInput', +1)">+</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="colsInput" data-delta="1">+</button>
                             <input type="number" id="colsInput" min="1" style="display:none">
                         </div>
                     </div>
                     <div class="stepper-pair-item">
                         <div class="stepper-pair-label">Lignes</div>
                         <div class="stepper stepper-sm">
-                            <button class="stepper-btn" onclick="changeGridSetting('rowsInput', -1)">−</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="rowsInput" data-delta="-1">−</button>
                             <div class="stepper-track">
                                 <span class="stepper-val" id="stepperRowsVal">4</span>
                             </div>
-                            <button class="stepper-btn" onclick="changeGridSetting('rowsInput', +1)">+</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="rowsInput" data-delta="1">+</button>
                             <input type="number" id="rowsInput" min="1" style="display:none">
                         </div>
                     </div>
@@ -465,22 +462,22 @@
                     <div class="stepper-pair-item">
                         <div class="stepper-pair-label">Espacement (px)</div>
                         <div class="stepper stepper-sm">
-                            <button class="stepper-btn" onclick="changeGridSetting('gapInput', -1)">−</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="gapInput" data-delta="-1">−</button>
                             <div class="stepper-track">
                                 <span class="stepper-val" id="stepperGapVal">15</span>
                             </div>
-                            <button class="stepper-btn" onclick="changeGridSetting('gapInput', +1)">+</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="gapInput" data-delta="1">+</button>
                             <input type="number" id="gapInput" min="0" style="display:none">
                         </div>
                     </div>
                     <div class="stepper-pair-item">
                         <div class="stepper-pair-label">Police (px)</div>
                         <div class="stepper stepper-sm">
-                            <button class="stepper-btn" onclick="changeGridSetting('fontInput', -1)">−</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="fontInput" data-delta="-1">−</button>
                             <div class="stepper-track">
                                 <span class="stepper-val" id="stepperFontVal">12</span>
                             </div>
-                            <button class="stepper-btn" onclick="changeGridSetting('fontInput', +1)">+</button>
+                            <button class="stepper-btn" data-action="changeGrid" data-field="fontInput" data-delta="1">+</button>
                             <input type="number" id="fontInput" min="6" style="display:none">
                         </div>
                     </div>
@@ -556,27 +553,27 @@
                 <div class="folder-toolbar-item">
                     <label>Colonnes</label>
                     <div class="stepper stepper-sm">
-                        <button class="stepper-btn" onclick="changeFolderSetting('fCols', -1)">&#x2212;</button>
+                        <button class="stepper-btn" data-action="changeFolder" data-field="fCols" data-delta="-1">&#x2212;</button>
                         <span class="stepper-val" id="ftmColsVal">3</span>
-                        <button class="stepper-btn" onclick="changeFolderSetting('fCols', +1)">+</button>
+                        <button class="stepper-btn" data-action="changeFolder" data-field="fCols" data-delta="1">+</button>
                     </div>
                     <input type="number" id="fCols" min="1" style="display:none">
                 </div>
                 <div class="folder-toolbar-item">
                     <label>Lignes</label>
                     <div class="stepper stepper-sm">
-                        <button class="stepper-btn" onclick="changeFolderSetting('fRows', -1)">&#x2212;</button>
+                        <button class="stepper-btn" data-action="changeFolder" data-field="fRows" data-delta="-1">&#x2212;</button>
                         <span class="stepper-val" id="ftmRowsVal">3</span>
-                        <button class="stepper-btn" onclick="changeFolderSetting('fRows', +1)">+</button>
+                        <button class="stepper-btn" data-action="changeFolder" data-field="fRows" data-delta="1">+</button>
                     </div>
                     <input type="number" id="fRows" min="1" style="display:none">
                 </div>
                 <div class="folder-toolbar-item">
                     <label>Espacement</label>
                     <div class="stepper stepper-sm">
-                        <button class="stepper-btn" onclick="changeFolderSetting('fGap', -1)">&#x2212;</button>
+                        <button class="stepper-btn" data-action="changeFolder" data-field="fGap" data-delta="-1">&#x2212;</button>
                         <span class="stepper-val" id="ftmGapVal">10</span>
-                        <button class="stepper-btn" onclick="changeFolderSetting('fGap', +1)">+</button>
+                        <button class="stepper-btn" data-action="changeFolder" data-field="fGap" data-delta="1">+</button>
                     </div>
                     <input type="number" id="fGap" min="0" style="display:none">
                 </div>

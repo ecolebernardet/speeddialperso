@@ -892,6 +892,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     listen('btn-menu', 'click', toggleMenu);
     listen('btn-close-sidebar', 'click', toggleMenu);
     listen('overlay', 'click', toggleMenu);
+    // Listeners pour les steppers (remplace les onclick= inline bloqués par la CSP)
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        if (btn.dataset.action === 'changeGrid') {
+            changeGridSetting(btn.dataset.field, parseInt(btn.dataset.delta));
+        } else if (btn.dataset.action === 'changeFolder') {
+            changeFolderSetting(btn.dataset.field, parseInt(btn.dataset.delta));
+        }
+    });
+
+    // Listeners pour les swatches couleur (remplace les oninput= inline bloqués par la CSP)
+    const bgInput = document.getElementById('bgInput');
+    if (bgInput) bgInput.addEventListener('input', function() {
+        document.getElementById('previewBg').style.background = this.value;
+        document.getElementById('hexBg').textContent = this.value.toUpperCase();
+    });
+    const tileColorInput = document.getElementById('tileColorInput');
+    if (tileColorInput) tileColorInput.addEventListener('input', function() {
+        document.getElementById('previewTile').style.background = this.value;
+        document.getElementById('hexTile').textContent = this.value.toUpperCase();
+    });
+    const folderTileColorInput = document.getElementById('folderTileColorInput');
+    if (folderTileColorInput) folderTileColorInput.addEventListener('input', function() {
+        document.getElementById('previewFolder').style.background = this.value;
+        document.getElementById('hexFolder').textContent = this.value.toUpperCase();
+    });
+
     listen('bgInput', 'input', updateGridParams);
     listen('tileColorInput', 'input', inputGridParams);
     listen('folderTileColorInput', 'input', inputGridParams);
