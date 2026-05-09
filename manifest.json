@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Speed Dial Perso",
-  "version": "3.5",
+  "version": "3.8",
   "description": "Mon nouvel onglet personnalisé avec gestion de dossiers.",
   "permissions": ["storage"],
   "background": {
