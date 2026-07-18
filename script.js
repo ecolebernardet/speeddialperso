@@ -209,6 +209,24 @@ function createTile(coords, data, isMain) {
             div.innerHTML = `<img src="${icon}"><div class="tile-label">${data.name}</div>`;
             div.addEventListener('click', (e) => { e.stopPropagation(); window.open(data.url, '_blank'); });
         }
+
+        // --- Bouton dédié éditer/supprimer, toujours visible, indépendant du drag ---
+        const editBtn = document.createElement('div');
+        editBtn.className = 'tile-edit-btn';
+        editBtn.textContent = '⋮';
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openTileActionsModal(coords);
+        });
+        // Empêche ce bouton de déclencher le drag / l'ouverture du lien au toucher
+        editBtn.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+        editBtn.addEventListener('touchmove', (e) => { e.stopPropagation(); }, { passive: true });
+        editBtn.addEventListener('touchend', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            openTileActionsModal(coords);
+        });
+        div.appendChild(editBtn);
     } else {
         div.innerHTML = ''; 
         div.addEventListener('click', (e) => {
@@ -247,31 +265,19 @@ function createTile(coords, data, isMain) {
         }
     });
 
-    // --- TOUCH : long press (édition) + drag tactile avec clone flottant ---
+    // --- TOUCH : drag tactile avec clone flottant (l'édition/suppression passe désormais par le bouton ⋮) ---
     if (data) {
-        let longPressTimer = null;
         let touchStartX = 0;
         let touchStartY = 0;
-        let touchStartTime = 0;
-        let longPressFired = false;
         let touchDragStarted = false;
         let touchClone = null;
 
-        const MOVE_THRESHOLD = 12;   // tolérance avant de considérer que c'est un drag
-        const GRACE_PERIOD_MS = 150; // pendant ce laps de temps, on ignore les micro-mouvements (tremblement du doigt)
+        const MOVE_THRESHOLD = 12; // tolérance avant de considérer que c'est un drag
 
         div.addEventListener('touchstart', (e) => {
-            longPressFired = false;
             touchDragStarted = false;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
-            touchStartTime = Date.now();
-
-            longPressTimer = setTimeout(() => {
-                longPressFired = true;
-                if (navigator.vibrate) navigator.vibrate(40);
-                openTileActionsModal(coords);
-            }, 500);
         }, { passive: false });
 
         div.addEventListener('touchmove', (e) => {
@@ -279,15 +285,8 @@ function createTile(coords, data, isMain) {
             const dx = touch.clientX - touchStartX;
             const dy = touch.clientY - touchStartY;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            const elapsed = Date.now() - touchStartTime;
 
-            // Pendant la période de grâce, on ignore les petits mouvements pour ne pas
-            // annuler le long press à cause d'un léger tremblement du doigt.
-            const effectiveThreshold = elapsed < GRACE_PERIOD_MS ? MOVE_THRESHOLD * 2 : MOVE_THRESHOLD;
-
-            if (!touchDragStarted && !longPressFired && dist > effectiveThreshold) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
+            if (!touchDragStarted && dist > MOVE_THRESHOLD) {
                 touchDragStarted = true;
                 draggedCoords = coords;
                 draggedFromFolder = !isMain;
@@ -326,14 +325,6 @@ function createTile(coords, data, isMain) {
         }, { passive: false });
 
         div.addEventListener('touchend', (e) => {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-
-            if (longPressFired) {
-                longPressFired = false;
-                return;
-            }
-
             if (touchDragStarted) {
                 if (touchClone) { touchClone.remove(); touchClone = null; }
                 div.style.opacity = '';

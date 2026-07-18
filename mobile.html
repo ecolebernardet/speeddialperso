@@ -70,6 +70,15 @@
             overflow: hidden; text-overflow: ellipsis;
         }
         .tile.folder .tile-label { background: rgba(0,0,0,0); z-index: 3; }
+        .tile-edit-btn {
+            position: absolute; top: 2px; right: 2px; z-index: 10;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(0,0,0,0.55); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; line-height: 1;
+            cursor: pointer; touch-action: manipulation;
+        }
+        .tile-edit-btn:active { background: rgba(0,0,0,0.8); transform: scale(0.9); }
         .folder-icon-bg {
             position: absolute; width: auto; height: 100%; max-width: 100%;
             top: 0; left: 50%; transform: translateX(-50%); z-index: 1; pointer-events: none;
